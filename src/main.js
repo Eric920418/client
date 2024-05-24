@@ -15,7 +15,7 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 const app = createApp(App)
 
 app.config.globalProperties.$axios = axios.create({
-    baseURL: "https://140.138.147.12:3000"
+    baseURL: "http://140.138.147.12:3000"
 })
 app.use(VueCookies, { expire: '1d'})
 app.use(VueSweetalert2)
