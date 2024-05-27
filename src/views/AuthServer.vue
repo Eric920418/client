@@ -69,29 +69,48 @@ export default {
             .then( res => { 
                 this.token = res.data.user.token;
                 localStorage.setItem('token', this.token);
+                localStorage.setItem('identity', res.data.user.identity)
                 this.studentID = "";
                 this.password = "";
                 var storedToken = localStorage.getItem('token');
+                var storedIdentity = localStorage.getItem('identity');
 
                 if (storedToken) {
-                    const jwtParts = storedToken.split(".");
-                    const payload = JSON.parse(atob(jwtParts[1]));
-                    this.$cookies.set('id', payload.id)
-                    this.$cookies.set('name', payload.name)
-                    this.$swal.fire({
-                    title: '登入成功',
-                    text: '',
-                    icon: 'success',
-                    showCancelButton: true,
-                    confirmButtonText: '進入頁面',
-                    cancelButtonText: '關閉'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            this.$router.push('/home');
-                        } else if (result.isDismissed) {
-                            console.log('Modal closed')
-                        }
-                    })
+                    if(storedIdentity == 'admin'){
+                        this.$swal.fire({
+                        title: '登入成功',
+                        text: '老師您好',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: '進入頁面',
+                        cancelButtonText: '關閉'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.$router.push('/admin');
+                            } else if (result.isDismissed) {
+                                console.log('Modal closed')
+                            }
+                        })
+                    }else{
+                        const jwtParts = storedToken.split(".");
+                        const payload = JSON.parse(atob(jwtParts[1]));
+                        this.$cookies.set('id', payload.id)
+                        this.$cookies.set('name', payload.name)
+                        this.$swal.fire({
+                        title: '登入成功',
+                        text: '',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: '進入頁面',
+                        cancelButtonText: '關閉'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.$router.push('/home');
+                            } else if (result.isDismissed) {
+                                console.log('Modal closed')
+                            }
+                        })
+                    }   
                 } 
             })
 
