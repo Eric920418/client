@@ -15,6 +15,8 @@ import 'highlight.js/styles/default.css';
 
 
 const app = createApp(App)
+
+
 if (window.VueAdvancedChat) {
     app.component('VueAdvancedChat', window.VueAdvancedChat);
 }
