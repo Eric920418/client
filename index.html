@@ -12,7 +12,7 @@
     <script type="module" src="/src/main.js"></script>
   </body>
 
-  <style>
+<style>
 body {
     font-family: Arial, sans-serif;
     box-sizing: border-box;
@@ -20,6 +20,26 @@ body {
     color: #fff;
     margin: 0;
 }
+
+body::-webkit-scrollbar {
+  width: 0; 
+}
+
+body::-webkit-scrollbar-track {
+  background-color: transparent;
+}
 </style>
+
+<script>
+  function copyToClipboard(button) { 
+    const codeElement = button.nextElementSibling; 
+    const textarea = document.createElement('textarea'); 
+    textarea.value = codeElement.textContent; 
+    document.body.appendChild(textarea); 
+    textarea.select(); 
+    document.execCommand('copy'); 
+    document.body.removeChild(textarea); 
+  }
+</script>
 
 </html>
