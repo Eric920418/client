@@ -1,27 +1,35 @@
 <template>
   <div class="chat d-flex align-content-end flex-wrap bg-black" :class="{ 'chat-collapsed': isCollapsed }">
-    <label class="ms-1 mb-3" style="border-radius: 2% !important;">
+    <label class="ms-1 mb-1" style="border-radius: 2% !important;">
       <i class="fa-solid fa-comment-dots"></i> AI Chat
     </label>
-    <div class="ch w-100 m-1" ref="chat">
+    <div v-if="!thisLog" class="log w-100 " ref="log">
+      <div class="thisLog" v-for="(log, index) in log" :key="index" @click="checkLog(log)">
+        <div class=" my-3 px-2 d-flex justify-content-between align-items-center w-100">
+          <div>{{ log.title }}</div>
+          <div> {{ log.time }} </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="thisLog"  class="ch w-100 " ref="chat">
       <div v-for="(message, index) in chat" :key="index">
         <div class="m-1 d-flex justify-content-end" v-if="message.user">
           <div class="user-message">User: {{ message.user }}</div>
         </div>
         <div class="m-1 d-flex justify-content-start" v-if="message.ai">
-            
             <pre class="ai-message" v-html="renderMessage(message.ai)"></pre>
         </div>
       </div>
+      <div v-if="chatOpen" class="mt-auto w-100 position-relative pt-2 " ref="input">
+        <input class="w-100 form-control border-1" type="text" v-model="que" @keyup.enter="handleEnter">
+        <i class="bi bi-arrow-up-square-fill in position-absolute z-3 fs-3 mt-1" style="top: 0px; right: 5px;" @click="handleEnter"></i>
+      </div>
+      <div v-else class="mt-auto w-100 position-relative">
+        <input class="w-100 form-control border-0" type="text" v-model="que" @keyup.enter="handleEnter" disabled>
+        <i class="bi bi-arrow-up-square-fill in position-absolute z-3 fs-2 opacity-25" style="top: 0px; right: 5px;" @click="handleEnter"></i>
+      </div>
     </div>
-    <div v-if="chatOpen" class="mt-auto w-100 position-relative" ref="input">
-      <input class="w-100 form-control border-0" type="text" v-model="que" @keyup.enter="handleEnter">
-      <i class="bi bi-arrow-up-square-fill in position-absolute z-3 fs-2" style="top: -5px; right: 5px;" @click="handleEnter"></i>
-    </div>
-    <div v-else class="mt-auto w-100 position-relative">
-      <input class="w-100 form-control border-0" type="text" v-model="que" @keyup.enter="handleEnter" disabled>
-      <i class="bi bi-arrow-up-square-fill in position-absolute z-3 fs-2 opacity-25" style="top: -5px; right: 5px;" @click="handleEnter"></i>
-    </div>
+    
   </div>
 </template>
 
@@ -29,17 +37,7 @@
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
-
-function copyToClipboard(button) { 
-    const codeElement = button.nextElementSibling; 
-    const textarea = document.createElement('textarea'); 
-    textarea.value = codeElement.textContent; 
-    document.body.appendChild(textarea); 
-    textarea.select(); 
-    document.execCommand('copy'); 
-    document.body.removeChild(textarea); 
-    alert('Code copied to clipboard'); 
-  }
+import {action} from "../components/action.js"
 
 export default {
   props: ['isCollapsed'],
@@ -47,6 +45,17 @@ export default {
     return {
       que: '',
       chat: [],
+      log: [
+        {
+          title: 'New chat',
+          time: '',
+        },
+        {
+          title: 'chat2',
+          time: '2024/12/12',
+        }
+      ],
+      thisLog: null,
       chatOpen: true,
       isSubmitting: false,
     };
@@ -63,14 +72,24 @@ export default {
           this.chat.push({ ai: response.data.ai });
         } catch (err) {
           console.error('Failed to send/receive chat:', err);
-          this.chat.push({ ai: 'An error occurred. Please try again.' });
+          this.chat.push({ ai: '發生錯誤' });
         }
+        action.pushAction({
+          action: `發送問題 問題內容：${this.que}`,
+          timestamp: new Date().toLocaleString('zh-TW', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+          }).replace(/\//g, '-').replace(',', '')
+        });
         this.que = '';
       }
       this.isSubmitting = false;
       this.chatOpen = true;
     },
-
     renderMessage(message) { 
       const renderer = new marked.Renderer(); 
       renderer.code = (code, infostring, escaped) => { 
@@ -85,7 +104,9 @@ export default {
       }; 
       return marked(message, { renderer }); 
     },
-
+    checkLog(log) {
+      this.thisLog = log;
+    },
 
   },
   mounted() {
@@ -103,7 +124,6 @@ export default {
 
 <style scoped>
 .chat {
-  height: 100vh; /* 視窗的全高 */
   width: 100%; /* 預設寬度為 0，意味著視窗是隱藏的 */
   overflow: hidden; /* 隱藏超出容器的內容 */
   border-radius: 2%;
@@ -160,6 +180,11 @@ export default {
   border-radius: 20px;
   padding: 10px;
   margin-bottom: 10px;
+  white-space: pre-wrap; /* Allow text to wrap and handle line breaks */
+  word-break: break-word; /* Ensure long words break to avoid overflow */
 }
-
+.thisLog:hover {
+  background-color: #745959;
+  color: white;
+}  
 </style>

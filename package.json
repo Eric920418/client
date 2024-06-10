@@ -25,7 +25,8 @@
     "vue-bubble-chat": "^1.1.2",
     "vue-cookies": "^1.8.4",
     "vue-router": "^4.3.0",
-    "vue-sweetalert2": "^5.0.9"
+    "vue-sweetalert2": "^5.0.9",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

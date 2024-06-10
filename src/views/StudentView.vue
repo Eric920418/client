@@ -29,6 +29,31 @@
         </div>
         <div class="card shadow-lg mb-5">
             <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h5 class="card-title">動作紀錄</h5>
+                <button class="btn btn-success p-0 px-2" style="height: 25px; font-size: 11px;" @click="exportToExcel">匯出Excel</button>
+            </div>  
+            <div class="messages p-3 border rounded" style="height: 300px; overflow-y: scroll;">
+                <div v-for="(message, index) in data.action" :key="index" class="message mb-2">
+                    <hr class="bold">建立時間: {{ message.createAt }}
+                    <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
+                        <thead>
+                            <th class="fs-4 bold text-danger" scope="col">動作</th>
+                            <th class="fs-4 bold text-primary" scope="col">時間</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="action in message.actions.actions" :key="action">
+                                <td>{{ action.action }}</td>
+                                <td>{{ action.timestamp }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="card shadow-lg mb-5">
+            <div class="card-body">
             <h5 class="card-title">聊天記錄</h5>
             <div class="messages p-3 border rounded" style="height: 300px; overflow-y: scroll;">
                 <div v-for="(message, index) in chat" :key="index" class="message mb-2">
@@ -38,26 +63,26 @@
             </div>
         </div>
         <div v-if=" data.code" class="card shadow-lg mb-5">
-            <div class="card-body">
+            <div class="card-body code">
                 <h5 class="card-title">Code</h5>
                 <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
-                <thead>
-                <tr>
-                    <th scope="col">時間</th>
-                    <th scope="col">html</th>
-                    <th scope="col">css</th>
-                    <th scope="col">js</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(code, index) in data.code" :key="code._id">
-                    <td>{{ code.createdAt }}</td>
-                    <td class="sm" v-html="code.html"></td>
-                    <td class="sm" v-html="code.css"></td>
-                    <td class="sm" v-html="code.js"></td>
-                </tr>
-                </tbody>
-            </table>
+                    <thead>
+                    <tr>
+                        <th scope="col">時間</th>
+                        <th scope="col">html</th>
+                        <th scope="col">css</th>
+                        <th scope="col">js</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr  v-for="(code, index) in data.code" :key="code._id">
+                        <td>{{ code.createdAt }}</td>
+                        <td class="sm " v-html="code.html"></td>
+                        <td class="sm " v-html="code.css"></td>
+                        <td class="sm " v-html="code.js"></td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -66,6 +91,7 @@
 <script>
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
+import * as XLSX from 'xlsx';
 export default {
     props: ['id'],
     data() {
@@ -77,7 +103,8 @@ export default {
                 session: '',
                 password: '',
                 chat: [],
-                code: [] 
+                code: [],
+                action:[]
             },
         };
     },
@@ -129,6 +156,14 @@ export default {
         setCode(code) {
             return `<pre><code class="hljs">${hljs.highlightAuto(code).value}</code></pre>`;
         },
+        exportToExcel() {
+        /* 获取表格数据 */
+        const table = document.querySelector('.messages table');
+        const wb = XLSX.utils.table_to_book(table, {sheet: 'Sheet JS'});
+
+        /* 将Workbook对象保存为Excel文件 */
+        XLSX.writeFile(wb, 'exported_data.xlsx');
+        }
     },
     mounted() {
         const yourToken = localStorage.getItem('token');
@@ -143,13 +178,14 @@ export default {
                 this.data.session = res.data.data.session;
                 this.data.password = res.data.data.password;
                 this.data.chat = res.data.data.chat;
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        this.$axios.get(`/code/${this.studentID}`)
-            .then(res => {
-                res.data.data.forEach((item) => {
+                res.data.data.action.reverse().forEach((item) => {
+                    const action = {
+                        actions: item.actions,
+                        timestamp: item.timestamp
+                    };
+                    this.data.action.push({actions: action , createAt: item.createdAt});
+                });
+                res.data.data.code.reverse().forEach((item) => {
                     const code = {
                         html: this.setCode(item.html),
                         css: this.setCode(item.css),
@@ -160,9 +196,10 @@ export default {
                     this.data.code.push(code);
                 });
             })
-            .catch(err => {
-                console.log(err);
+            .catch(error => {
+                console.error(error);
             });
+
     }
 };
 </script>
@@ -170,5 +207,9 @@ export default {
 <style scoped>
 .code-block {
     white-space: pre-wrap;
+}
+.code{
+    height: 100vh;
+    overflow-x: hidden;
 }
 </style>
