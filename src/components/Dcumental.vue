@@ -1,23 +1,18 @@
 <template>
-    <button class="btn btn-danger m-3" @click="$router.push('/home')">返回</button>
-    <div class="container mt-2">
+    <div class="container mt-2" >
         <div class="card shadow-lg mb-5">
-            <div class="card-body">
-                <h5 class="card-title text-primary">編譯紀錄</h5>
-            </div>
-
             <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
                 <thead>
                 <tr>
-                    <th scope="col">時間</th>
-                    <th scope="col">html</th>
-                    <th scope="col">css</th>
-                    <th scope="col">js</th>
+                    <th class="text-center" style="width: 170px;" scope="col">時間<p class="text-danger m-0">(點擊時間載入程式碼)</p></th>
+                    <th class="text-center" scope="col">html</th>
+                    <th class="text-center" scope="col">css</th>
+                    <th class="text-center" scope="col">js</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(code, index) in code" :key="code._id" @click="goToDemo(this.beginCode[index])">
-                    <td>{{ code.createdAt }}</td>
+                <tr v-for="(code, index) in code" :key="code._id"  title="點擊時間載入程式碼" >
+                    <td @click="goToDemo(this.beginCode[index])">{{ code.createdAt }}</td>
                     <td class="sm" v-html="code.html"></td>
                     <td class="sm" v-html="code.css"></td>
                     <td class="sm" v-html="code.js"></td>
@@ -31,8 +26,9 @@
 <script>
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
-import {sharedCode} from "../components/sharedCode.js"
+import {action} from "../components/action.js"
 export default {
+
     data() {
         return {
             code: [],
@@ -49,12 +45,18 @@ export default {
             return `<pre><code class="hljs">${hljs.highlightAuto(code).value}</code></pre>`;
         },
         goToDemo(code) {
-            sharedCode.setCode({
-                html: code.html,
-                css: code.css,
-                js: code.js
+            action.pushAction({
+                action: `讀取了${code.createdAt}這個時間儲存的程式碼`,
+                timestamp: new Date().toLocaleString('zh-TW', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }).replace(/\//g, '-').replace(',', '')
             });
-            this.$router.push('/home');
+            this.$emit('go-to-demo', code); 
         }
     },
     mounted() {
@@ -71,7 +73,8 @@ export default {
                     const beginCode = {
                         html: item.html,
                         css: item.css,
-                        js: item.js
+                        js: item.js,
+                        createdAt: item.createdAt
                     };
                     this.beginCode.push(beginCode);
                     this.code.push(code);
@@ -99,4 +102,10 @@ export default {
     background-color: #f5f5f5;;
     font-size: 30px;
 }
+
+.doc-collapsed {
+  width: 0;
+  overflow: hidden;
+}
+
 </style>
