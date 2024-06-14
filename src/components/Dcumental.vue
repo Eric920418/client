@@ -1,6 +1,7 @@
 <template>
     <div class="container mt-2" >
         <div class="card shadow-lg mb-5">
+            <button class="btn btn-danger ms-auto" style="width: 50px;" @click="closeModel">X</button>
             <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
                 <thead>
                 <tr>
@@ -57,6 +58,9 @@ export default {
                 }).replace(/\//g, '-').replace(',', '')
             });
             this.$emit('go-to-demo', code); 
+        },
+        closeModel() {
+            this.$emit('close-model');
         }
     },
     mounted() {

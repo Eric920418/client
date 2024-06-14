@@ -1,7 +1,7 @@
 <template>
   <div class="chat d-flex align-content-end flex-wrap bg-black" :class="{ 'chat-collapsed': isCollapsed }">
-    <label class="ms-1 mb-1" style="border-radius: 2% !important;">
-      <i class="fa-solid fa-comment-dots"></i> AI Chat
+    <label class="ms-1 mb-1 w-100" >
+      <i class="fa-solid fa-comment-dots"></i> AI Chat <button v-if="thisLog" class="btn btn-sm btn-outline-secondary float-end" @click="saveChat">返回</button>
     </label>
     <div v-if="!thisLog" class="log w-100 " ref="log">
       <div class="thisLog" v-for="(log, index) in log" :key="index" @click="checkLog(log)">
@@ -11,7 +11,7 @@
         </div>
       </div>
     </div>
-    <div v-if="thisLog"  class="ch w-100 " ref="chat">
+    <div v-else class="ch w-100 " ref="chat">
       <div v-for="(message, index) in chat" :key="index">
         <div class="m-1 d-flex justify-content-end" v-if="message.user">
           <div class="user-message">User: {{ message.user }}</div>
@@ -44,16 +44,21 @@ export default {
   data() {
     return {
       que: '',
+      allChat: [],
       chat: [],
       log: [
         {
-          title: 'New chat',
-          time: '',
+          title: '新對話',
+          time: new Date().toLocaleString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }).replace(/\//g, '-').replace(/,/, ''),
+          dialogues: [],
         },
-        {
-          title: 'chat2',
-          time: '2024/12/12',
-        }
       ],
       thisLog: null,
       chatOpen: true,
@@ -104,21 +109,55 @@ export default {
       }; 
       return marked(message, { renderer }); 
     },
+    getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        },
     checkLog(log) {
       this.thisLog = log;
+      this.chat = log.dialogues;
+      action.pushAction({
+            action:`載入${log.time}這個時間點的對話 標題：${log.title}`,
+            timestamp: new Date().toLocaleString('zh-TW', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            }).replace(/\//g, '-').replace(',', '')
+      });
     },
-
+    saveChat(){
+        let userId = this.getCookie('id');
+        this.$axios.post('/chat/dialogue', {dialogues: this.chat, user: userId})
+        .then((res) => {
+          window.location.reload();
+        });
+        this.thisLog = null;
+    }
   },
   mounted() {
-    this.$nextTick(() => {
-      this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight;
+
+    let userId = this.getCookie('id');
+    this.$axios.get(`/chat/dialogue/${userId}`)
+    .then((res) => {
+      res.data.data.forEach((data) => {
+          let log = {
+            title: '',
+            time: '',
+            dialogues: [],
+          }
+          log.title = data.dialogues[0].user;
+          log.time = data.createdAt;
+          log.dialogues = data.dialogues;
+
+          this.log.push(log);
+      });
     });
   },
-  updated() {
-    this.$nextTick(() => {
-      this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight;
-    });
-  }
+
 };
 </script>
 

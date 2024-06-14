@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     vue(),
     // MonacoEditorPlugin({ languages: ['javascript', 'typescript', 'html', 'css', 'json'] })
-    ViteMonacoPlugin({  })
+    ViteMonacoPlugin({}),
   ],
   resolve: {
     alias: {
