@@ -1,6 +1,6 @@
 <template>
     <button class="btn btn-danger m-3" @click="$router.push('/admin')">返回</button>
-    <div class="container mt-2">
+    <div class="px-5 mt-2">
         <div class="card shadow-lg mb-5">
             <div class="card-body">
                 <h5 class="card-title text-primary">學生詳細信息</h5>
@@ -33,7 +33,7 @@
                 <h5 class="card-title">動作紀錄</h5>
                 <button class="btn btn-success p-0 px-2" style="height: 25px; font-size: 11px;" @click="exportToExcel">匯出Excel</button>
             </div>  
-            <div class="messages p-3 border rounded" style="height: 300px; overflow-y: scroll;">
+            <div class="messages p-3 border rounded" style="height: 500px; overflow-y: scroll;">
                 <div v-for="(message, index) in data.action" :key="index" class="message mb-2">
                     <hr class="bold">建立時間: {{ message.createAt }}
                     <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
@@ -55,9 +55,9 @@
         <div class="card shadow-lg mb-5">
             <div class="card-body">
             <h5 class="card-title">聊天記錄</h5>
-            <div class="messages p-3 border rounded" style="height: 300px; overflow-y: scroll;">
-                <div v-for="(message, index) in chat" :key="index" class="message mb-2">
-                <p><strong>{{ message.sender }}:</strong> {{ message.text }}</p>
+            <div class="messages p-3 border rounded" style="height: 500px; overflow-y: scroll;">
+                <div v-for="(message, index) in data.chat" :key="index" class="message mb-2">
+                    <p><strong>{{ message.sender }}:</strong> {{ message.text }}</p>
                 </div>
             </div>
             </div>
@@ -68,14 +68,14 @@
                 <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
                     <thead>
                     <tr>
-                        <th scope="col">時間</th>
-                        <th scope="col">html</th>
-                        <th scope="col">css</th>
-                        <th scope="col">js</th>
+                        <th scope="col-1">時間</th>
+                        <th scope="col-4">html</th>
+                        <th scope="col-3">css</th>
+                        <th scope="col-3">js</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr  v-for="(code, index) in data.code" :key="code._id">
+                    <tbody style="height: 200px; overflow-y: scroll;">
+                    <tr class="my-3 border-3"  v-for="(code, index) in data.code" :key="code._id">
                         <td>{{ code.createdAt }}</td>
                         <td class="sm " v-html="code.html"></td>
                         <td class="sm " v-html="code.css"></td>
@@ -157,12 +157,24 @@ export default {
             return `<pre><code class="hljs">${hljs.highlightAuto(code).value}</code></pre>`;
         },
         exportToExcel() {
-        /* 获取表格数据 */
-        const table = document.querySelector('.messages table');
-        const wb = XLSX.utils.table_to_book(table, {sheet: 'Sheet JS'});
+            const header = ["動作", "時間"];
+            const studentInfo = [
+                ["姓名", this.data.name],
+                ["學號", this.data.studentID],
+                ["屆數", this.data.session],
+                []
+            ];
 
-        /* 将Workbook对象保存为Excel文件 */
-        XLSX.writeFile(wb, 'exported_data.xlsx');
+            const data = this.data.action.flatMap(message => 
+                message.actions.actions.map(action => [action.action, action.timestamp])
+            );
+
+            const ws_data = [...studentInfo, header, ...data];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet JS");
+
+            XLSX.writeFile(wb, '學生動作紀錄.xlsx');
         }
     },
     mounted() {
@@ -177,7 +189,16 @@ export default {
                 this.data.studentID = res.data.data.studentID;
                 this.data.session = res.data.data.session;
                 this.data.password = res.data.data.password;
-                this.data.chat = res.data.data.chat;
+                
+                res.data.data.chat.reverse().forEach((item) => {
+                    item.dialogues.reverse().forEach((dialogue) => {
+                        if (dialogue.user) {
+                            this.data.chat.unshift({ sender: '學生', text: dialogue.user});
+                        } else if (dialogue.ai) {
+                            this.data.chat.unshift({ sender: 'AI', text: dialogue.ai });
+                        }
+                    });
+                });
                 res.data.data.action.reverse().forEach((item) => {
                     const action = {
                         actions: item.actions,
@@ -212,4 +233,5 @@ export default {
     height: 100vh;
     overflow-x: hidden;
 }
+
 </style>

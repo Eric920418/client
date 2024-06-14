@@ -1,9 +1,16 @@
 <template>
   <div>
+
     <div class="d-flex justify-content-between mt-4" style="height: 40px;">
       <button type="button" class="btn btn-primary text-nowrap">
         <label for="file">新增學生</label>
         <input type="file" name="file" id="file" @change="handleFileUpload" />
+      </button>
+      <button type="button" class="btn btn-success text-nowrap" data-bs-toggle="modal" data-bs-target="#exampleModal" >
+        <label>單一新增</label>
+      </button>
+      <button type="button" class="btn btn-secondary text-nowrap" @click="example()">
+        <label >新增學生範例</label>
       </button>
       <select class="form-select w-25" aria-label="Default select example" v-model="selectedSession">
         <option value="" >屆數</option>
@@ -31,18 +38,43 @@
       </tbody>
     </table>
   </div>
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-black" id="exampleModalLabel">單一新增學生表單</h5>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control my-2" placeholder="姓名" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="name">
+          <input type="text" class="form-control my-2" placeholder="學號" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="studentID">
+          <input type="text" class="form-control my-2" placeholder="屆數" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="session">
+          <input type="text" class="form-control my-2" placeholder="密碼" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="password">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+          <button type="button" class="btn btn-primary" @click="addStudent()">送出</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script>
 import readXlsxFile from 'read-excel-file';
-
+import * as XLSX from 'xlsx';
 export default {
   data() {
     return {
       students: [],
       data: [],
       sessions: [],
-      selectedSession: ''
+      selectedSession: '',
+      name: '',
+      studentID: '',
+      session: '',
+      password: ''
     };
   },
   computed: {
@@ -50,6 +82,9 @@ export default {
       return [...new Set(this.sessions)];
     },
     filteredStudents() {
+      if (this.selectedSession == '0') {
+        return this.students.filter(student => student.session == '0');
+      }
       if (this.selectedSession) {
         return this.students.filter(student => student.session === this.selectedSession);
       }
@@ -82,9 +117,10 @@ export default {
       }
     },
     pushDataInBatches(data) {
-      const batchSize = 10; // 定義每批次的大小
+      const batchSize = 10; 
       const totalBatches = Math.ceil(data.length / batchSize);
       let currentBatch = 0;
+      const failedRecords = [];
 
       const sendNextBatch = () => {
         if (currentBatch < totalBatches) {
@@ -103,7 +139,8 @@ export default {
               studentID: student.studentID,
               password: student.password,
               session: student.session
-            }).then(() => {
+            }).catch(err => {
+              failedRecords.push(student);
             })
           );
 
@@ -121,20 +158,28 @@ export default {
               });
             });
         } else {
-          this.$swal.fire({
-            title: '新增成功',
-            text: '已成功新增所有學生',
-            icon: 'success',
-            showCancelButton: true,
-            confirmButtonText: 'ok',
-            cancelButtonText: '關閉'
+          if (failedRecords.length > 0) {
+            this.$swal.fire({
+              title: '部分新增失敗',
+              html: `<p>以下學生新增失敗：</p><ul>${failedRecords.map(record => `<li>${record.name} (ID: ${record.studentID})</li>`).join('')}</ul>`,
+              icon: 'error'
+            });
+          } else {
+            this.$swal.fire({
+              title: '新增成功',
+              text: '已成功新增所有學生',
+              icon: 'success',
+              showCancelButton: true,
+              confirmButtonText: 'ok',
+              cancelButtonText: '關閉'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.reload();
-                } else if (result.isDismissed) {
-                    console.log('Modal closed')
-                }
-          });
+              if (result.isConfirmed) {
+                window.location.reload();
+              } else if (result.isDismissed) {
+                console.log('Modal closed')
+              }
+            });
+          }
         }
       };
 
@@ -145,35 +190,112 @@ export default {
     },
     deleteStudent(student) {
       let yourToken = localStorage.getItem('token');
-      this.$axios.delete(`/auth/student/${student._id}`,{
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${yourToken}`, 
-        }
-      })
-      .then(() => {
         this.$swal.fire({
-          title: '刪除成功',
-          text: '已成功刪除學生',
-          icon: 'success',
+          html: '<i class="fas fa-question-circle" style="font-size: 3em; height: 1.5em; color: #3085d6;"></i>',
+          customClass: {
+            icon: 'no-icon' // 這樣可以避免顯示預設的圖標
+          },
+          title: '是否刪除',
           showCancelButton: true,
           confirmButtonText: 'ok',
           cancelButtonText: '關閉'
           }).then((result) => {
               if (result.isConfirmed) {
-                  window.location.reload();
+                this.$axios.delete(`/auth/student/${student._id}`,{
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${yourToken}`, 
+                  }
+                })
+                .then(() => {
+                  this.$swal.fire({
+                    title: '刪除成功',
+                    text: '已成功刪除學生',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'ok',
+                    cancelButtonText: '關閉'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        } else if (result.isDismissed) {
+                            console.log('Modal closed')
+                        }
+                  });
+                }).catch(err => {
+                  console.error('Error deleting student:', err);
+                  this.$swal.fire({
+                    title: '刪除失敗',
+                    text: '刪除學生時發生錯誤',
+                    icon: 'error'
+                  });
+                });
               } else if (result.isDismissed) {
                   console.log('Modal closed')
               }
           })
-      }).catch(err => {
-        console.error('Error deleting student:', err);
-        this.$swal.fire({
-          title: '刪除失敗',
-          text: '刪除學生時發生錯誤',
-          icon: 'error'
-        });
-      });
+    },
+    example() {
+      const data = [
+        ["姓名", "學號", "屆數", "密碼"],
+        ["eric", "123456", "123", "123"],
+        ["alan", "56554", "555", "888"]
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+      function s2ab(s) {
+        const buf = new ArrayBuffer(s.length);
+        const view = new Uint8Array(buf);
+        for (let i = 0; i < s.length; i++) {
+          view[i] = s.charCodeAt(i) & 0xFF;
+        }
+        return buf;
+      }
+
+      const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = '學生範例.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
+    addStudent() {
+      this.$axios.post('/auth/signUp', {
+                name: this.name,
+                studentID: this.studentID,
+                password: this.password
+            })
+            .then(res => {
+                this.$swal.fire({
+                title: '註冊成功',
+                text: '',
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: 'ok',
+                cancelButtonText: '關閉'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.reload();
+                } else if (result.isDismissed) {
+                    console.log('Modal closed')
+                }
+                })
+            })
+            .catch(err => {
+                const errorMessage = err.response.data.message || '註冊失敗，請重試';
+                this.$swal.fire({
+                title: '註冊失敗',
+                text: errorMessage,
+                icon: 'error'
+                })
+            })
     }
   },
   mounted() {
