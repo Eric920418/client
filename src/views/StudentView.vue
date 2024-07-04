@@ -1,7 +1,15 @@
 <template>
-    <button class="btn btn-danger m-3" @click="$router.push('/admin')">返回</button>
-    <div class="px-5 mt-2">
-        <div class="card shadow-lg mb-5">
+    <div class="bar">
+        <button class="btn btn-danger m-3" @click="$router.push('/admin')">返回</button> 
+        <button class="btn btn-secondary m-3" @click="gotoInfo">學生資料</button>
+        <button class="btn btn-primary m-3" @click="">成績</button>
+        <button class="btn btn-warning m-3" @click="gotoAction">動作紀錄</button>
+        <button class="btn btn-info m-3" @click="gotoChat">聊天記錄</button>
+        <button class="btn btn-success m-3" @click="gotoCode">Code</button>
+    </div>
+
+    <div class="px-5 mt-4" >
+        <div class="card shadow-lg mb-5" ref="info">
             <div class="card-body">
                 <h5 class="card-title text-primary">學生詳細信息</h5>
                 <div v-if="data"> 
@@ -27,7 +35,7 @@
                 </div>
             </div>
         </div>
-        <div class="card shadow-lg mb-5">
+        <div class="card shadow-lg mb-5" ref="action">
             <div class="card-body">
             <div class="d-flex justify-content-between">
                 <h5 class="card-title">動作紀錄</h5>
@@ -52,7 +60,7 @@
             </div>
             </div>
         </div>
-        <div class="card shadow-lg mb-5">
+        <div class="card shadow-lg mb-5" ref="chat">
             <div class="card-body">
             <h5 class="card-title">聊天記錄</h5>
             <div class="messages p-3 border rounded" style="height: 500px; overflow-y: scroll;">
@@ -62,7 +70,7 @@
             </div>
             </div>
         </div>
-        <div v-if=" data.code" class="card shadow-lg mb-5">
+        <div v-if=" data.code" class="card shadow-lg mb-5" ref="code">
             <div class="card-body code">
                 <h5 class="card-title">Code</h5>
                 <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
@@ -175,15 +183,29 @@ export default {
             XLSX.utils.book_append_sheet(wb, ws, "Sheet JS");
 
             XLSX.writeFile(wb, '學生動作紀錄.xlsx');
+        },
+        gotoAction() {
+            this.$refs.action.scrollIntoView({ behavior: 'smooth', block: 'start' });
+         
+        },
+        gotoChat() {
+            this.$refs.chat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        },
+        gotoCode() {
+            this.$refs.code.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        },
+        gotoInfo() {
+            this.$refs.info.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     },
     mounted() {
         const yourToken = localStorage.getItem('token');
         this.$axios.get(`/auth/student/${this.studentID}`, {
-            headers: {
-            'Authorization': `Bearer ${yourToken}`
-            }
-        })
+                headers: {
+                'Authorization': `Bearer ${yourToken}`,
+                'Content-Type': 'application/json',
+                }
+            })
             .then(res => {
                 this.data.name = res.data.data.name;
                 this.data.studentID = res.data.data.studentID;
@@ -232,6 +254,20 @@ export default {
 .code{
     height: 100vh;
     overflow-x: hidden;
+}
+.bar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: black;
+    transform: translateY(-65px);
+    transition: all 0.3s ease-in-out;
+}
+.bar:hover{
+    transform: translateY(0);
+    transition: all 0.3s ease-in-out;
 }
 
 </style>

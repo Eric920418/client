@@ -115,10 +115,9 @@ export default {
             })
 
             .catch(err => {
-                const errorMessage = err.response.data.message || '登入失敗，請重試';
                 this.$swal.fire({
                 title: '登入失敗',
-                text: errorMessage,
+                text: '登入失敗，請重試',
                 icon: 'error'
                 })
             })

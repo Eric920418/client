@@ -73,7 +73,13 @@ export default {
       if (this.que.trim() !== '') {
         this.chat.push({ user: this.que });
         try {
-          const response = await this.$axios.post('/chat', { que: this.que });
+          let storedToken = localStorage.getItem('token');
+          const response = await this.$axios.post('/chat', { que: this.que },{
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+              'Content-Type': 'application/json',
+            }
+          });
           this.chat.push({ ai: response.data.ai });
         } catch (err) {
           console.error('Failed to send/receive chat:', err);
@@ -131,17 +137,42 @@ export default {
     },
     saveChat(){
         let userId = this.getCookie('id');
-        this.$axios.post('/chat/dialogue', {dialogues: this.chat, user: userId})
-        .then((res) => {
-          window.location.reload();
-        });
+        let chatId = this.thisLog._id;
+        let storedToken = localStorage.getItem('token');
+        if( this.thisLog.title == '新對話'){
+          this.$axios.post('/chat/dialogue', {dialogues: this.chat, user: userId},{
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+              'Content-Type': 'application/json',
+            }
+          })
+          .then((res) => {
+            
+          });
+        }else{
+          this.$axios.put(`/chat/dialogue/${chatId}`, {dialogues: this.chat, user: userId},{
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+              'Content-Type': 'application/json',
+            }
+          })
+          .then((res) => {
+            
+          });
+        }
         this.thisLog = null;
     }
   },
   mounted() {
 
     let userId = this.getCookie('id');
-    this.$axios.get(`/chat/dialogue/${userId}`)
+    let storedToken = localStorage.getItem('token');
+    this.$axios.get(`/chat/dialogue/${userId}`,{
+      headers: {
+        'Authorization': `Bearer ${storedToken}`,
+        'Content-Type': 'application/json',
+      }
+    })
     .then((res) => {
       res.data.data.forEach((data) => {
           let log = {
@@ -152,7 +183,8 @@ export default {
           log.title = data.dialogues[0].user;
           log.time = data.createdAt;
           log.dialogues = data.dialogues;
-
+          log._id = data._id;
+          console.log(log);
           this.log.push(log);
       });
     });

@@ -3,8 +3,9 @@
     <nav>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('student')">學生資料</button>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('exam')">考試系統</button>
-    <button class="btn btn-outline-secondary border-0" @click="">成績查詢</button>
-    <button class="btn btn-outline-danger border-0 ms-auto" @click="restartServer">重啟伺服器</button>
+    <button class="btn btn-outline-secondary border-0" @click="changeFocus('score')">成績查詢</button>
+    <button class="btn btn-outline-warning border-0 ms-auto" @click="stop" >暫停伺服器</button>  
+    <button class="btn btn-outline-danger border-0 ms-1" @click="restartServer">重啟伺服器</button>
     </nav>
     <div class="mx-auto " style="width: 90%; height: 100%;">
         <div  v-if="focus === 'exam'">
@@ -13,6 +14,9 @@
         <div  v-if="focus === 'student'">
             <student></student>
         </div>
+        <div  v-if="focus === 'score'">
+            <score></score>
+        </div>
     </div>
 </div>
 </template>
@@ -20,17 +24,18 @@
 <script>
 import student from '../components/StudentInformation.vue';
 import exam from '../components/ExamSystem.vue';
-
+import score from '../components/Score.vue';
 export default {
 components: {
     student,
-    exam
+    exam,
+    score
 },
 data() {
     return {
         focus: "student",
         serverRestart: false,
-        waitSec: 10
+        waitSec: 15
     }
 },
 methods: {
@@ -39,7 +44,13 @@ methods: {
     },
     restartServer() {
         let countdown = this.waitSec;
-        this.$axiox.post('restart')
+        var storedToken = localStorage.getItem('token');
+        this.$axios.post('/restart', {
+            headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+            }
+        })
         .then((res) => {
             this.$swal.fire({
                 title: '重啟伺服器',
@@ -71,7 +82,12 @@ methods: {
         }).catch((err) => {
             console.log(err);
         });
+    },
+    stop() {
+        let data = {status: "stop"};
+        EventBus.$emit('stop', data);
     }
+
 },
 mounted() {
     var storedToken = localStorage.getItem('identity');

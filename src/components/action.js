@@ -8,6 +8,7 @@ export const action = {
     },
 
     pushDBAction(user) {
+        var storedToken = localStorage.getItem('token');
         if (isRequestPending) {
             console.log('Request is already in progress, skipping duplicate...');
             return; // 如果已经有请求正在进行中，则直接返回
@@ -25,7 +26,8 @@ export const action = {
         fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + storedToken
             },
             body: payload
         })

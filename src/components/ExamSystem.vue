@@ -9,9 +9,10 @@
             <button v-if="oldExamTicket.type" class="btn btn-success ms-3" @click="saveOldTicket">儲存舊考券</button>
             <button v-if="oldExamTicket.type" class="btn btn-secondary ms-3" @click="this.oldExamTicket = {}">新考券</button>
             <button class="btn btn-warning ms-3" data-bs-toggle="modal" data-bs-target="#exampleModal">考券檔案</button>
+            
         </div>
         <div class="card shadow-lg mb-5">
-            <div v-if="!oldExamTicket" class="card-body">
+            <div v-if="!oldExamTicket.type" class="card-body">
                 <h1 class="card-title text-info">考券表單</h1>
                 <input type="text" class="form-control mx-3 fs-5 w-25 my-3 " v-model="ExamTicket.name" placeholder="考券名稱">
                 <div class="d-flex my-4">
@@ -80,10 +81,11 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end">
-                    <button class="btn btn-success" @click="saveData">發送考券</button>
+                    <button class="btn btn-success" @click="pushNewTicket">發送考券</button>
+                    {{ ExamTicket }}
                 </div>
             </div>
-            <div v-if="oldExamTicket" class="card-body">
+            <div v-if="oldExamTicket.type" class="card-body">
                 <h1 class="card-title text-info">考券表單</h1>
                 <input type="text" class="form-control mx-3 fs-5 w-25 my-3 " v-model="oldExamTicket.name" placeholder="考券名稱">
                 <div class="d-flex my-4">
@@ -152,6 +154,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end">
+                    <button class="btn btn-success me-3" data-bs-toggle="modal" data-bs-target="#exampleModal2">發送單一同學考券</button>
                     <button class="btn btn-success" @click="pushTicket">發送考券</button>
                 </div>
             </div>
@@ -159,37 +162,66 @@
     </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title text-black" id="exampleModalLabel">全部考券(點擊載入)</h5>
-            </div>
-            <div class="modal-body text-black ">
-                <table class="table  table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th scope="col">考券名稱</th>
-                            <th scope="col">題數</th>
-                            <th scope="col">期限</th>
-                            <th scope="col">難度</th>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title text-black" id="exampleModalLabel">全部考券(點擊載入)</h5>
+                </div>
+                <div class="modal-body text-black ">
+                    <table class="table  table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">考券名稱</th>
+                                <th scope="col">題數</th>
+                                <th scope="col">期限</th>
+                                <th scope="col">難度</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(exam, index) in AllExamTicket" :key="index"  @click="checkExam(exam)" data-bs-dismiss="modal">
+                            <td>{{exam.name}}</td>
+                            <td>{{exam.HowMany}}</td>
+                            <td>{{exam.date}}</td>
+                            <td>{{exam.difficulty}}</td>
+                            <td><button class="btn btn-danger" @click="deleteExam(index)">刪除</button></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(exam, index) in AllExamTicket" :key="index"  @click="checkExam(exam)" data-bs-dismiss="modal">
-                        <td>{{exam.name}}</td>
-                        <td>{{exam.HowMany}}</td>
-                        <td>{{exam.date}}</td>
-                        <td>{{exam.difficulty}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body text-black ">
+                    <table class="table  table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">姓名</th>
+                                <th scope="col">學號</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(student, index) in AllStudent" :key="index" @click="pushOnlyOne(student._id)">
+                                <td>{{student.name}}</td>
+                                <td>{{student.studentID}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
     </div>
+
 </template>
 
 <script>
@@ -207,13 +239,12 @@ export default {
                 time: "",
                 question: []
             },
-            oldExamTicket: {
-            },
+            oldExamTicket: {},
             examType: "multiple-choice",
             score: 100,
 
             AllExamTicket: [],
-            
+            AllStudent: [],
         };
     },
     watch: {
@@ -292,7 +323,7 @@ export default {
         },
         saveTicket() {
                 const { name, date, time, HowMany, question } = this.ExamTicket;
-                if (name === "考券名稱" || date === "" || time === "" || HowMany === 0 || question.length === 0) {
+                if (name === "考券名稱" || date === "" || time === "" || HowMany == "0" || question.length === 0) {
                     this.$swal.fire({
                         title: '儲存失敗',
                         text: '請填寫完整資料',
@@ -342,7 +373,13 @@ export default {
                     });
                     return;
                 }
-                this.$axios.post('/exam/save', this.ExamTicket)
+                var storedToken = localStorage.getItem('token');
+                this.$axios.post('/exam/save', this.ExamTicket , {
+                headers: {
+                    'Authorization': `Bearer ${storedToken}`,
+                    'Content-Type': 'application/json',
+                }
+                })
                 .then(res => {
                     this.$swal.fire({
                         title: '儲存成功',
@@ -361,7 +398,7 @@ export default {
         },
         saveOldTicket() {
                 const { name, date, time, HowMany, question } = this.oldExamTicket;
-                if (name === "考券名稱" || date === "" || time === "" || HowMany === 0 || question.length === 0) {
+                if (name === "考券名稱" || date === "" || time === "" || HowMany == "0" || question.length === 0) {
                     this.$swal.fire({
                         title: '儲存失敗',
                         text: '請填寫完整資料',
@@ -411,7 +448,13 @@ export default {
                     });
                     return;
                 }
-                this.$axios.put(`/exam/${this.oldExamTicket._id}`, this.oldExamTicket)
+                var storedToken = localStorage.getItem('token');
+                this.$axios.put(`/exam/${this.oldExamTicket._id}`, this.oldExamTicket , {
+                headers: {
+                    'Authorization': `Bearer ${storedToken}`,
+                    'Content-Type': 'application/json',
+                }
+                })
                 .then(res => {
                     this.$swal.fire({
                         title: '更新考券成功',
@@ -439,7 +482,7 @@ export default {
         },
         pushTicket() {
                 const { name, date, time, HowMany, question } = this.oldExamTicket;
-                if (name === "考券名稱" || date === "" || time === "" || HowMany === 0 || question.length === 0) {
+                if (name === "考券名稱" || date === "" || time === "" || HowMany == "0"  || question.length === 0) {
                     this.$swal.fire({
                         title: '儲存失敗',
                         text: '請填寫完整資料',
@@ -489,22 +532,178 @@ export default {
                     });
                     return;
                 }
-                this.$axios.post('/exam', this.oldExamTicket)
+                var storedToken = localStorage.getItem('token');
+                this.$axios.post('/exam', this.oldExamTicket, {
+                headers: {
+                    'Authorization': `Bearer ${storedToken}`,
+                    'Content-Type': 'application/json',
+                }
+                })
                 .then(res => {
                     this.$swal.fire({
-                        title: '儲存成功',
-                        text: '考券已成功儲存',
+                        title: '發布成功',
+                        text: '考券已成功發布',
                         icon: 'success'
                     });
                 }).catch(err => {
                     console.error(err);
                     console.log(this.ExamTicket)
                     this.$swal.fire({
-                        title: '儲存失敗',
-                        text: '儲存考券時發生錯誤',
+                        title: '發布失敗',
+                        text: `發布考券時發生錯誤 ${err}` ,
                         icon: 'error'
                     });
                 });
+        },
+        pushNewTicket() {
+                const { name, date, time, HowMany, question } = this.ExamTicket;
+                    if (name === "考券名稱" || date === "" || time === "" || HowMany == "0" || question.length === 0) {
+                        this.$swal.fire({
+                            title: '儲存失敗',
+                            text: '請填寫完整資料',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+                    let totalScore = 0;
+                    for (let q of question) {
+                        if (q.types === "multiple-choice") {
+                            if (q.title === "題目" || q.answer === "選擇答案" || q.score === "配分") {
+                                this.$swal.fire({
+                                    title: '儲存失敗',
+                                    text: '考題資料不完整',
+                                    icon: 'error'
+                                });
+                                return;
+                            }
+                            for (let option of q.options) {
+                                if (option === "選項1" || option === "選項2" || option === "選項3" || option === "選項4") {
+                                    this.$swal.fire({
+                                        title: '儲存失敗',
+                                        text: '考題選項不完整',
+                                        icon: 'error'
+                                    });
+                                    return;
+                                }
+                            }
+                            totalScore += parseInt(q.score);
+                        } else if (q.types === "short-answer") {
+                            if (q.title === "題目" || q.answer === "選擇答案" || q.score === "配分") {
+                                this.$swal.fire({
+                                    title: '儲存失敗',
+                                    text: '考題資料不完整',
+                                    icon: 'error'
+                                });
+                                return;
+                            }
+                            totalScore += parseInt(q.score);
+                        }
+                    }
+                    if (totalScore !== 100) {
+                        this.$swal.fire({
+                            title: '儲存失敗',
+                            text: '考題配分不等於100',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+                    var storedToken = localStorage.getItem('token');
+                    this.$axios.post('/exam', this.ExamTicket, {
+                    headers: {
+                        'Authorization': `Bearer ${storedToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                    })
+                    .then(res => {
+                        this.$swal.fire({
+                            title: '發布成功',
+                            text: '考券已成功發布',
+                            icon: 'success'
+                        });
+                    }).catch(err => {
+                        console.error(err);
+                        console.log(this.ExamTicket)
+                        this.$swal.fire({
+                            title: '發布失敗',
+                            text: `發布考券時發生錯誤 ${err}` ,
+                            icon: 'error'
+                        });
+                    });
+        },
+        pushOnlyOne(user) {
+            const { name, date, time, HowMany, question } = this.oldExamTicket;
+            if (name === "考券名稱" || date === "" || time === "" || HowMany === 0 || question.length === 0) {
+                this.$swal.fire({
+                    title: '儲存失敗',
+                    text: '請填寫完整資料',
+                    icon: 'error'
+                });
+                return;
+            }
+            let totalScore = 0;
+            for (let q of question) {
+                if (q.types === "multiple-choice") {
+                    if (q.title === "題目" || q.answer === "選擇答案" || q.score === "配分") {
+                        this.$swal.fire({
+                            title: '儲存失敗',
+                            text: '考題資料不完整',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+                    for (let option of q.options) {
+                        if (option === "選項1" || option === "選項2" || option === "選項3" || option === "選項4") {
+                            this.$swal.fire({
+                                title: '儲存失敗',
+                                text: '考題選項不完整',
+                                icon: 'error'
+                            });
+                            return;
+                        }
+                    }
+                    totalScore += parseInt(q.score);
+                } else if (q.types === "short-answer") {
+                    if (q.title === "題目" || q.answer === "選擇答案" || q.score === "配分") {
+                        this.$swal.fire({
+                            title: '儲存失敗',
+                            text: '考題資料不完整',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+                    totalScore += parseInt(q.score);
+                }
+            }
+            if (totalScore !== 100) {
+                this.$swal.fire({
+                    title: '儲存失敗',
+                    text: '考題配分不等於100',
+                    icon: 'error'
+                });
+                return;
+            }
+            var storedToken = localStorage.getItem('token');
+            this.$axios.post(`/exam/${user}`, this.oldExamTicket, {
+            headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+            }
+            })
+            .then(res => {
+                this.$swal.fire({
+                    title: '發布成功',
+                    text: '考券已成功發布',
+                    icon: 'success'
+                });
+            }).catch(err => {
+                console.error(err);
+                console.log(this.ExamTicket)
+                this.$swal.fire({
+                    title: '發布失敗',
+                    text: `發布考券時發生錯誤 ${err}` ,
+                    icon: 'error'
+                });
+            });
         },
         checkExam(event) {
             this.oldExamTicket.name = event.name;
@@ -516,15 +715,57 @@ export default {
             this.oldExamTicket.question = JSON.parse(JSON.stringify(event.question));
             this.oldExamTicket._id = event._id;
         },
+        deleteExam(index) {
+            var storedToken = localStorage.getItem('token');
+            this.$axios.delete(`/exam/${this.AllExamTicket[index]._id}`, {
+            headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+            }
+            })
+            .then(res => {
+                this.$swal.fire({
+                    title: '刪除成功',
+                    text: '考券已成功刪除',
+                    icon: 'success'
+                });
+                this.AllExamTicket.splice(index, 1);
+            }).catch(err => {
+                console.error(err);
+                this.$swal.fire({
+                    title: '刪除失敗',
+                    text: '刪除考券時發生錯誤',
+                    icon: 'error'
+                });
+            });
+        }
     },
     mounted() {
-        this.$axios.get('/exam/allExam')
+        var storedToken = localStorage.getItem('token');
+        this.$axios.get('/exam/allExam', {
+            headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+            }
+            })
         .then(res => {
             res.data.exam.forEach((exam) => {
                 this.AllExamTicket.push(exam);
             });
         }).catch(err => {
             console.error(err);
+        });
+        this.$axios.get('/auth/students', {
+            headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(res => {
+            this.AllStudent = res.data.data.students;
+        })
+        .catch(err => {
+            console.error('Error fetching students:', err);
         });
     }
 };
