@@ -299,8 +299,14 @@ export default {
     }
   },
   mounted() {
+    var storedToken = localStorage.getItem('token');
     this.$axios
-      .get('/auth/students')
+      .get('/auth/students', {
+        headers: {
+            'Authorization': `Bearer ${storedToken}`,
+            'Content-Type': 'application/json',
+        }
+      })
       .then(res => {
         this.students = res.data.data.students;
         this.sessions = this.students.map(student => student.session);

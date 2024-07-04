@@ -1,5 +1,5 @@
 <template>
-    <div class="container mt-2" >
+    <div class=" mt-2" >
         <div class="card shadow-lg mb-5">
             <button class="btn btn-danger ms-auto" style="width: 50px;" @click="closeModel">X</button>
             <table class="table mt-3 table-sm  table-hover align-middle table-borderless">
@@ -65,7 +65,13 @@ export default {
     },
     mounted() {
         let userId = this.getCookie('id');
-        this.$axios.get(`/code/${userId}`)
+        var storedToken = localStorage.getItem('token');
+        this.$axios.get(`/code/${userId}`,{
+            headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+            }
+            })
             .then(res => {
                 res.data.data.forEach((item) => {
                     const code = {
