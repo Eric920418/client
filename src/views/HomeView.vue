@@ -2,26 +2,29 @@
   <div class="main" ref="main">
       <div class="containers" ref="code">
           <div>
-            <button class="toggle-btn btn btn-danger" style="font-size: 50px;  top: 0%;" @click="toggleHtml"><i class="fa-brands fa-html5"></i></button>
+            <button class="toggle-btn btn btn-danger" id="html" style="font-size: 50px;  top: 0%;" @click="toggleHtml"><i class="fa-brands fa-html5"></i></button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-primary" style="font-size: 50px;  top: 10.5%;" @click="toggleCss"><i class="fa-brands fa-css3-alt"></i></button>
+            <button class="toggle-btn btn btn-primary" id="css" style="font-size: 50px;  top: 10.5%;" @click="toggleCss"><i class="fa-brands fa-css3-alt"></i></button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-warning" style="font-size: 50px;  top: 21%;" @click="toggleJs"><i class="fa-brands fa-square-js"></i></button>
+            <button class="toggle-btn btn btn-warning" id="js" style="font-size: 50px;  top: 21%;" @click="toggleJs"><i class="fa-brands fa-square-js"></i></button>
+          </div>
+
+          <div>
+            <button class="toggle-btn btn btn-light" id="restart" style="font-size: 50px;  top: 49%;" @click="restart"><i class="fa-solid fa-rotate-left"></i></button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-success" style="font-size: 50px;  top: 38%;" @click="toggleIframe"><i class="fa-brands fa-codepen"></i></button>
+            <button class="toggle-btn btn practiceBtn" id="practice" ref="tip" style="font-size: 50px; top: 60%;" @click="startPractice"><i class="fa-solid fa-laptop-code"></i></button>
           </div>
-          <div>
-            <button class="toggle-btn btn btn-light" style="font-size: 50px;  top: 49%;" @click="restart"><i class="fa-solid fa-rotate-left"></i></button>
-          </div>
-          <div>
-            <button v-if="!StartPractice" class="toggle-btn btn" ref="tip" style="font-size: 50px;background-color: blueviolet;  top: 60%;" @click="startPractice"><i class="fa-solid fa-laptop-code"></i></button>
-            <button v-if="StartPractice" class="toggle-btn btn" ref="tip" style="font-size: 50px;background-color: blueviolet;  top: 60%;" @click="closePractice"><i class="fa-solid fa-laptop-code"></i></button>
-          </div>
-          <div class="toggle-btn practice" ref="practice" style="">
-            123
+          <div class="practice" ref="practice" style="">
+            <div class="card w-100 h-100" style="background-color: #f8f9fa;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">練習題</h5>
+                <p class="card-text flex-grow-1">請做出．．．．．的網頁</p>
+                <button class="btn btn-primary align-self-end" @click="startPractice">看範例</button>
+              </div>
+            </div>
           </div>
           <div>
             <div class="text-close" id="html-code" ref="html">
@@ -38,14 +41,14 @@
               <iframe id="output" ref="output"></iframe>
             </div>
           </div>
-          <button class="toggle-chat-btn btn btn-danger" style="font-size: large; width: 40px; top: 0%;" @click.stop="runOutput" ref="run">跑程式碼</button>
-          <button class="toggle-chat-btn btn btn-primary" style="font-size: large; width: 40px; top: 14.5%;" @click.stop="saveButton" ref="save">儲存</button>
-          <button class="toggle-chat-btn btn btn-warning" style="font-size: large; width: 40px; top: 23%;" v-if="isCollapsed" @click="toggleChat" ref="chat">開啟聊天</button>
-          <button class="toggle-chat-btn btn btn-success" style="font-size: large; width: 40px; top: 37.5%;" v-if="isOpenLog" @click="openLog" ref="log">打開紀錄</button>
-          <button class="toggle-chat-btn btn btn-secondary" style="font-size: large; width: 40px; top: 52%;" v-if="isTest" @click="openTest">開啟考試視窗
+          <button class="toggle-chat-btn btn btn-danger" id="code" style="font-size: large; width: 40px; top: 0%;" @click.stop="runOutput" ref="run">跑程式碼</button>
+          <button class="toggle-chat-btn btn btn-primary" id="save" style="font-size: large; width: 40px; top: 14.5%;" @click.stop="saveButton" ref="save">儲存</button>
+          <button class="toggle-chat-btn btn btn-warning" id="chatbot" style="font-size: large; width: 40px; top: 23%;" v-if="isCollapsed" @click="toggleChat" ref="chat">開啟聊天</button>
+          <button class="toggle-chat-btn btn btn-success" id="log" style="font-size: large; width: 40px; top: 37.5%;" v-if="isOpenLog" @click="openLog" ref="log">打開紀錄</button>
+          <button class="toggle-chat-btn btn btn-secondary" id="test" style="font-size: large; width: 40px; top: 52%;" v-if="isTest" @click="openTest">開啟考試視窗
             <span class="position-absolute  translate-middle badge rounded-pill bg-danger " style="left: -5px; top: 10px;">{{ exams.length }}</span>
           </button>
-          <button class="toggle-chat-btn btn btn-info" style="font-size: large; width: 40px; top: 72.7%;" @click="openLog">心得</button>
+          <button class="toggle-chat-btn btn btn-info" id="document" style="font-size: large; width: 40px; top: 72.7%;" @click="openLog">心得</button>
       </div>
 
       <div v-if="!isCollapsed" >
@@ -170,6 +173,7 @@
   import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
   import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
   import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+  import { DomHandler, Parser } from 'htmlparser2';
 
   import Chat from '../components/ChatMessage.vue';
   import Document from '../components/Dcumental.vue';
@@ -193,7 +197,6 @@
         isActionPushed : false,     
         isOpenLog: true,
         isTest: true,
-        StartPractice: false,
         exams: [],
         finishExams: [],
         exam: {},
@@ -207,17 +210,23 @@
         const documentContent = `
           <html>
             <head>
-              <style>${this.cssCode}</style>
+              <style>${this.cssCode}<\/style>
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"><\/script>
             </head>
             <body>
               ${this.htmlCode}
-              <script>${this.jsCode}<\/script>
+              <script>
+                  ${this.jsCode}
+              <\/script>
             </body>
           </html>
         `;
         iframe.srcdoc = documentContent;
       },
       runOutput() {
+        console.log(this.htmlEditor.getValue());
+        console.log(this.cssEditor.getValue());
+        console.log(this.jsEditor.getValue());
         action.pushAction({
           action: '跑程式碼',
           timestamp: new Date().toLocaleString('zh-TW', {
@@ -231,7 +240,7 @@
         });
         this.isActionPushed = false;
         let storedToken = localStorage.getItem('token');
-        this.$axios.post('/code/runCode', {code : this.jsCode},{
+        this.$axios.post('/code/runCode', {htmlCode: this.htmlEditor.getValue(), cssCode: this.cssEditor.getValue(), jsCode: this.jsEditor.getValue()},{
             headers: {
               'Authorization': `Bearer ${storedToken}`,
               'Content-Type': 'application/json',
@@ -250,36 +259,6 @@
                   warnings.push(message);
                   originalWarn.apply(console, arguments);
               };
-
-              try {
-                  eval(this.jsCode); 
-              } catch (jsError) {
-                  this.$swal.fire({
-                      title: 'JS 出现错误',
-                      text: jsError,
-                      icon: 'error'
-                  });
-              }
-
-              try {
-                eval(this.cssCode)
-              } catch (cssError) {
-                  this.$swal.fire({
-                      title: 'CSS 出现错误',
-                      text: cssError,
-                      icon: 'error'
-                  });
-              }
-
-              try {
-                eval(this.htmlCode)
-              } catch (htmlError) {
-                  this.$swal.fire({
-                      title: 'HTML 出现错误',
-                      text: htmlError,
-                      icon: 'error'
-                  });
-              }
 
               this.updateOutput();
               console.warn = originalWarn;
@@ -438,12 +417,13 @@
         this.isActionPushed = false;
       },
       startPractice() {
-        this.StartPractice = true;
-        this.$refs.practice.style.top = '30%';
-      },
-      closePractice() {
-        this.StartPractice = false;
-        this.$refs.practice.style.top = '-100%';
+        if (!this.isStarted) {
+          this.$refs.practice.style.top = '49%';
+          this.isStarted = true;
+        } else {
+          this.$refs.practice.style.top = '-100%';
+          this.isStarted = false;
+        }
       },
       getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -494,8 +474,8 @@
         });
       },
       handleBeforeUnload(event) {
-          const confirmationMessage = '您確定要離開此頁面嗎？';
-          event.returnValue = confirmationMessage;
+          // const confirmationMessage = '您確定要離開此頁面嗎？';
+          // event.returnValue = confirmationMessage;
 
           let userId = this.getCookie('id');
           action.pushDBAction(userId);
@@ -658,20 +638,116 @@
           });
       },
       restart(){
-        this.htmlEditor.setValue(`<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8">\n\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\t<title>Document</title>\n</head>\n<body>\n\t\n</body>\n</html>\n`)
-        this.cssEditor.setValue(``)
-        this.jsEditor.setValue(``)
-        this.htmlCode = `<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8">\n\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\t<title>Document</title>\n</head>\n<body>\n\t\n</body>\n</html>\n`
-        this.cssCode = ``
-        this.jsCode = ``
-        this.updateOutput();
+          this.htmlEditor.setValue(`<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8">\n\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\t<title>Document</title>\n</head>\n<body>\n\t\n</body>\n</html>\n`)
+          this.cssEditor.setValue(``)
+          this.jsEditor.setValue(`document.addEventListener('DOMContentLoaded', (event) => { 
+          
+            })`)
+          this.htmlCode = `<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8">\n\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\t<title>Document</title>\n</head>\n<body>\n\t\n</body>\n</html>\n`
+          this.cssCode = ``
+          this.jsCode = `document.addEventListener('DOMContentLoaded', (event) => { })`
+          this.updateOutput();
+      },
+      firstLogin() {
+      if(localStorage.getItem('loginNumber') == 0){
+
+          function animateElement(id, delay, fontSize, width = '', extraStyles = '') {
+              setTimeout(() => {
+                  const element = document.getElementById(id);
+                  element.style.cssText = `transform: translateX(0); transition: all 0.3s ease; font-size: ${fontSize}; top: ${element.style.top}; ${width ? `width: ${width};` : ''} ${extraStyles}`;
+              }, delay);
+          }
+
+          function goBack(id, delay, fontSize, width = '', extraClass) {
+              setTimeout(() => {
+                  const element = document.getElementById(id);
+                  element.style.cssText = `font-size: ${fontSize}; top: ${element.style.top}; ${width ? `width: ${width};` : ''}`;
+                  element.classList.add(extraClass);
+              }, delay);
+          }
+
+          function changeText(content, delay) {
+              setTimeout(() => {
+                  const text = output.contentWindow.document.getElementById('text');
+                  text.style.cssText = "transition: all 0.3s ease; opacity: 0;";
+                  setTimeout(() => {
+                      text.style.opacity = "1";
+                      text.innerHTML = content;
+                  }, 300);
+              }, delay);
+          }
+
+          document.getElementById('output').onload = function() {
+              this.contentWindow.document.getElementById('demo-canvas').style.cssText = "backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);background:rgba(255, 255, 255, 0.37);";
+
+              const messages = [
+                  "大家好 歡迎第一次登陸這個編譯網站<br>現在開始我要慢慢介紹功能按鈕", 
+                  "這是撰寫HTML的地方 點擊後會出現編輯器", "這是撰寫CSS的地方 點擊後會出現編輯器", "這是JavaScript的地方 點擊後會出現編輯器", 
+                  "這是清空代碼的地方 點擊後會清空所有代碼", "這是練習的地方 點擊後會出現練習題目", 
+                  "這是跑程式碼的地方 點擊後會出現程式碼結果", "這是儲存的地方 可以按下crtl+s快速儲存代碼", 
+                  "這是聊天室的地方 點擊可以打開聊天室<br>與gpt機器人交流", "這是程式碼紀錄的地方 可以查看自己的程式碼紀錄<br>點擊日期可以還原程式碼", 
+                  "這是考試視窗的地方 可以進行考試", "這是寫心得的地方 可以寫下自己的心得", 
+                  "歡迎 來到編譯網站", "準備好開始學習"
+              ];
+
+              messages.forEach((message, index) => changeText(message, index * 4000));
+          };
+
+          const elements = [
+              { id: 'html', delay: 4500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'css', delay: 8500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'js', delay: 12500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'restart', delay: 16500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'practice', delay: 20500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'code', delay: 24500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
+              { id: 'save', delay: 28500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
+              { id: 'chatbot', delay: 32500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
+              { id: 'log', delay: 36500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
+              { id: 'test', delay: 40500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
+              { id: 'document', delay: 44500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' }
+          ];
+
+          elements.forEach((element) => {
+              animateElement(element.id, element.delay, element.fontSize, element.width ? `width: ${element.width};` : '');
+              goBack(element.id, element.delay + 3000, element.fontSize, element.class);
+          });
+
+          const buttons = ['html', 'css', 'js', 'restart', 'practice', 'code', 'save', 'chatbot', 'log', 'test', 'document'];
+          buttons.forEach(id => document.getElementById(id).disabled = true);
+
+          setTimeout(() => {
+              buttons.forEach(id => document.getElementById(id).disabled = false);
+            }, 48000);
+            
+          setTimeout(() => {
+            localStorage.setItem('loginNumber', 1);
+            window.location.reload();
+          }, 54000);
+
+          
+      }else{
+          return;
+      }
       }
     },
     mounted() {
+      this.firstLogin()
+      this.toggleIframe();
       var storedToken = localStorage.getItem('token');
       if (storedToken == null) {
         this.$router.push('/');
       }
+      ////////////////////////////////////////////////////////////
+      document.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey && event.key === 's') || (event.metaKey && event.key === 's')) {
+          event.preventDefault();
+          this.saveButton()
+        }
+        if ((event.ctrlKey && event.key === 'g') || (event.metaKey && event.key === 'g')) {
+          event.preventDefault();
+          this.runOutput()
+        }
+      });
       ////////////////////////////////////////////////////////////
       this.$refs.htmlEditorContainer.MonacoEnvironment = {
         getWorkerUrl: (moduleId, label) => {
@@ -690,20 +766,28 @@
       };
       // 初始化 HTML 编辑器
       this.htmlEditor = monaco.editor.create(this.$refs.htmlEditorContainer, {
-        value: `<!DOCTYPE html>\n<html>\n<head>\n\t<title>My Page</title>\n</head>\n<body>\n\t<h1 style="text-align: center;">歡迎來到編譯器網站</h1>\n\t\n    <div class="container">
-            <div class="html">這是HTML</div>
-            <div class="code">這是執行程式碼</div>
-            <div class="css">這是CSS</div>
-            <div class="save">這是儲存你的程式碼</div>
-            <div class="javascript">這是JavaScript</div>
-            <div class="chatbot">這是開起聊天機器人</div>
-            <div class="output">這是你的輸出結果</div>
-            <div class="log">這是你的程式碼紀錄</div>
-        </div>\n</body>\n</html>`,
+        value: `
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Page</title>
+  </head>
+<body>
+      <div id="large-header" class="large-header">
+        <canvas id="demo-canvas"></canvas>
+            <h1 class="main-title" id="text"></h1>
+        </div>
+</body>
+</html>
+        `,
         language: 'html',
         theme: 'vs-dark',
         colorDecorators: true,
         automaticLayout: true, // 启用自动布局
+        formatOnType: true,
+        minimap: {
+          enabled: false // 關閉迷你地圖
+        }
       });
       // 监听 HTML 编辑器内容变化
       this.htmlEditor.onDidChangeModelContent(() => {
@@ -727,12 +811,17 @@
       });
       // 初始化 CSS 编辑器
       this.cssEditor = monaco.editor.create(this.$refs.cssEditorContainer, {
-        value: 'body {\n\tfont-family: Arial, sans-serif;\n}\nh1 {\n\tmargin-top: 50px;\n\tz-index: 10;\n\ttext-align: center;\n}\n.content{\n\tdisplay: flex;\n\tflex-direction: column;\n\tmargin: 0 0 0 40px;\n}\n.html{\n\tdisplay:flex;\n\tjustify-content: start;\n\tmargin-top: -75px;\n\tmargin-left: 40px;\n}\n.code{\n\tdisplay:flex;\n\tjustify-content: end;\n\tmargin-right: 50px;\n\tmargin-top: -15px;\n}\n.css{\n\tdisplay:flex;\n\tjustify-content: start;\n\tmargin-top: 50px;\n\tmargin-left: 40px;\n}\n.save{\n\tdisplay:flex;\n\tjustify-content: end;\n\tmargin-right: 50px;\n\tmargin-top: 5px;\n}\n.javascript{\n\tdisplay:flex;\n\tjustify-content: start;\n\tmargin-top: 40px;\n\tmargin-left: 40px;\n}\n.chatbot{\n\tdisplay:flex;\n\tjustify-content: end;\n\tmargin-right: 50px;\n\tmargin-top: 20px;\n}\n.output{\n\tdisplay:flex;\n\tjustify-content: start;\n\tmargin-top: 80px;\n\tmargin-left: 40px;\n}\n.log{\n\tdisplay:flex;\n\tjustify-content: end;\n\tmargin-right: 50px;\n\tmargin-top: -30px;\n}\n',
+        value: 'body {\n\tfont-family: Arial, sans-serif;\n\tmargin: 0;\n}\n.large-header {\n\tposition: relative;\n\twidth: 100%;\n\tbackground: #333;\n\toverflow: hidden;\n\tbackground-size: cover;\n\tbackground-position: center center;\n\tz-index: 1;\n}\n#large-header {\n\tbackground-image: url(\'https://www.marcoguglie.it/Codepen/AnimatedHeaderBg/demo-1/img/demo-1-bg.jpg\');\n}\n.main-title {\n\tposition: absolute;\n\tmargin: 0;\n\tpadding: 0;\n\tcolor: #f9f1e9;\n\ttext-align: center;\n\ttop: 50%;\n\tleft: 50%;\n\t-webkit-transform: translate3d(-50%,-50%,0);\n\ttransform: translate3d(-50%,-50%,0);\n}\n.demo-1 .main-title {\n\ttext-transform: uppercase;\n\tfont-size: 4.2em;\n\tletter-spacing: 0.1em;\n}\n.main-title .thin {\n\tfont-weight: 200;\n}\n@media only screen and (max-width : 768px) {\n\t.demo-1 .main-title {\n\t\tfont-size: 3em;\n\t}\n}\nh1 {\n\tmargin-top: 50px;\n\tz-index: 10;\n\ttext-align: center;\n}\n.content{\n\tdisplay: flex;\n\tflex-direction: column;\n\tmargin: 0 0 0 40px;\n}'
+,
         language: 'css',
         theme: 'vs-dark',
         codeLens: false,
         colorDecorators: true,
         automaticLayout: true, // 启用自动布局
+        formatOnType: true,
+        minimap: {
+                enabled: false // 關閉迷你地圖
+        }
       });
       // 监听 CSS 编辑器内容变化
       this.cssEditor.onDidChangeModelContent(() => {
@@ -754,11 +843,197 @@
       });
       // 初始化 JavaScript 编辑器
       this.jsEditor = monaco.editor.create(this.$refs.jsEditorContainer, {
-        value: `console.log('Hello, world!');`,
+        value: `
+        document.addEventListener('DOMContentLoaded', () => {
+            (function() {
+                var width, height, largeHeader, canvas, ctx, points, target, animateHeader = true;
+
+                // Main
+                initHeader();
+                initAnimation();
+                addListeners();
+
+                function initHeader() {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    target = {x: width/2, y: height/2};
+
+                    largeHeader = document.getElementById('large-header');
+                    largeHeader.style.height = height+'px';
+
+                    canvas = document.getElementById('demo-canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx = canvas.getContext('2d');
+
+                    // create points
+                    points = [];
+                    for(var x = 0; x < width; x = x + width/20) {
+                        for(var y = 0; y < height; y = y + height/20) {
+                            var px = x + Math.random()*width/20;
+                            var py = y + Math.random()*height/20;
+                            var p = {x: px, originX: px, y: py, originY: py };
+                            points.push(p);
+                        }
+                    }
+
+                    // for each point find the 5 closest points
+                    for(var i = 0; i < points.length; i++) {
+                        var closest = [];
+                        var p1 = points[i];
+                        for(var j = 0; j < points.length; j++) {
+                            var p2 = points[j];
+                            if(!(p1 == p2)) {
+                                var placed = false;
+                                for(var k = 0; k < 5; k++) {
+                                    if(!placed) {
+                                        if(closest[k] == undefined) {
+                                            closest[k] = p2;
+                                            placed = true;
+                                        }
+                                    }
+                                }
+
+                                for(var k = 0; k < 5; k++) {
+                                    if(!placed) {
+                                        if(getDistance(p1, p2) < getDistance(p1, closest[k])) {
+                                            closest[k] = p2;
+                                            placed = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        p1.closest = closest;
+                    }
+
+                    // assign a circle to each point
+                    for(var i in points) {
+                        var c = new Circle(points[i], 2+Math.random()*2, 'rgba(255,255,255,0.3)');
+                        points[i].circle = c;
+                    }
+                }
+
+                // Event handling
+                function addListeners() {
+                    if(!('ontouchstart' in window)) {
+                        window.addEventListener('mousemove', mouseMove);
+                    }
+                    window.addEventListener('scroll', scrollCheck);
+                    window.addEventListener('resize', resize);
+                }
+
+                function mouseMove(e) {
+                    var posx = posy = 0;
+                    if (e.pageX || e.pageY) {
+                        posx = e.pageX;
+                        posy = e.pageY;
+                    } else if (e.clientX || e.clientY) {
+                        posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+                        posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+                    }
+                    target.x = posx;
+                    target.y = posy;
+                }
+
+                function scrollCheck() {
+                    if(document.body.scrollTop > height) animateHeader = false;
+                    else animateHeader = true;
+                }
+
+                function resize() {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    largeHeader.style.height = height+'px';
+                    canvas.width = width;
+                    canvas.height = height;
+                }
+
+                // animation
+                function initAnimation() {
+                    animate();
+                    for(var i in points) {
+                        shiftPoint(points[i]);
+                    }
+                }
+
+                function animate() {
+                    if(animateHeader) {
+                        ctx.clearRect(0,0,width,height);
+                        for(var i in points) {
+                            // detect points in range
+                            if(Math.abs(getDistance(target, points[i])) < 4000) {
+                                points[i].active = 0.3;
+                                points[i].circle.active = 0.6;
+                            } else if(Math.abs(getDistance(target, points[i])) < 20000) {
+                                points[i].active = 0.1;
+                                points[i].circle.active = 0.3;
+                            } else if(Math.abs(getDistance(target, points[i])) < 40000) {
+                                points[i].active = 0.02;
+                                points[i].circle.active = 0.1;
+                            } else {
+                                points[i].active = 0;
+                                points[i].circle.active = 0;
+                            }
+
+                            drawLines(points[i]);
+                            points[i].circle.draw();
+                        }
+                    }
+                    requestAnimationFrame(animate);
+                }
+
+                function shiftPoint(p) {
+                    gsap.to(p, {duration: 1 + Math.random(), x: p.originX - 50 + Math.random() * 100, y: p.originY - 50 + Math.random() * 100, ease: "power1.inOut", onComplete: function() {
+                        shiftPoint(p);
+                    }});
+                }
+
+                // Canvas manipulation
+                function drawLines(p) {
+                    if(!p.active) return;
+                    for(var i in p.closest) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p.closest[i].x, p.closest[i].y);
+                        ctx.strokeStyle = 'rgba(156,217,249,'+ p.active+')';
+                        ctx.stroke();
+                    }
+                }
+
+                function Circle(pos,rad,color) {
+                    var _this = this;
+
+                    // constructor
+                    (function() {
+                        _this.pos = pos || null;
+                        _this.radius = rad || null;
+                        _this.color = color || null;
+                    })();
+
+                    this.draw = function() {
+                        if(!_this.active) return;
+                        ctx.beginPath();
+                        ctx.arc(_this.pos.x, _this.pos.y, _this.radius, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = 'rgba(156,217,249,'+ _this.active+')';
+                        ctx.fill();
+                    };
+                }
+
+                // Util
+                function getDistance(p1, p2) {
+                    return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
+                }
+            })();
+        });
+        `,
         language: 'javascript',
         theme: 'vs-dark',
         automaticLayout: true, // 启用自动布局
-
+        formatOnType: true,
+        minimap: {
+            enabled: false // 關閉迷你地圖
+        }
         
       });
       // 监听 JavaScript 编辑器内容变化
@@ -837,7 +1112,6 @@
       .then(response => {
           response.data.data.ExamTicket.forEach(element => {
               if (element.state == 1) { 
-                console.log(element);
                   let ticket = {
                     examScore: element.score, 
                     examAns: element.answer,
@@ -947,7 +1221,11 @@
   #iframe-container {
     width: 100%;
     height: 100%;
+    backdrop-filter:blur(8px); 
+    -webkit-backdrop-filter:blur(8px);
+    background:rgba(255, 255, 255, 0.37);
   }
+
   iframe {
     position: fixed;
     top: 0;
@@ -975,7 +1253,7 @@
   .toggle-chat-btn {
     position: fixed;
     right: 0;
-    width: 80px;
+    width: 40px;
     z-index: 1000;
     transform: translateX(85%);
     transition: all 0.3s ease;;
@@ -1002,6 +1280,10 @@
     z-index: 1000;
     transform: translateX(-85%);
     transition: all 0.5s ease;;
+  }
+  .toggle-btn:hover {
+    transform: translateX(0);
+    transition: all 0.3s ease;;
   }
   .chat{
     position: fixed;
@@ -1036,10 +1318,7 @@
   .document::-webkit-scrollbar-track {
     background-color: transparent;
   }
-  .toggle-btn:hover {
-    transform: translateX(0);
-    transition: all 0.3s ease;;
-  }
+
   .text .editor-container {
     width: 100%;
     height: 100vh;
@@ -1078,16 +1357,27 @@
       overflow: auto; /* Add overflow to make it scrollable if needed */
     }
   .practice {
+    position: fixed;
+    width: 80px;
+    z-index: 9000;
     left: 50%; 
-    top: -30%; 
+    top: -80%; 
     transform: translate(-50%, -50%); 
     font-size: 50px; 
-    background-color: #f0ad4e; 
-    width: 500px; 
-    height: 500px;  
+    width: 80%; 
+    height: 90%;  
     display: flex; 
-    justify-content: 
-    center; align-items: center;
+    justify-content: center; 
+    align-items: center;
+    transition: all 0.5s ease;;
+  }
+  .practiceBtn{
+    background-color: blueviolet;
+  }
+  .practiceBtn:hover {
+    background-color: blueviolet;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;;
   }
 
 </style>

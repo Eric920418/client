@@ -82,7 +82,6 @@
                 </div>
                 <div class="d-flex justify-content-end">
                     <button class="btn btn-success" @click="pushNewTicket">發送考券</button>
-                    {{ ExamTicket }}
                 </div>
             </div>
             <div v-if="oldExamTicket.type" class="card-body">
