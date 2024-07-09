@@ -4,10 +4,11 @@
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('student')">學生資料</button>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('exam')">考試系統</button>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('score')">成績查詢</button>
+    <button class="btn btn-outline-secondary border-0" @click="changeFocus('practice')">練習系統</button>
     <button class="btn btn-outline-warning border-0 ms-auto" @click="stop" >暫停伺服器</button>  
     <button class="btn btn-outline-danger border-0 ms-1" @click="restartServer">重啟伺服器</button>
     </nav>
-    <div class="mx-auto " style="width: 90%; height: 100%;">
+    <div class="mx-auto " style="width: 95%; height: 100%;">
         <div  v-if="focus === 'exam'">
             <exam></exam>
         </div>
@@ -17,6 +18,9 @@
         <div  v-if="focus === 'score'">
             <score></score>
         </div>
+        <div  v-if="focus === 'practice'">
+            <practice></practice>
+        </div>
     </div>
 </div>
 </template>
@@ -25,11 +29,13 @@
 import student from '../components/StudentInformation.vue';
 import exam from '../components/ExamSystem.vue';
 import score from '../components/Score.vue';
+import practice from '../components/Practice.vue';
 export default {
 components: {
     student,
     exam,
-    score
+    score,
+    practice
 },
 data() {
     return {
