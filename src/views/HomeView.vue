@@ -2,28 +2,36 @@
   <div class="main" ref="main">
       <div class="containers" ref="code">
           <div>
-            <button class="toggle-btn btn btn-danger" id="html" style="font-size: 50px;  top: 0%;" @click="toggleHtml"><i class="fa-brands fa-html5"></i></button>
+            <button class="toggle-btn btn btn-danger" id="html" style="font-size: 50px;  top: 0%;" @click="toggleHtml"><i class="fa-brands fa-html5 m-0 p-0"></i><div class="icon-text">HTML</div></button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-primary" id="css" style="font-size: 50px;  top: 10.5%;" @click="toggleCss"><i class="fa-brands fa-css3-alt"></i></button>
+            <button class="toggle-btn btn btn-primary" id="css" style="font-size: 50px;  top: 11.5%;" @click="toggleCss"><i class="fa-brands fa-css3-alt"></i><div class="icon-text">CSS</div></button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-warning" id="js" style="font-size: 50px;  top: 21%;" @click="toggleJs"><i class="fa-brands fa-square-js"></i></button>
+            <button class="toggle-btn btn btn-warning" id="js" style="font-size: 50px;  top: 23.5%;" @click="toggleJs"><i class="fa-brands fa-square-js"></i><div class="icon-text">JavaScript</div></button>
           </div>
-
+          <div>
+            <button class="toggle-btn btn btn-success" id="code" style="font-size: 23px;  top: 36%;"  @click.stop="runOutput" ref="run">執行</button>
+          </div>
           <div>
             <button class="toggle-btn btn btn-light" id="restart" style="font-size: 50px;  top: 49%;" @click="restart"><i class="fa-solid fa-rotate-left"></i></button>
           </div>
           <div>
-            <button class="toggle-btn btn practiceBtn" id="practice" ref="tip" style="font-size: 50px; top: 60%;" @click="startPractice"><i class="fa-solid fa-laptop-code"></i></button>
+            <button class="toggle-btn btn practiceBtn" id="practice" ref="tip" style="font-size: 50px; top: 60%;" @click="startPractice">
+              <i class="fa-solid fa-laptop-code"></i>
+              <span v-html="badgeHtml"></span>
+            </button>
           </div>
-          <div class="practice" ref="practice" style="">
-            <div class="card w-100 h-100" style="background-color: #f8f9fa;">
+          <div class="practice" ref="practice">
+            <div ref="practiceCard"  class="card w-100 h-100"  style="background-color: #f8f9fa;">
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">練習題</h5>
-                <p class="card-text flex-grow-1">請做出．．．．．的網頁</p>
-                <button class="btn btn-primary align-self-end" @click="startPractice">看範例</button>
+                <p class="flex-grow-1" style="font-size: 30px;">{{ practiceCode.context }}</p>
+                <button class="btn btn-primary align-self-end" @click="watchExm">看範例</button>
               </div>
+            </div>
+            <div ref="practiceIframeCard" class="card d-none mx-auto w-100 " style="background-color: transparent; ">
+              <iframe ref="practiceIframe" height="80%" width="100%"></iframe>
             </div>
           </div>
           <div>
@@ -41,14 +49,13 @@
               <iframe id="output" ref="output"></iframe>
             </div>
           </div>
-          <button class="toggle-chat-btn btn btn-danger" id="code" style="font-size: large; width: 40px; top: 0%;" @click.stop="runOutput" ref="run">跑程式碼</button>
           <button class="toggle-chat-btn btn btn-primary" id="save" style="font-size: large; width: 40px; top: 14.5%;" @click.stop="saveButton" ref="save">儲存</button>
           <button class="toggle-chat-btn btn btn-warning" id="chatbot" style="font-size: large; width: 40px; top: 23%;" v-if="isCollapsed" @click="toggleChat" ref="chat">開啟聊天</button>
           <button class="toggle-chat-btn btn btn-success" id="log" style="font-size: large; width: 40px; top: 37.5%;" v-if="isOpenLog" @click="openLog" ref="log">打開紀錄</button>
           <button class="toggle-chat-btn btn btn-secondary" id="test" style="font-size: large; width: 40px; top: 52%;" v-if="isTest" @click="openTest">開啟考試視窗
             <span class="position-absolute  translate-middle badge rounded-pill bg-danger " style="left: -5px; top: 10px;">{{ exams.length }}</span>
           </button>
-          <button class="toggle-chat-btn btn btn-info" id="document" style="font-size: large; width: 40px; top: 72.7%;" @click="openLog">心得</button>
+          <button class="toggle-chat-btn btn btn-info" id="document" style="font-size: large; width: 40px; top: 72.7%;" @click="">心得</button>
       </div>
 
       <div v-if="!isCollapsed" >
@@ -201,7 +208,14 @@
         finishExams: [],
         exam: {},
         isFinishExam: {},
-
+        practiceCode: {
+          html: '',
+          css: '',
+          js: '',
+          context: '',
+        },
+        badgeHtml: '' ,
+        socket: null,
       };
     },
     methods: {
@@ -418,8 +432,9 @@
       },
       startPractice() {
         if (!this.isStarted) {
-          this.$refs.practice.style.top = '49%';
+          this.$refs.practice.style.top = '30%';
           this.isStarted = true;
+
         } else {
           this.$refs.practice.style.top = '-100%';
           this.isStarted = false;
@@ -647,6 +662,11 @@
           this.cssCode = ``
           this.jsCode = `document.addEventListener('DOMContentLoaded', (event) => { })`
           this.updateOutput();
+          this.$swal.fire({
+              title: '重置成功',
+              text: '已成功重置',
+              icon: 'success',
+          })
       },
       firstLogin() {
       if(localStorage.getItem('loginNumber') == 0){
@@ -683,9 +703,9 @@
               const messages = [
                   "大家好 歡迎第一次登陸這個編譯網站<br>現在開始我要慢慢介紹功能按鈕", 
                   "這是撰寫HTML的地方 點擊後會出現編輯器", "這是撰寫CSS的地方 點擊後會出現編輯器", "這是JavaScript的地方 點擊後會出現編輯器", 
-                  "這是清空代碼的地方 點擊後會清空所有代碼", "這是練習的地方 點擊後會出現練習題目", 
-                  "這是跑程式碼的地方 點擊後會出現程式碼結果", "這是儲存的地方 可以按下crtl+s快速儲存代碼", 
-                  "這是聊天室的地方 點擊可以打開聊天室<br>與gpt機器人交流", "這是程式碼紀錄的地方 可以查看自己的程式碼紀錄<br>點擊日期可以還原程式碼", 
+                  "這是跑程式碼的地方 點擊後會出現程式碼結果","這是清空代碼的地方 點擊後會清空所有代碼", 
+                  "這是練習的地方 點擊後會出現練習題目","這是儲存的地方 可以按下crtl+s快速儲存代碼", 
+                  "這是聊天室的地方 點擊可以打開聊天室<br>與gpt機器人交流", "這是程式碼紀錄的地方 可以查看自己的程式碼紀錄<br>點擊Demo可以還原程式碼", 
                   "這是考試視窗的地方 可以進行考試", "這是寫心得的地方 可以寫下自己的心得", 
                   "歡迎 來到編譯網站", "準備好開始學習"
               ];
@@ -697,9 +717,9 @@
               { id: 'html', delay: 4500, fontSize: '50px', class: 'toggle-btn' },
               { id: 'css', delay: 8500, fontSize: '50px', class: 'toggle-btn' },
               { id: 'js', delay: 12500, fontSize: '50px', class: 'toggle-btn' },
-              { id: 'restart', delay: 16500, fontSize: '50px', class: 'toggle-btn' },
-              { id: 'practice', delay: 20500, fontSize: '50px', class: 'toggle-btn' },
-              { id: 'code', delay: 24500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
+              { id: 'code', delay: 16500, fontSize: '23px',  class: 'toggle-btn' },
+              { id: 'restart', delay: 20500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'practice', delay: 24500, fontSize: '50px', class: 'toggle-btn' },
               { id: 'save', delay: 28500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
               { id: 'chatbot', delay: 32500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
               { id: 'log', delay: 36500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
@@ -728,7 +748,51 @@
       }else{
           return;
       }
+      },
+      watchExm() {
+        this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 0; transition: all 0.5s ease-in-out;';
+          this.$refs.practiceCard.classList.add('d-none');
+          this.$refs.practiceIframeCard.classList.remove('d-none');
+        }, 500);
+
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: 150%; top: 31%; opacity: 0; transition: all 0.5s ease-in-out;';
+          const iframe2 = this.$refs.practiceIframe;
+          if (iframe2) {
+            const documentContent = `
+              <html>
+                <head>
+                  <style>${this.practiceCode.css}<\/style>
+                  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"><\/script>
+                </head>
+                <body>
+                  ${this.practiceCode.html}
+                  <script>
+                      ${this.practiceCode.js}
+                  <\/script>
+                </body>
+              </html>
+            `;
+            iframe2.srcdoc = documentContent;
+          } else {
+            console.error('Iframe reference is undefined');
+          }
+          setTimeout(() => {
+            this.$refs.practice.style.cssText = 'left: 50%; top:31%; opacity: 1; width: 80%;  transition: all 0.5s ease-in-out;';
+          }, 400);
+        }, 500); 
+      },
+      closeSocket(){
+        const userId = this.getCookie('id');
+        const userClose = JSON.stringify({ type: 'close',userId: userId });
+        this.socket.send( userClose );
+        setTimeout(() => {
+          this.socket.close();
+        }, 100);
       }
+
     },
     mounted() {
       this.firstLogin()
@@ -736,6 +800,22 @@
       var storedToken = localStorage.getItem('token');
       if (storedToken == null) {
         this.$router.push('/');
+      }
+      if (this.getCookie('state') == 0) {
+        this.$swal({
+              title: '目前暫停操作',
+              text: '請等待老師指示',
+              icon: 'warning',
+              confirmButtonText: '確定',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              allowEnterKey: false,
+              stopKeydownPropagation: false,
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: false,
+              showDenyButton: false,
+            })
       }
       ////////////////////////////////////////////////////////////
       document.addEventListener('keydown', (event) => {
@@ -1198,6 +1278,61 @@
               }
           });
       })
+      this.socket = new WebSocket('ws://140.138.147.12:3000');
+      this.socket.onopen = () => {
+        const userLogin = JSON.stringify({ type: 'open',userId: userId });
+        this.socket.send(userLogin);
+      };
+
+      this.socket.onmessage = (event) => {
+        try {
+          if(event.data[0] != '{') return;
+          const jsonObject = JSON.parse(event.data);
+          const type = jsonObject.type;
+
+          if (type === 'practice') {
+            this.badgeHtml = '<span class="position-absolute translate-middle badge rounded-pill bg-danger" style="left: 90px; top: 10px; font-size: 15px;">!</span>';
+            this.practiceCode.html = jsonObject.content.html;
+            this.practiceCode.css = jsonObject.content.css;
+            this.practiceCode.js = jsonObject.content.js;
+            this.practiceCode.context = jsonObject.content.content;
+          }
+
+          if (type === 'stop') {
+            this.$cookies.set('state', 0);
+            
+            this.$swal({
+              title: '目前暫停操作',
+              text: '請等待老師指示',
+              icon: 'warning',
+              confirmButtonText: '確定',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              allowEnterKey: false,
+              stopKeydownPropagation: false,
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: false,
+              showDenyButton: false,
+            })
+          }
+
+          if( type === 'begin') {
+            this.$swal.close();
+            this.$cookies.set('state', 1);
+            const userLogin = JSON.stringify({ type: 'open',userId: userId });
+            this.socket.send(userLogin);
+          }
+
+        } catch (error) {
+          console.error('JSON 解析错误:', error);
+        }
+      };
+
+      this.socket.onclose = () => {
+        console.log('Socket斷線');
+      };
+
       window.addEventListener('beforeunload', this.handleBeforeUnload);
     },
     beforeUnmount() {
@@ -1212,6 +1347,7 @@
       }
     },        
     beforeDestroy() {
+      this.closeSocket()
       window.removeEventListener('beforeunload', this.handleBeforeUnload);
     },
   };
@@ -1231,8 +1367,8 @@
     top: 0;
     width: 100%;
     height: 100vh;
-    background: #fff;
     border: none;
+    background-color: #fff;
   }
   label i {
     margin-left: 10px;
@@ -1358,14 +1494,13 @@
     }
   .practice {
     position: fixed;
-    width: 80px;
     z-index: 9000;
     left: 50%; 
     top: -80%; 
     transform: translate(-50%, -50%); 
     font-size: 50px; 
-    width: 80%; 
-    height: 90%;  
+    width: 60%; 
+    height: 60%;  
     display: flex; 
     justify-content: center; 
     align-items: center;
@@ -1378,6 +1513,11 @@
     background-color: blueviolet;
     cursor: pointer;
     transition: all 0.3s ease-in-out;;
+  }
+  .icon-text{
+    font-size: 15px;
+    margin-top: -10px;
+    padding: 0;
   }
 
 </style>

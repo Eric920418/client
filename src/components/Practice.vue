@@ -1,8 +1,8 @@
 <template>
-    <button type="button" class="btn btn-primary my-3">紀錄</button>
+    <!-- <button type="button" class="btn btn-primary my-3">紀錄</button> -->
     <div class="card shadow-lg my-2">
         <div class="card-body">
-            <textarea type="text" class="form-control fs-5 w-100 my-3 border-3" style="height: 200px;" placeholder="練習內容"></textarea>  
+            <textarea type="text" class="form-control fs-5 w-100 my-3 border-3" v-model="content" style="height: 200px;" placeholder="練習內容"></textarea>  
             <div class="d-flex my-1">
                 <div class="text" id="html-code" ref="html">
                     <div class="editor-container" ref="htmlEditorContainer"></div>
@@ -19,7 +19,7 @@
                     <iframe id="output" ref="output"></iframe>
                 </div>
             <div class="d-flex mt-4">
-                <button type="button" class="btn btn-primary ms-auto">送出</button>
+                <button type="button" class="btn btn-primary ms-auto" @click="sendPractice">送出</button>
             </div>
         </div>
 
@@ -35,6 +35,7 @@ import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 export default {
     data() {
         return {
+            content: '',
             htmlCode: '',
             cssCode: '',
             jsCode: '',
@@ -42,20 +43,36 @@ export default {
     },
     methods: {
         updateOutput() {
-        const iframe = this.$refs.output;
-        const documentContent = `
-          <html>
-            <head>
-              <style>${this.cssCode}</style>
-            </head>
-            <body>
-              ${this.htmlCode}
-              <script>${this.jsCode}<\/script>
-            </body>
-          </html>
-        `;
-        iframe.srcdoc = documentContent;
-      },
+            const iframe = this.$refs.output;
+                const documentContent = `
+                <html>
+                    <head>
+                    <style>${this.cssCode}</style>
+                    </head>
+                    <body>
+                    ${this.htmlCode}
+                    <script>${this.jsCode}<\/script>
+                    </body>
+                </html>
+                `;
+                iframe.srcdoc = documentContent;
+        },
+        sendPractice() {
+            const practice = {
+                content: this.content,
+                html: this.htmlCode,
+                css: this.cssCode,
+                js: this.jsCode,
+            }
+            this.$axios.post('/code/sendPractice', practice)
+            .then((res) => {
+                this.$swal.fire({
+                    title: '發送成功',
+                    text: '已成功發送',
+                    icon: 'success',
+                })
+            })
+        }
     },
     mounted() {
         this.$refs.htmlEditorContainer.MonacoEnvironment = {
@@ -179,7 +196,8 @@ export default {
 iframe {
     width: 100%;
     height: 60vh;;
-    background: #ffffff;;
+    background: transparent;
     border: none;
 }
+
 </style>

@@ -34,6 +34,9 @@ export default {
 
                     if (storedToken) {
                         if (storedIdentity == 'admin') {
+                            const jwtParts = storedToken.split(".");
+                            const payload = JSON.parse(atob(jwtParts[1]));
+                            this.$cookies.set('id', payload.id);
                             this.$swal.fire({
                                 title: '登入成功',
                                 text: '老師您好',
@@ -53,6 +56,7 @@ export default {
                             const payload = JSON.parse(atob(jwtParts[1]));
                             this.$cookies.set('id', payload.id);
                             this.$cookies.set('name', payload.name);
+                            this.$cookies.set('state', 1);
                             this.$swal.fire({
                                 title: '登入成功',
                                 text: '',
