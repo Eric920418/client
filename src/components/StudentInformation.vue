@@ -24,7 +24,8 @@
           <th scope="col">姓名</th>
           <th scope="col">學號</th>
           <th scope="col">屆數</th>
-          <th scope="col">內容</th>
+          <th scope="col">狀態</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
@@ -33,7 +34,11 @@
           <td>{{ student.name }}</td>
           <td>{{ student.studentID }}</td>
           <td>{{ student.session }}</td>
-          <td><button class="btn btn-danger" @click.stop="deleteStudent(student)">刪除</button></td>
+          <td> 
+            <div v-if="student.state == 0" class="light" style="background-color: red;"></div>
+            <div v-else class="light"></div>
+          </td>
+          <td class="d-flex justify-content-center"><button class="btn btn-danger" @click.stop="deleteStudent(student)">刪除</button></td>
         </tr>
       </tbody>
     </table>
@@ -74,7 +79,8 @@ export default {
       name: '',
       studentID: '',
       session: '',
-      password: ''
+      password: '',
+      socket: null,
     };
   },
   computed: {
@@ -92,6 +98,11 @@ export default {
     }
   },
   methods: {
+    getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    },
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -300,27 +311,68 @@ export default {
   },
   mounted() {
     var storedToken = localStorage.getItem('token');
-    this.$axios
-      .get('/auth/students', {
-        headers: {
-            'Authorization': `Bearer ${storedToken}`,
-            'Content-Type': 'application/json',
-        }
-      })
-      .then(res => {
-        this.students = res.data.data.students;
-        this.sessions = this.students.map(student => student.session);
-      })
-      .catch(err => {
-        console.error('Error fetching students:', err);
+    this.$axios.get('/auth/students', {
+      headers: {
+          'Authorization': `Bearer ${storedToken}`,
+          'Content-Type': 'application/json',
+      }
+    })
+    .then(res => {
+      res.data.data.students.forEach(student => {
+        this.students.push({
+          name: student.name,
+          studentID: student.studentID,
+          session: student.session,
+          _id: student._id,
+          state: 0
+        });
       });
-  }
+      this.sessions = this.students.map(student => student.session);
+    })
+    .catch(err => {
+      console.error('Error fetching students:', err);
+    });
+    let userId = this.getCookie('id');
+    this.socket = new WebSocket('ws://140.138.147.12:3000');
+    this.socket.onopen = () => {
+      const userLogin = JSON.stringify({ type: 'open',userId: userId });
+      this.socket.send(userLogin);
+    };
+
+    this.socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type == 'userConnected') {
+        this.students.forEach(student => {
+          if (student._id == data.userId) {
+            student.state = 1;
+          }
+        });
+      }else if (data.type == 'userDisconnected') {
+        this.students.forEach(student => {
+          if (student._id == data.userId) {
+            student.state = 0;
+          }
+        });
+      }
+    };
+
+    this.socket.onclose = () => {
+      console.log('Socket斷線');
+    };
+  },
 };
 </script>
 
 <style scoped>
 input[type='file'] {
   display: none;
+}
+
+.light{
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: greenyellow;
 }
 
 </style>

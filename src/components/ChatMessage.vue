@@ -6,7 +6,7 @@
     <div v-if="!thisLog" class="log w-100 " ref="log">
       <div class="thisLog" v-for="(log, index) in log" :key="index" @click="checkLog(log)">
         <div class=" my-3 px-2 d-flex justify-content-between align-items-center w-100">
-          <div>{{ log.title }}</div>
+          <div style="width: 220px; overflow: hidden;">{{ log.title }}</div>
           <div> {{ log.time }} </div>
         </div>
       </div>
@@ -22,6 +22,11 @@
       </div>
       <div v-if="chatOpen == true" class="mt-auto w-100 position-relative pt-2 CI" ref="input">
         <textarea ref="textarea" class=" form-control border-1 int" type="text" v-model="que" @input="autoResize" @keypress.enter="handleEnter" ></textarea>
+        <div class="icon-Loading" v-if="isSubmitting">
+          <div class="spinner-border" style="color: black;" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
         <div class="icon-wrapper">
           <i class="bi bi-arrow-up-square-fill in z-3 fs-3 mt-1" @click="handleEnter"></i>
         </div>
@@ -72,8 +77,9 @@ export default {
         this.$nextTick(() => {
           this.scrollToBottom();
         });
-        this.que = '稍等...';
-        
+        this.$refs.textarea.disabled = true;
+        this.$refs.textarea.style.height = '30px';
+        this.que = '';
         try {
           let storedToken = localStorage.getItem('token');
           let userId = this.getCookie('id');
@@ -84,11 +90,11 @@ export default {
               'Content-Type': 'application/json',
             }
           });
-          this.que = '';
+          this.chat.push({ role: 'assistant', content: response.data.ai  });
           this.$nextTick(() => {
             this.scrollToBottom();
           });
-          this.chat.push({ role: 'assistant', content: response.data.ai  });
+          this.$refs.textarea.disabled = false;
           this.$axios.put(`/chat/dialogue/${chatId}`, {dialogues: this.chat, user: userId},{
             headers: {
               'Authorization': `Bearer ${storedToken}`,
@@ -269,7 +275,7 @@ export default {
 }
 
 .in:hover {
-  color: #636363; /* 更改 'red' 為所需顏色 */
+  color: #636363; 
 }
 
 .code-container {
@@ -293,8 +299,12 @@ export default {
   border-radius: 20px;
   padding: 10px;
   margin-bottom: 10px;
-  white-space: pre-wrap; /* Allow text to wrap and handle line breaks */
-  word-break: break-word; /* Ensure long words break to avoid overflow */
+  white-space: pre-wrap; 
+  word-break: break-word; 
+}
+.ai-message pre {
+  margin: 0;
+  padding: 0;
 }
 .thisLog:hover {
   background-color: #745959;
@@ -304,6 +314,14 @@ export default {
   position: absolute;
   top: 0;
   right: 10px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.icon-Loading{
+  position: absolute;
+  top: 0;
+  right: 350px;
   height: 100%;
   display: flex;
   align-items: center;

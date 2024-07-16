@@ -5,10 +5,11 @@
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('exam')">考試系統</button>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('score')">成績查詢</button>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('practice')">練習系統</button>
-    <button class="btn btn-outline-warning border-0 ms-auto" @click="stop" >暫停伺服器</button>  
+    <button v-if="state === 1"  class="btn btn-outline-warning border-0 ms-auto" @click="stop" >暫停伺服器</button>  
+    <button v-if="state === 0"  class="btn btn-outline-success border-0 ms-auto" @click="stop" >啟動伺服器</button>
     <button class="btn btn-outline-danger border-0 ms-1" @click="restartServer">重啟伺服器</button>
     </nav>
-    <div class="mx-auto " style="width: 95%; height: 100%;">
+    <div class="mx-auto admin" style="width: 95%; height: 100%;">
         <div  v-if="focus === 'exam'">
             <exam></exam>
         </div>
@@ -41,7 +42,9 @@ data() {
     return {
         focus: "student",
         serverRestart: false,
-        waitSec: 15
+        waitSec: 15,
+        socket: null,
+        state: 1,
     }
 },
 methods: {
@@ -90,16 +93,36 @@ methods: {
         });
     },
     stop() {
-        let data = {status: "stop"};
-        EventBus.$emit('stop', data);
+        if (this.state === 1) {
+            this.state = 0;
+            this.$swal.fire({
+                title: '暫停伺服器',
+                text: `伺服器正在暫停`,
+                icon: 'success',
+                confirmButtonText: `確定`,
+            })
+            this.$axios.post('/code/stop', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } })
+        } else {
+            this.state = 1;
+            this.$swal.fire({
+                title: '啟動伺服器',
+                title: '啟動伺服器',
+                text: `伺服器正在啟動`,
+                icon: 'success',
+                confirmButtonText: `確定`,
+            })
+            this.$axios.post('/code/begin', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } })
+        }
+        
     }
 
 },
 mounted() {
     var storedToken = localStorage.getItem('identity');
     if (storedToken !== "admin") {
-    this.$router.push('/home');
+        this.$router.push('/home');
     }
+
 },
 }
 </script>
@@ -113,5 +136,6 @@ padding: 10px;
 width: 100%;
 height: 70px;
 }
+
 
 </style>
