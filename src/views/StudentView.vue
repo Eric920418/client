@@ -2,13 +2,13 @@
     <div class="bar">
         <button class="btn btn-danger m-3" @click="$router.push('/admin')">返回</button> 
         <button class="btn btn-secondary m-3" @click="gotoInfo">學生資料</button>
-        <button class="btn btn-primary m-3" @click="">成績</button>
+        <button class="btn btn-primary m-3" @click="gotoScore">成績</button>
         <button class="btn btn-warning m-3" @click="gotoAction">動作紀錄</button>
         <button class="btn btn-info m-3" @click="gotoChat">聊天記錄</button>
         <button class="btn btn-success m-3" @click="gotoCode">Code</button>
     </div>
 
-    <div class="px-5 mt-4" >
+    <div class="px-5" style="margin-top: 100px;" >
         <div class="card shadow-lg mb-5" ref="info">
             <div class="card-body">
                 <h5 class="card-title text-primary">學生詳細信息</h5>
@@ -22,6 +22,10 @@
                         <input type="text" id="studentID" v-model="data.studentID" class="form-control">
                     </div>
                     <div class="form-group my-3">
+                        <label for="classNum" class="form-label">班級:</label> 
+                        <input type="text" id="classNum" v-model="data.classNum" class="form-control">
+                    </div>
+                    <div class="form-group my-3">
                         <label for="session" class="form-label">學期:</label> 
                         <input type="text" id="session" v-model="data.session" class="form-control">
                     </div>
@@ -33,6 +37,34 @@
                 <div class="d-flex justify-content-end">
                     <button class="btn btn-success" @click="saveData">儲存</button>
                 </div>
+            </div>
+        </div>
+        <div class="card shadow-lg mb-5" ref="score">
+            <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h5 class="card-title">成績</h5>
+                <!-- <button class="btn btn-success p-0 px-2" style="height: 25px; font-size: 11px;" @click="exportToExcel">匯出Excel</button> -->
+            </div>  
+            <div class="messages p-3 border rounded" style="height: 500px; overflow-y: scroll;">
+                <div  class="message mb-2">
+                    <table class="table mt-3 table-sm  table-hover align-middle ">
+                        <thead>
+                            <th class="fs-4 bold " scope="col">考券名稱</th>
+                            <th class="fs-4 bold " scope="col">分數</th>
+                            <th class="fs-4 bold " scope="col">狀態</th>
+                            <th class="fs-4 bold " scope="col">完成時間</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="exam in data.examTicket" :key="exam">
+                                <td>{{ exam.name }}</td>
+                                <td>{{ exam.score }}</td>
+                                <td>{{ exam.state }}</td>
+                                <td>{{ exam.finishTime }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             </div>
         </div>
         <div class="card shadow-lg mb-5" ref="action">
@@ -112,7 +144,9 @@ export default {
                 password: '',
                 chat: [],
                 code: [],
-                action:[]
+                action:[],
+                classNum: '',
+                examTicket: [],
             },
         };
     },
@@ -123,6 +157,7 @@ export default {
                 name: this.data.name,
                 studentID: this.data.studentID,
                 session: this.data.session,
+                classNum: this.data.classNum,
                 chat: this.data.chat,
                 code: this.data.code
             };
@@ -185,17 +220,26 @@ export default {
             XLSX.writeFile(wb, '學生動作紀錄.xlsx');
         },
         gotoAction() {
-            this.$refs.action.scrollIntoView({ behavior: 'smooth', block: 'start' });
-         
+        this.scrollToElement(this.$refs.action ,100);
         },
         gotoChat() {
-            this.$refs.chat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.scrollToElement(this.$refs.chat ,100);
         },
         gotoCode() {
-            this.$refs.code.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.scrollToElement(this.$refs.code, 100);
         },
         gotoInfo() {
-            this.$refs.info.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.scrollToElement(this.$refs.info, 100);
+        },
+        gotoScore() {
+            this.scrollToElement(this.$refs.score, 100);
+        },
+        scrollToElement(element, offset = 0) {
+            const offsetTop = element.offsetTop - offset;
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            });
         }
     },
     mounted() {
@@ -210,8 +254,7 @@ export default {
                 this.data.name = res.data.data.name;
                 this.data.studentID = res.data.data.studentID;
                 this.data.session = res.data.data.session;
-                this.data.password = res.data.data.password;
-                
+                this.data.classNum = res.data.data.classNum;
                 res.data.data.chat.reverse().forEach((item) => {
                     item.dialogues.reverse().forEach((dialogue) => {
                         if (dialogue.user) {
@@ -238,6 +281,15 @@ export default {
 
                     this.data.code.push(code);
                 });
+                res.data.data.ExamTicket.reverse().forEach((item) => {
+                    const exam ={
+                        name: item.examId.name,
+                        score: item.score,
+                        state: item.state? '完成' : '未完成',
+                        finishTime : item.finishTime,
+                    }
+                    this.data.examTicket.push(exam);
+                });
             })
             .catch(error => {
                 console.error(error);
@@ -262,12 +314,9 @@ export default {
     right: 0;
     z-index: 100;
     background-color: black;
-    transform: translateY(-65px);
+
     transition: all 0.3s ease-in-out;
 }
-.bar:hover{
-    transform: translateY(0);
-    transition: all 0.3s ease-in-out;
-}
+
 
 </style>

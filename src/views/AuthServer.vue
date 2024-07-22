@@ -1,29 +1,38 @@
 <script>
+import { jwtDecode } from 'jwt-decode';
 export default {
 	data() {
 		return {
             name: "",
             studentID: "",
             password: "",
+            classNum:"",
             eye: false,
             token: "",
             status: true,
-		}
-	},
-	computed: {
-		pageStatus() {
-			return {
-				'/login': '木木苑登入',
-				'/login/signin': '木木苑註冊',
-				'/login/forget': '密碼找回'
-			}[this.$route.path]
+            socket: null,
+            userLogin: null
 		}
 	},
 	methods: {
         login() {
-            this.$axios.post('/auth/login', { studentID: this.studentID, password: this.password })
+            const isStudentIDInUse = this.userLogin.some(user => user.studentID === this.studentID);
+            if (this.userLogin.some(user => user=== this.studentID)) {
+                this.$swal.fire({
+                    title: '登入失敗',
+                    text: '帳號正在被使用',
+                    icon: 'error'
+                }).then((result) => {
+                    window.location.reload();
+                });
+            }else{
+                this.$axios.post('/auth/login', { studentID: this.studentID, password: this.password })
                 .then(res => {
                     this.token = res.data.user.token;
+                    const { studentID } =  jwtDecode(res.data.user.token);
+                    const userLogin = JSON.stringify({ type: 'open',userId: studentID });
+                    this.socket.send(userLogin);
+
                     localStorage.setItem('token', this.token);
                     localStorage.setItem('identity', res.data.user.identity);
                     localStorage.setItem('loginNumber' , res.data.user.loginNumber)
@@ -31,45 +40,35 @@ export default {
                     this.password = "";
                     var storedToken = localStorage.getItem('token');
                     var storedIdentity = localStorage.getItem('identity');
-
                     if (storedToken) {
                         if (storedIdentity == 'admin') {
                             const jwtParts = storedToken.split(".");
                             const payload = JSON.parse(atob(jwtParts[1]));
-                            this.$cookies.set('id', payload.id);
                             this.$swal.fire({
                                 title: '登入成功',
                                 text: '老師您好',
                                 icon: 'success',
-                                showCancelButton: true,
-                                confirmButtonText: '進入頁面',
-                                cancelButtonText: '關閉'
+                                showCancelButton: false,
+                                confirmButtonText: '進入頁面'
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     this.$router.push('/admin');
-                                } else if (result.isDismissed) {
-                                    console.log('Modal closed');
                                 }
                             })
                         } else {
                             const jwtParts = storedToken.split(".");
                             const payload = JSON.parse(atob(jwtParts[1]));
-                            this.$cookies.set('id', payload.id);
-                            this.$cookies.set('name', payload.name);
                             this.$cookies.set('state', 1);
                             this.$swal.fire({
                                 title: '登入成功',
                                 text: '',
                                 icon: 'success',
-                                showCancelButton: true,
+                                showCancelButton: false,
                                 confirmButtonText: '進入頁面',
-                                cancelButtonText: '關閉'
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     this.$router.push('/home');
-                                } else if (result.isDismissed) {
-                                    console.log('Modal closed');
-                                }
+                                } 
                             })
                         }
                     }
@@ -77,16 +76,18 @@ export default {
                 .catch(err => {
                     this.$swal.fire({
                         title: '登入失敗',
-                        text: '登入失敗，請重試',
+                        text: `登入失敗，請重試  ${err}`,
                         icon: 'error'
                     });
                 });
+            }
         },
         signup() {
             this.$axios.post('/auth/signUp', {
                 name: this.name,
                 studentID: this.studentID,
-                password: this.password
+                password: this.password,
+                classNum: this.classNum
             })
                 .then(res => {
                     this.$swal.fire({
@@ -120,6 +121,19 @@ export default {
             this.$refs.pas.type = this.eye ? 'text' : 'password';
         }
     },
+    mounted() {
+        this.socket = new WebSocket('ws://140.138.147.12:3000');
+        this.socket.onopen = () => {
+            this.socket.send(JSON.stringify({ type: 'watch' }));
+        };
+        this.socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'response') {
+                this.userLogin = data.message;
+            }
+        };
+        
+    }
 }
 </script>
 
@@ -197,17 +211,18 @@ export default {
             </div>
             <div v-if="!status" class="w-100 d-flex justify-content-center align-items-center" style="height: 100vh;">
                 <div class="form d-flex justify-content-center">
-                    <div style="width: 250px; height: 150px; margin-top: 50px;">
-                        <div class="position-relative">
-                            <i class="bi bi-person-vcard-fill position-absolute z-3 fs-5 text-black" style="top:4px; right:217px;"></i>
+                    <div style="width: 300px; height: 150px; margin-top: 50px;">
+                        <div class="position-relative d-flex">
+                            <i class="bi bi-person-vcard-fill position-absolute z-3 fs-5 text-black" style="top:4px; right:270px;"></i>
                             <input class="d-flex form-control mb-2 position-relative ps-5" type="text" placeholder="姓名" v-model="name">
+                            <input class="d-flex form-control mb-2 position-relative ms-2" type="text" placeholder="班級" v-model="classNum">
                         </div>
                         <div class="position-relative">
-                            <i class="bi bi-person-square position-absolute z-3 fs-5 text-black" style="top:4px; right:217px;"></i>
+                            <i class="bi bi-person-square position-absolute z-3 fs-5 text-black" style="top:4px; right:270px;"></i>
                             <input class="d-flex form-control mb-2 position-relative ps-5" type="text" placeholder="學號" v-model="studentID">
                         </div>
                         <div class="position-relative">
-                            <i class="bi bi-lock-fill position-absolute z-3 fs-5 text-black" style="top:4px; right:217px;"></i>
+                            <i class="bi bi-lock-fill position-absolute z-3 fs-5 text-black" style="top:4px; right:270px;"></i>
                             <input class="d-flex form-control mt-2 position-relative ps-5" type="password" placeholder="密碼" v-model="password" ref="pas">
                             <i v-if="eye==false" class="bi bi-eye-fill position-absolute z-3 fs-5 text-black" style="top:5px; right:10px" @click="see"></i>
                             <i v-else-if="eye==true" class="bi bi-eye-slash-fill position-absolute z-3 fs-5 text-black" style="top:5px; right:10px" @click="see"></i>

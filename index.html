@@ -33,32 +33,32 @@
 
 <script>
   const excludedPaths = ['/client/'];
-  function checkUser() {
-    const storedToken = localStorage.getItem('token');
-    const currentPath = window.location.pathname;
-    if (excludedPaths.includes(currentPath)) {
-      return;
-    }
-    axios.get(`http://140.138.147.12:3000/auth/${storedToken}`)
-      .then((res) => {})
-      .catch((err) => {
-        Swal.fire({
-          title: '帳號被登錄',
-          text: '請重新登入',
-          icon: 'error',
-          confirmButtonText: '確定',
-          confirmButtonColor: '#dc3545'
-        }).then(() => {
-          localStorage.removeItem('token');
-          window.location.href = '/';
-        });
-      });
-  }
+  // function checkUser() {
+  //   const storedToken = localStorage.getItem('token');
+  //   const currentPath = window.location.pathname;
+  //   if (excludedPaths.includes(currentPath)) {
+  //     return;
+  //   }
+  //   axios.get(`http://140.138.147.12:3000/auth/${storedToken}`)
+  //     .then((res) => {})
+  //     .catch((err) => {
+  //       Swal.fire({
+  //         title: '帳號被登錄',
+  //         text: '請重新登入',
+  //         icon: 'error',
+  //         confirmButtonText: '確定',
+  //         confirmButtonColor: '#dc3545'
+  //       }).then(() => {
+  //         localStorage.removeItem('token');
+  //         window.location.href = '/';
+  //       });
+  //     });
+  // }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    checkUser();
-    setInterval(checkUser, 60000);
-  });
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   checkUser();
+  //   setInterval(checkUser, 60000);
+  // });
 
   function copyToClipboard(button) {
     const codeElement = button.nextElementSibling;

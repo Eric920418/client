@@ -33,8 +33,8 @@
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import {action} from "../components/action.js"
+import { jwtDecode } from 'jwt-decode';
 export default {
-
     data() {
         return {
             code: [],
@@ -42,11 +42,6 @@ export default {
         }
     },
     methods: {
-        getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        },
         setCode(code) {
             return `<code class="hljs">${hljs.highlightAuto(code).value}</code>`;
         },
@@ -116,9 +111,9 @@ export default {
         }
     },
     mounted() {
-        let userId = this.getCookie('id');
         var storedToken = localStorage.getItem('token');
-        this.$axios.get(`/code/${userId}`,{
+        const { id } =  jwtDecode(storedToken);
+        this.$axios.get(`/code/${id}`,{
             headers: {
                 'Authorization': `Bearer ${storedToken}`,
                 'Content-Type': 'application/json',

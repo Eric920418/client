@@ -8,16 +8,19 @@
             <button class="toggle-btn btn btn-primary" id="css" style="font-size: 50px;  top: 11.5%;" @click="toggleCss"><i class="fa-brands fa-css3-alt"></i><div class="icon-text">CSS</div></button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-warning" id="js" style="font-size: 50px;  top: 23.5%;" @click="toggleJs"><i class="fa-brands fa-square-js"></i><div class="icon-text">JavaScript</div></button>
+            <button class="toggle-btnJS btn btn-warning" id="js" style="font-size: 45px;  top: 23.5%;" @click="toggleJs"><i class="fa-brands fa-square-js"></i><div class="icon-text">JavaScript</div></button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-success" id="code" style="font-size: 23px;  top: 36%;"  @click.stop="runOutput" ref="run">執行</button>
+            <button class="toggle-btn btn " id="code" style="font-size: 23px; background-color: #454545; top: 40%;"  @click.stop="runOutput" ref="run">執行</button>
           </div>
           <div>
-            <button class="toggle-btn btn btn-light" id="restart" style="font-size: 50px;  top: 49%;" @click="restart"><i class="fa-solid fa-rotate-left"></i></button>
+            <button class="toggle-btn btn " id="save" style="font-size: 23px; background-color: #454545;  top: 45.5%;"  @click.stop="saveButton" ref="save">儲存</button>
           </div>
           <div>
-            <button class="toggle-btn btn practiceBtn" id="practice" ref="tip" style="font-size: 50px; top: 60%;" @click="startPractice">
+            <button class="toggle-btn btn btn-light" id="restart" style="font-size: 50px;  top: 59%;" @click="restart"><i class="fa-solid fa-rotate-left"></i></button>
+          </div>
+          <div>
+            <button class="toggle-btn btn practiceBtn" id="practice" ref="tip" style="font-size: 50px; top: 70%;" @click="startPractice">
               <i class="fa-solid fa-laptop-code"></i>
               <span v-html="badgeHtml"></span>
             </button>
@@ -43,19 +46,20 @@
             </div>
             <div class="text-close " id="js-code" ref="js">
               <div class="editor-container" ref="jsEditorContainer"></div>
-              <div id="console-output"></div>
+              <!-- <div id="console-output"></div> -->
             </div>
             <div id="iframe-container" class="text-close " ref="iframe">
               <iframe id="output" ref="output"></iframe>
             </div>
           </div>
-          <button class="toggle-chat-btn btn btn-primary" id="save" style="font-size: large; width: 40px; top: 14.5%;" @click.stop="saveButton" ref="save">儲存</button>
-          <button class="toggle-chat-btn btn btn-warning" id="chatbot" style="font-size: large; width: 40px; top: 23%;" v-if="isCollapsed" @click="toggleChat" ref="chat">開啟聊天</button>
-          <button class="toggle-chat-btn btn btn-success" id="log" style="font-size: large; width: 40px; top: 37.5%;" v-if="isOpenLog" @click="openLog" ref="log">打開紀錄</button>
-          <button class="toggle-chat-btn btn btn-secondary" id="test" style="font-size: large; width: 40px; top: 52%;" v-if="isTest" @click="openTest">開啟考試視窗
+
+          <button class="toggle-chat-btn btn " id="chatbot" style="font-size: large;background-color: #808A87; width: 40px; top: 0%;" v-if="isCollapsed" @click="toggleChat" ref="chat">開啟聊天</button>
+          <button class="toggle-chat-btn btn btn-secondary" id="log" style="font-size: large; width: 40px; top: 13.5%;" v-if="isOpenLog" @click="openLog" ref="log">打開紀錄</button>
+          <button class="toggle-chat-btn btn btn-secondary" id="test" style="font-size: large; width: 40px; top: 26.5%;" v-if="isTest" @click="openTest">開啟考試視窗
             <span class="position-absolute  translate-middle badge rounded-pill bg-danger " style="left: -5px; top: 10px;">{{ exams.length }}</span>
           </button>
-          <button class="toggle-chat-btn btn btn-info" id="document" style="font-size: large; width: 40px; top: 72.7%;" @click="">心得</button>
+          <!-- <button class="toggle-chat-btn btn btn-info" id="document" style="font-size: large; width: 40px; top: 72.7%;" @click="">心得</button> -->
+          <button class="toggle-chat-btn btn btn-light" id="document" style="font-size: large; width: 40px; top: 90%;" @click="SignOut">登出</button>
       </div>
 
       <div v-if="!isCollapsed" >
@@ -187,7 +191,7 @@
 
   import { marked } from 'marked';
   import {action} from "../components/action.js";
-
+  import { jwtDecode } from 'jwt-decode';
   export default {
     name: 'MonacoEditor',
     components: {
@@ -446,12 +450,13 @@
         if (parts.length === 2) return parts.pop().split(';').shift();
       },
       saveButton() {
-        let userId = this.getCookie('id');
+        let storedToken = localStorage.getItem('token');
+        const { id } =  jwtDecode(storedToken);
         let code = {
             html: this.htmlCode,
             css: this.cssCode,
             js: this.jsCode,
-            user: userId,
+            user: id,
         };
         action.pushAction({
           action: '存程式碼',
@@ -465,7 +470,6 @@
             }).replace(/\//g, '-').replace(',', '')
         });
         this.isActionPushed = false;
-        let storedToken = localStorage.getItem('token');
         this.$axios.post('/code', code, {
           headers: {
             'Authorization': `Bearer ${storedToken}`,
@@ -492,8 +496,9 @@
           // const confirmationMessage = '您確定要離開此頁面嗎？';
           // event.returnValue = confirmationMessage;
 
-          let userId = this.getCookie('id');
-          action.pushDBAction(userId);
+          let storedToken = localStorage.getItem('token');
+          const { id } =  jwtDecode(storedToken);
+          action.pushDBAction(id);
 
           return confirmationMessage;
       },
@@ -613,8 +618,8 @@
           }
       },
       finishExam() {
-          let userId = this.getCookie('id');
           let storedToken = localStorage.getItem('token');
+          const { id } =  jwtDecode(storedToken);
           let exam = {
               examId: this.exam.examId,
               finishTime: new Date().toLocaleString('zh-TW', {
@@ -629,7 +634,7 @@
               state: 1
           }
 
-          this.$axios.patch(`/auth/student/examTicket/${userId}`, exam, {
+          this.$axios.patch(`/auth/student/examTicket/${id}`, exam, {
               headers: {
                   'Authorization': `Bearer ${storedToken}`,
                   'Content-Type': 'application/json',
@@ -671,17 +676,17 @@
       firstLogin() {
       if(localStorage.getItem('loginNumber') == 0){
 
-          function animateElement(id, delay, fontSize, width = '', extraStyles = '') {
+          function animateElement(id, delay,  fontSize, width = '', extraStyles = '') {
               setTimeout(() => {
                   const element = document.getElementById(id);
-                  element.style.cssText = `transform: translateX(0); transition: all 0.3s ease; font-size: ${fontSize}; top: ${element.style.top}; ${width ? `width: ${width};` : ''} ${extraStyles}`;
+                  element.style.cssText = `transform: translateX(0); transition: all 0.3s ease;  font-size: ${fontSize}; top: ${element.style.top}; ${width ? `width: ${width};` : ''} ${extraStyles}`;
               }, delay);
           }
 
-          function goBack(id, delay, fontSize, width = '', extraClass) {
+          function goBack(id, delay, fontSize,  width = '', extraClass) {
               setTimeout(() => {
                   const element = document.getElementById(id);
-                  element.style.cssText = `font-size: ${fontSize}; top: ${element.style.top}; ${width ? `width: ${width};` : ''}`;
+                  element.style.cssText = `font-size: ${fontSize};  top: ${element.style.top}; ${width ? `width: ${width};` : ''}`;
                   element.classList.add(extraClass);
               }, delay);
           }
@@ -703,10 +708,10 @@
               const messages = [
                   "大家好 歡迎第一次登陸這個編譯網站<br>現在開始我要慢慢介紹功能按鈕", 
                   "這是撰寫HTML的地方 點擊後會出現編輯器", "這是撰寫CSS的地方 點擊後會出現編輯器", "這是JavaScript的地方 點擊後會出現編輯器", 
-                  "這是跑程式碼的地方 點擊後會出現程式碼結果","這是清空代碼的地方 點擊後會清空所有代碼", 
-                  "這是練習的地方 點擊後會出現練習題目","這是儲存的地方 可以按下crtl+s快速儲存代碼", 
+                  "這是跑程式碼的地方 點擊後會出現程式碼結果","這是儲存的地方 可以按下crtl+s快速儲存代碼", 
+                  "這是清空代碼的地方 點擊後會清空所有代碼","這是練習的地方 點擊後會出現練習題目",
                   "這是聊天室的地方 點擊可以打開聊天室<br>與gpt機器人交流", "這是程式碼紀錄的地方 可以查看自己的程式碼紀錄<br>點擊Demo可以還原程式碼", 
-                  "這是考試視窗的地方 可以進行考試", "這是寫心得的地方 可以寫下自己的心得", 
+                  "這是考試視窗的地方 可以進行考試", 
                   "歡迎 來到編譯網站", "準備好開始學習"
               ];
 
@@ -716,15 +721,15 @@
           const elements = [
               { id: 'html', delay: 4500, fontSize: '50px', class: 'toggle-btn' },
               { id: 'css', delay: 8500, fontSize: '50px', class: 'toggle-btn' },
-              { id: 'js', delay: 12500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'js', delay: 12500, fontSize: '50px', class: 'toggle-btnJS' },
               { id: 'code', delay: 16500, fontSize: '23px',  class: 'toggle-btn' },
-              { id: 'restart', delay: 20500, fontSize: '50px', class: 'toggle-btn' },
-              { id: 'practice', delay: 24500, fontSize: '50px', class: 'toggle-btn' },
-              { id: 'save', delay: 28500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
+              { id: 'save', delay:  20500, fontSize: '23px', class: 'toggle-btn' },
+              { id: 'restart', delay: 24500, fontSize: '50px', class: 'toggle-btn' },
+              { id: 'practice', delay: 28500, fontSize: '50px', class: 'toggle-btn' },
               { id: 'chatbot', delay: 32500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
               { id: 'log', delay: 36500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
               { id: 'test', delay: 40500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' },
-              { id: 'document', delay: 44500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' }
+              // { id: 'document', delay: 44500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' }
           ];
 
           elements.forEach((element) => {
@@ -732,13 +737,9 @@
               goBack(element.id, element.delay + 3000, element.fontSize, element.class);
           });
 
-          const buttons = ['html', 'css', 'js', 'restart', 'practice', 'code', 'save', 'chatbot', 'log', 'test', 'document'];
+          const buttons = ['html', 'css', 'js', 'restart', 'practice', 'code', 'save', 'chatbot', 'log', 'test'];
           buttons.forEach(id => document.getElementById(id).disabled = true);
 
-          setTimeout(() => {
-              buttons.forEach(id => document.getElementById(id).disabled = false);
-            }, 48000);
-            
           setTimeout(() => {
             localStorage.setItem('loginNumber', 1);
             window.location.reload();
@@ -785,12 +786,18 @@
         }, 500); 
       },
       closeSocket(){
-        const userId = this.getCookie('id');
-        const userClose = JSON.stringify({ type: 'close',userId: userId });
+        var storedToken = localStorage.getItem('token');
+        const { studentID } =  jwtDecode(storedToken);
+        const userClose = JSON.stringify({ type: 'close',userId: studentID});
         this.socket.send( userClose );
-        setTimeout(() => {
-          this.socket.close();
-        }, 100);
+        this.socket.close();
+      },
+      SignOut() {
+        this.closeSocket();
+        localStorage.removeItem('token');
+        localStorage.removeItem('identity');
+        localStorage.removeItem('loginNumber');
+        window.location.href = '/';
       }
 
     },
@@ -1182,8 +1189,8 @@
       this.jsCode = this.jsEditor.getValue();
       this.updateOutput();
       //////////////////////////////////////////////////////////////
-      let userId = this.getCookie('id');
-      this.$axios.get(`/auth/student/examTicket/${userId}`, {
+      const { id } =  jwtDecode(storedToken);
+      this.$axios.get(`/auth/student/examTicket/${id}`, {
         headers: {
           'Authorization': `Bearer ${storedToken}`,
           'Content-Type': 'application/json',
@@ -1226,8 +1233,8 @@
                 const examDateTimeStr = `${examDateStr}T${examTimeStr}`;
                 const examDateTime = new Date(examDateTimeStr);
                 if (examDateTime < currentDate) {
-                  let userId = this.getCookie('id');
                   let storedToken = localStorage.getItem('token');
+                  const { id } =  jwtDecode(storedToken);
                   let exam = {
                       examId: element._id,
                       finishTime: new Date().toLocaleString('zh-TW', {
@@ -1242,7 +1249,7 @@
                       state: 1
                   }
 
-                  this.$axios.patch(`/auth/student/examTicket/${userId}`, exam, {
+                  this.$axios.patch(`/auth/student/examTicket/${id}`, exam, {
                       headers: {
                           'Authorization': `Bearer ${storedToken}`,
                           'Content-Type': 'application/json',
@@ -1280,10 +1287,10 @@
       })
       this.socket = new WebSocket('ws://140.138.147.12:3000');
       this.socket.onopen = () => {
-        const userLogin = JSON.stringify({ type: 'open',userId: userId });
+        const { studentID } =  jwtDecode(storedToken);
+        const userLogin = JSON.stringify({ type: 'open',userId: studentID });
         this.socket.send(userLogin);
       };
-
       this.socket.onmessage = (event) => {
         try {
           if(event.data[0] != '{') return;
@@ -1320,8 +1327,6 @@
           if( type === 'begin') {
             this.$swal.close();
             this.$cookies.set('state', 1);
-            const userLogin = JSON.stringify({ type: 'open',userId: userId });
-            this.socket.send(userLogin);
           }
 
         } catch (error) {
@@ -1347,7 +1352,7 @@
       }
     },        
     beforeDestroy() {
-      this.closeSocket()
+      this.SignOut()
       window.removeEventListener('beforeunload', this.handleBeforeUnload);
     },
   };
@@ -1418,6 +1423,16 @@
     transition: all 0.5s ease;;
   }
   .toggle-btn:hover {
+    transform: translateX(0);
+    transition: all 0.3s ease;;
+  }
+  .toggle-btnJS {
+    position: fixed;
+    z-index: 1000;
+    transform: translateX(-90%);
+    transition: all 0.5s ease;;
+  }
+  .toggle-btnJS:hover {
     transform: translateX(0);
     transition: all 0.3s ease;;
   }
@@ -1507,14 +1522,15 @@
     transition: all 0.5s ease;;
   }
   .practiceBtn{
-    background-color: blueviolet;
+    background-color:  #292421;
   }
   .practiceBtn:hover {
-    background-color: blueviolet;
+    background-color: #292421;
     cursor: pointer;
     transition: all 0.3s ease-in-out;;
   }
   .icon-text{
+    color: #fff;
     font-size: 15px;
     margin-top: -10px;
     padding: 0;

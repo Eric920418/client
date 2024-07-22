@@ -41,7 +41,7 @@ import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import {action} from "../components/action.js"
-
+import { jwtDecode } from 'jwt-decode';
 export default {
   props: ['isCollapsed'],
   data() {
@@ -82,7 +82,7 @@ export default {
         this.que = '';
         try {
           let storedToken = localStorage.getItem('token');
-          let userId = this.getCookie('id');
+          const { id } =  jwtDecode(storedToken);
           let chatId = this.thisLog._id;
           const response = await this.$axios.post('/chat', { messages: this.chat},{
             headers: {
@@ -95,7 +95,7 @@ export default {
             this.scrollToBottom();
           });
           this.$refs.textarea.disabled = false;
-          this.$axios.put(`/chat/dialogue/${chatId}`, {dialogues: this.chat, user: userId},{
+          this.$axios.put(`/chat/dialogue/${chatId}`, {dialogues: this.chat, user: id},{
             headers: {
               'Authorization': `Bearer ${storedToken}`,
               'Content-Type': 'application/json',
@@ -136,18 +136,13 @@ export default {
       }; 
       return marked(message, { renderer }); 
     },
-    getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-    },
     checkLog(log) {
       this.thisLog = log;
       this.chat = log.dialogues;
       let storedToken = localStorage.getItem('token');
-      let userId = this.getCookie('id');
+      const { id } =  jwtDecode(storedToken);
       if( this.thisLog.title == '新對話'){
-          this.$axios.post('/chat/dialogue', {dialogues: this.chat, user: userId},{
+          this.$axios.post('/chat/dialogue', {dialogues: this.chat, user: id},{
             headers: {
               'Authorization': `Bearer ${storedToken}`,
               'Content-Type': 'application/json',
@@ -173,9 +168,9 @@ export default {
         });
     },
     loadingChat(){
-      let userId = this.getCookie('id');
       let storedToken = localStorage.getItem('token');
-      this.$axios.get(`/chat/dialogue/${userId}`, {
+      const { id } =  jwtDecode(storedToken);
+      this.$axios.get(`/chat/dialogue/${id}`, {
         headers: {
           'Authorization': `Bearer ${storedToken}`,
           'Content-Type': 'application/json',
