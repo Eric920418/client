@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div class="d-flex justify-content-between mt-4" style="height: 40px;">
       <button type="button" class="btn btn-primary text-nowrap">
         <label for="file">新增學生</label>
@@ -12,6 +11,11 @@
       <button type="button" class="btn btn-secondary text-nowrap" @click="example()">
         <label >新增學生範例</label>
       </button>
+
+      <select class="form-select w-25" aria-label="Default select example" v-model="selectedClassNum">
+        <option value="" >班級</option>
+        <option v-for="ClassNum in uniqueClassNum" :key="ClassNum" :value="ClassNum">{{ ClassNum }}</option>
+      </select>
       <select class="form-select w-25" aria-label="Default select example" v-model="selectedSession">
         <option value="" >屆數</option>
         <option v-for="session in uniqueSessions" :key="session" :value="session">{{ session }}</option>
@@ -23,6 +27,7 @@
           <th scope="col"></th>
           <th scope="col">姓名</th>
           <th scope="col">學號</th>
+          <th scope="col">班級</th>
           <th scope="col">屆數</th>
           <th scope="col">狀態</th>
           <th scope="col"></th>
@@ -33,6 +38,7 @@
           <th scope="row">{{ index + 1 }}</th>
           <td>{{ student.name }}</td>
           <td>{{ student.studentID }}</td>
+          <td>{{ student.classNum }}</td>
           <td>{{ student.session }}</td>
           <td> 
             <div v-if="student.state == 0" class="light" style="background-color: red;"></div>
@@ -53,6 +59,7 @@
         <div class="modal-body">
           <input type="text" class="form-control my-2" placeholder="姓名" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="name">
           <input type="text" class="form-control my-2" placeholder="學號" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="studentID">
+          <input type="text" class="form-control my-2" placeholder="班級" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="classNum">
           <input type="text" class="form-control my-2" placeholder="屆數" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="session">
           <input type="text" class="form-control my-2" placeholder="密碼" aria-label="Recipient's username" aria-describedby="basic-addon2" v-model="password">
         </div>
@@ -69,6 +76,7 @@
 <script>
 import readXlsxFile from 'read-excel-file';
 import * as XLSX from 'xlsx';
+import { jwtDecode } from 'jwt-decode';
 export default {
   data() {
     return {
@@ -76,8 +84,10 @@ export default {
       data: [],
       sessions: [],
       selectedSession: '',
+      selectedClassNum: '',
       name: '',
       studentID: '',
+      classNum: '',
       session: '',
       password: '',
       socket: null,
@@ -87,22 +97,23 @@ export default {
     uniqueSessions() {
       return [...new Set(this.sessions)];
     },
+    uniqueClassNum(){
+      return [...new Set(this.students.map(student => student.classNum))]
+    },
     filteredStudents() {
-      if (this.selectedSession == '0') {
-        return this.students.filter(student => student.session == '0');
-      }
-      if (this.selectedSession) {
+      if( this.selectedSession && this.selectedClassNum) {
+        return this.students.filter(student => student.session === this.selectedSession && student.classNum === this.selectedClassNum);
+      }else if(this.selectedClassNum) {
+        return this.students.filter(student => student.classNum === this.selectedClassNum);
+      }else if(this.selectedSession) {
         return this.students.filter(student => student.session === this.selectedSession);
+      }else if(this.selectedSession == '0') {
+        return this.students.filter(student => student.session == '0');
       }
       return this.students;
     }
   },
   methods: {
-    getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    },
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -140,8 +151,9 @@ export default {
             .map(row => ({
               name: row[0],
               studentID: String(row[1]),
-              password: String(row[3]),
-              session: row[2]
+              classNum: String(row[2]),
+              session: row[3],
+              password: String(row[4]),
             }));
 
           const promises = batch.map(student =>
@@ -149,6 +161,7 @@ export default {
               name: student.name,
               studentID: student.studentID,
               password: student.password,
+              classNum: student.classNum,
               session: student.session
             }).catch(err => {
               failedRecords.push(student);
@@ -248,9 +261,9 @@ export default {
     },
     example() {
       const data = [
-        ["姓名", "學號", "屆數", "密碼"],
-        ["eric", "123456", "123", "123"],
-        ["alan", "56554", "555", "888"]
+        ["姓名", "學號", "班級", "屆數", "密碼"],
+        ["eric", "123456","C1", "123", "123"],
+        ["alan", "56554","C2", "555", "888"]
       ];
 
       const ws = XLSX.utils.aoa_to_sheet(data);
@@ -281,7 +294,9 @@ export default {
       this.$axios.post('/auth/signUp', {
                 name: this.name,
                 studentID: this.studentID,
-                password: this.password
+                password: this.password,
+                session:  Number(this.session),
+                classNum: this.classNum
             })
             .then(res => {
                 this.$swal.fire({
@@ -322,6 +337,7 @@ export default {
         this.students.push({
           name: student.name,
           studentID: student.studentID,
+          classNum: student.classNum,
           session: student.session,
           _id: student._id,
           state: 0
@@ -332,30 +348,28 @@ export default {
     .catch(err => {
       console.error('Error fetching students:', err);
     });
-    let userId = this.getCookie('id');
     this.socket = new WebSocket('ws://140.138.147.12:3000');
     this.socket.onopen = () => {
-      const userLogin = JSON.stringify({ type: 'open',userId: userId });
+      const { studentID } =  jwtDecode(storedToken);
+      const userLogin = JSON.stringify({ type: 'open',userId: studentID });
       this.socket.send(userLogin);
     };
-
     this.socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const data = JSON.parse(event.data)
       if (data.type == 'userConnected') {
         this.students.forEach(student => {
-          if (student._id == data.userId) {
+          if (student.studentID == data.userId) {
             student.state = 1;
           }
         });
       }else if (data.type == 'userDisconnected') {
         this.students.forEach(student => {
-          if (student._id == data.userId) {
+          if (student.studentID == data.userId) {
             student.state = 0;
           }
         });
       }
     };
-
     this.socket.onclose = () => {
       console.log('Socket斷線');
     };

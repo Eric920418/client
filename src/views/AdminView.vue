@@ -31,6 +31,7 @@ import student from '../components/StudentInformation.vue';
 import exam from '../components/ExamSystem.vue';
 import score from '../components/Score.vue';
 import practice from '../components/Practice.vue';
+import { jwtDecode } from 'jwt-decode';
 export default {
 components: {
     student,
@@ -54,7 +55,7 @@ methods: {
     restartServer() {
         let countdown = this.waitSec;
         var storedToken = localStorage.getItem('token');
-        this.$axios.post('/restart', {
+        this.$axios.post('/restart', {},{
             headers: {
                 'Authorization': `Bearer ${storedToken}`,
                 'Content-Type': 'application/json',
@@ -70,7 +71,6 @@ methods: {
                 didOpen: () => {
                     // 禁用確認按鈕
                     this.$swal.getConfirmButton().setAttribute('disabled', 'disabled');
-
                     const interval = setInterval(() => {
                         if (countdown > 0) {
                             countdown -= 1;
@@ -90,6 +90,7 @@ methods: {
             });
         }).catch((err) => {
             console.log(err);
+            console.log(storedToken);
         });
     },
     stop() {
@@ -118,8 +119,9 @@ methods: {
 
 },
 mounted() {
-    var storedToken = localStorage.getItem('identity');
-    if (storedToken !== "admin") {
+    let storedToken = localStorage.getItem('token');
+    const { id } =  jwtDecode(storedToken);
+    if (id !== "66544d775f5f3f9440c7ffde") {
         this.$router.push('/home');
     }
 
