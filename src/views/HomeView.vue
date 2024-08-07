@@ -25,18 +25,235 @@
               <span v-html="badgeHtml"></span>
             </button>
           </div>
+
           <div class="practice" ref="practice">
-            <div ref="practiceCard"  class="card w-100 h-100"  style="background-color: #f8f9fa;">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title">練習題</h5>
-                <p class="flex-grow-1" style="font-size: 30px;">{{ practiceCode.context }}</p>
-                <button class="btn btn-primary align-self-end" @click="watchExm">看範例</button>
+            <div ref="nav" class="d-none" style="position:absolute; top: -20px; left: 50%; width:100.5%; height: 30px; transform: translate(-50%, -50%);z-index: 10; border: 2px solid black;background-color: #808A87;">
+              <div class="d-flex justify-content-between align-items-center" style="height: 100%;">
+                <div class="w-100 text-center" ref="one" style="font-size: 15px; border: 2px solid white;">第一步</div>
+                <div class="w-100 text-center" ref="two" style="font-size: 15px; border: 2px solid white;">第二步</div>
+                <div class="w-100 text-center" ref="three" style="font-size: 15px; border: 2px solid white;">第三步</div>
+                <div class="w-100 text-center" ref="four" style="font-size: 15px; border: 2px solid white;">第四步</div>
+                <div class="w-100 text-center" ref="five" style="font-size: 15px; border: 2px solid white;">第五步</div>
               </div>
             </div>
-            <div ref="practiceIframeCard" class="card d-none mx-auto w-100 " style="background-color: transparent; ">
-              <iframe ref="practiceIframe" height="80%" width="100%"></iframe>
+            <div ref="practiceCard"  class="card w-100 h-100"  style="background-color: #f8f9fa; position: relative;">
+              <h5 class="card-title text-center task-title">任務欄</h5>
+              <select class="form-select top-0 start-0 m-1" style="width: 150px; height: 40px; font-size: 15px; position: absolute;"  name="" id="" v-model="selectedState">
+                <option value="" >所有任務</option>
+                <option value="0">未作任務</option>
+                <option value="6">完成任務</option>
+              </select>
+              <div  class="card-body d-flex  justify-content-center " style="height: 90%; width: 100%; overflow-y: scroll; margin-top: 50px;">
+                <div class="row" >
+                  <div v-for="(task , index) in filteredTask" :key="task.id" class="col-3">
+                    <div v-if="task.state != 6"  class="card my-2 taskCard" style="height: 200px; width: 100%;">
+                      <div class="card-body front" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <h5 class="card-title text-center fs-4" style="width: 100px;">{{ task.title }}</h5>
+                      </div>
+                      <div class="card-body back " style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <button class="btn btn-primary " @click="watchExm(index)">體驗</button>
+                      </div>
+                    </div>
+                    <div v-else  class="card my-2 taskCard" style="height: 200px; width: 100%; background-color: greenyellow;">
+                      <div class="card-body front" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <h5 class="card-title text-center fs-4" style="width: 100px;">{{ task.title }}</h5>
+                      </div>
+                      <div class="card-body back " style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <button class="btn btn-primary " @click="watchExm(index)">查看老師評語</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="this.focusTaskIndex != null" ref="practiceIframeCard" class="card d-none w-100 h-100  " style="background-color: transparent; position: relative;">
+              <iframe ref="practiceIframe" style="height:100%; width: 100%; "></iframe>
+              <button v-if="this.tasks[this.focusTaskIndex].state == 0" class="btn btn-primary bottom-0 end-0 m-1" style="position: absolute; " @click="accept">接任務</button>
+              <button v-else class="btn btn-primary bottom-0 end-0 m-1" style="position: absolute; " @click="accept">繼續任務</button>
+              <button class="btn btn-danger bottom-0 start-0 m-1" style="position: absolute; " @click="closeExample">返回</button>
+            </div>
+            <div v-if="this.focusTaskIndex != null" ref="taskInformation"  class="card d-none w-100 h-100"  style="background-color: #f8f9fa; position: relative; align-self: center;">
+              <div class="d-flex justify-content-around " style="height: 100%;">
+                <div style="margin-top: 20px;">
+                  <h5 class="m-1 px-1 " >
+                      <div class=" text-center  t3 mx-auto" style=" opacity: 0;">教材區</div>
+                  </h5>
+                
+                  <div class="slides ">
+                    <div class="slide t4" style="opacity: 0; position: relative;">
+                      <img :src="this.tasks[this.focusTaskIndex].ppt[currentSlide]" alt="PDF Page" />
+                      <button class="btn btn-secondary me-2" style="position: absolute; top: 45%; left: 0%;" @click="prevSlide":disabled="currentSlide === 0"><i class="bi bi-chevron-compact-left"></i></button>
+                      <button class="btn btn-secondary me-2" style="position: absolute; top: 45%; left: 95.5%;" @click="nextSlide":disabled="currentSlide === this.tasks[this.focusTaskIndex].ppt.length - 1"><i class="bi bi-chevron-compact-right"></i></button>
+                    </div>
+                  </div>
+                  <div class="buttons">
+                     
+                    </div>
+                </div>
+                <div class="px-3" style="width: 100%; margin-top: 20px;">
+                  <h5 class="m-1 px-1 " >
+                      <div class=" text-center  t5 mx-auto" style=" opacity: 0;">學習目標</div>
+                  </h5>
+                  <table class="table  table-striped" style="font-size: 17px; overflow-y: scroll;">
+                    <tbody>
+                      <tr v-for="(option, index) in this.tasks[this.focusTaskIndex].guide" :key="option.id">
+                        <td class="tr" style="transform: translateX(-100%);opacity: 0;transition: all 0.5s ease-in-out;">{{ option}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div> 
+    
+              <div class="d-flex bottom-0 start-0" style="position: absolute; " >
+                <button class="btn btn-danger  m-1"  @click="backExample">返回範例</button>
+                <button class="btn btn-danger m-1 " @click="backTask">返回任務表</button>
+              </div>
+              <button class="btn btn-primary bottom-0 end-0 m-1" style="position: absolute; " @click="formulate">制定學習計畫</button>
+            </div>
+            <div v-if="this.focusTaskIndex != null" ref="formulate" class="card d-none w-100 h-100" style="background-color: #f8f9fa; position: relative; align-self: center;">
+              <h5 class=" text-center " style="font-size: 25px;">制定目標</h5>
+              <div class="row m-0 px-2 ">
+                <div class="card p-0 border-0 col-3" style="background-color: #f8f9fa;" >  
+                  <div class="card-body  ">   
+                    <div class="card-title text-center t1 py-1" style="opacity: 0;">子任務</div>
+                    <table class="table  table-striped my-1" style="font-size: 17px; overflow-y: scroll;">
+                      <tbody>
+                        <tr v-for="(option, index) in filterTaskTarget" :key="option.id">
+                          <td class="ts" style="transform: translateX(-100%);opacity: 0;transition: all 0.5s ease-in-out;">
+                            <div class="d-flex justify-content-between align-items-center">
+                              {{ option}}
+                              <button class="btn btn-secondary btn-sm" @click="addOrder(option,index)">加入順序</button>
+                            </div>
+                          </td> 
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="card p-0 border-0 col-9 " style="background-color: #f8f9fa;">
+                  <div class="card-body  ">   
+                    <div class="card-title text-center t2 py-1" style="opacity: 0;">
+                      <div class="d-flex justify-content-around align-items-center my-1">
+                        <p class="m-0">任務順序</p>
+                        <p class="m-0">策略</p>
+                      </div>
+                    </div>
+                    <div class="row m-0 px-1 ">
+                      <div class="col-6">
+                          <div class="card border-1 w-100" style="height: 600px; border-radius:0">
+                            <table class="table  " style="font-size: 17px; overflow-y: scroll; ">
+                              <tbody>
+                                <tr v-for="(order, index) in tasks[this.focusTaskIndex].order" :key="index" style="height: 100px; ">
+                                    <td class="p-0 px-4 order">
+                                      <div class="d-flex  align-items-center " style="height: 99px; ">
+                                        <span class="mx-auto h-100 d-flex " style="font-size: 30px;align-items: center; " >
+                                          {{ order.taskName }}
+                                        </span>
+                                        <button class="btn btn-secondary btn-sm me-2" @click="selectOrder(index)">策略</button>
+                                        <button v-if="order != '' && tasks[this.focusTaskIndex].state < 3" class="btn btn-secondary btn-sm" @click="removeOrder(order,index)">刪除</button>
+                                      </div>
+                                    </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                      </div>
+                      <div class="col-6">
+                          <div v-if="this.orderIndex != null"  class="card border-1 w-100 " style="height: 600px;">
+                            <div  v-for="(strategy, index) in tasks[this.focusTaskIndex].order[this.orderIndex].strategy" :key="index" :value="strategy" class="d-flex justify-content-between align-items-center px-1" style="height: 60px;" >
+                                <div class="w-100">
+                                    
+                                    <select name="strategy" class="form-select" v-model="tasks[this.focusTaskIndex].order[this.orderIndex].strategy[index]" id="">
+                                        <option value="環境結構">環境結構</option>
+                                        <option value="學習策略">學習策略</option>
+                                        <option value="時間管理">時間管理</option>
+                                        <option value="尋求協助">尋求協助</option>
+                                        <option value="自我評估">自我評估</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-end">
+                                    <button  type="button" class="btn btn-danger ms-2 py-2" @click="remove(index)"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary mx-auto py-2 w-50" @click="add"><i class="fa-solid fa-plus"></i></button>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-danger start-0 bottom-0 m-1" style="position: absolute; width: 10%;" @click="backTaskInformation">返回</button>
+              <button class="btn btn-primary end-0 bottom-0 m-1" style="position: absolute; width: 10%;" @click="beginTodo">開始實作</button>
+            </div>
+            <div v-if="this.focusTaskIndex != null" ref="todo" class="card d-none w-100 h-100" style="background-color: #f8f9fa; position: relative; align-self: center;">
+              <div class="row p-4" style="overflow-y: scroll;">
+                <div class="col-8" >
+                  <h3 class=" text-center ">實作問題</h3>
+                  <div class="my-4" v-for="(question, index) in tasks[this.focusTaskIndex].question" :key="index">
+                      <div class="form-label" style="font-size: 30px;">問題{{ index +1}}:{{ question }}</div>
+                      <input type="text" class="form-control" v-model="tasks[this.focusTaskIndex].answer[index]" :placeholder="`回答${index+1}`">
+                  </div>
+                </div>
+                <div class="col-4">
+                    <h3 class=" text-center py-1">子任務</h3>
+                    <table class="table  table-striped  mt-5" style="font-size: 17px; overflow-y: scroll;">
+                      <tbody>
+                        <tr v-for="(option, index) in this.tasks[this.focusTaskIndex].order" :key="option.id">
+                          <td >
+                            <div class="d-flex justify-content-between align-items-center">
+                              {{ index +1}}. : {{ option.taskName }}
+                            </div>
+                          </td> 
+                        </tr>
+                      </tbody>
+                    </table>
+                    <h3 class=" text-center py-1 mt-5">策略</h3>
+                    <table class="table  table-striped  mt-5" style="font-size: 17px; overflow-y: scroll;">
+                      <tbody>
+                        <tr v-for="(option, index) in this.tasks[this.focusTaskIndex].order" :key="option.id">
+                          <td >
+                            <div class="d-flex justify-content-between align-items-center">
+                              {{ index +1}}. : {{ option.strategy}}
+                            </div>
+                          </td> 
+                        </tr>
+                      </tbody>
+                    </table>
+                </div>
+              </div>
+              <button class="btn btn-danger bottom-0 start-0 m-1" style="position: absolute; width: 10%;" @click="backTaskInformation">返回教材</button>
+              <div class="d-flex justify-content-between bottom-0 end-0 m-1" style="position: absolute; width: 38%;" >
+                <p class="text-danger p-0 m-0" style="font-size: 20px;">(當按下『繳交任務』會自動交出程式碼)</p>
+                <button class="btn btn-primary " @click="finishTask">繳交任務</button>
+              </div>
+            </div>
+            <div v-if="this.focusTaskIndex != null" ref="finish" class="card d-none w-100 h-100" style="background-color: #f8f9fa; position: relative; align-self: center;">
+              <div class="px-5 py-4">
+                <div class="my-4">
+                  <div class="form-label" style="font-size: 30px;">任務檢查</div>
+                  <input type="text" class="form-control" v-model="tasks[this.focusTaskIndex].thought[0]" :placeholder="`回答`">
+                </div>
+                <div class="my-4">
+                  <div class="form-label" style="font-size: 30px;">學到什麼</div>
+                  <input type="text" class="form-control" v-model="tasks[this.focusTaskIndex].thought[1]" :placeholder="`回答`">
+                </div>
+                <div class="my-4">
+                  <div class="form-label" style="font-size: 30px;">遇到問題</div>
+                  <input type="text" class="form-control" v-model="tasks[this.focusTaskIndex].thought[2]" :placeholder="`回答`">
+                </div>
+                <div class="my-4">
+                  <div class="form-label" style="font-size: 30px;">覺得哪些需要改進</div>
+                  <input type="text" class="form-control" v-model="tasks[this.focusTaskIndex].thought[3]" :placeholder="`回答`">
+                </div>
+                <div class="my-4">
+                  <div class="form-label" style="font-size: 30px;">自我評估（分數）</div>
+                  <input type="text" class="form-control" v-model="tasks[this.focusTaskIndex].thought[4]" :placeholder="`回答1-100`">
+                </div>
+              </div>
+              <button class="btn btn-primary bottom-0 end-0 m-1" style="position: absolute; width: 10%;" @click="sendFinish">送出</button>
             </div>
           </div>
+
           <div>
             <div class="text-close" id="html-code" ref="html">
                 <div class="editor-container" ref="htmlEditorContainer"></div>
@@ -46,7 +263,6 @@
             </div>
             <div class="text-close " id="js-code" ref="js">
               <div class="editor-container" ref="jsEditorContainer"></div>
-              <!-- <div id="console-output"></div> -->
             </div>
             <div id="iframe-container" class="text-close " ref="iframe">
               <iframe id="output" ref="output"></iframe>
@@ -58,20 +274,32 @@
           <button class="toggle-chat-btn btn btn-secondary" id="test" style="font-size: large; width: 40px; top: 26.5%;" v-if="isTest" @click="openTest">開啟考試視窗
             <span class="position-absolute  translate-middle badge rounded-pill bg-danger " style="left: -5px; top: 10px;">{{ exams.length }}</span>
           </button>
-          <!-- <button class="toggle-chat-btn btn btn-info" id="document" style="font-size: large; width: 40px; top: 72.7%;" @click="">心得</button> -->
           <button class="toggle-chat-btn btn btn-light" id="document" style="font-size: large; width: 40px; top: 90%;" @click="SignOut">登出</button>
       </div>
 
+      <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast"  class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <strong class="me-auto">通知～～</strong>
+            <small class="text-muted">11 mins ago</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body " style="color: black;">
+            你有新的任務囉！
+          </div>
+        </div>
+      </div>
+
       <div v-if="!isCollapsed" >
-        <button @click="toggleChat" class="toggle-chat-btn btn btn-warning" style="font-size: large; width: 40px; top: 23%;">關閉聊天</button>
+        <button @click="toggleChat" class="toggle-chat-btn btn " style="font-size: large;background-color: #808A87; width: 40px; top: 0%;">關閉聊天</button>
         <chat  class="chat" ></chat>
       </div>
       <div v-if="!isOpenLog">
-        <button @click="openLog" class="toggle-chat-btn btn btn-success" style="font-size: large; width: 40px; top: 37.5%;">關閉紀錄</button>
+        <button @click="openLog" class="toggle-chat-btn btn btn-secondary" style="font-size: large; width: 40px; top: 13.5%;">關閉紀錄</button>
         <document @go-to-demo="handleGoToDemo" @close-model="openLog"  class="document" ></document>
       </div>
       <div v-if="!isTest">
-        <button @click="openTest" class="toggle-chat-btn btn btn-secondary" style="font-size: large; width: 40px; top: 52%;">關閉考試視窗</button>
+        <button @click="openTest" class="toggle-chat-btn btn btn-secondary" style="font-size: large; width: 40px; top: 26.5%;">關閉考試視窗</button>
         <div class="exam" style="height: 100vh; overflow-y: scroll;">
           <div v-if="exams && !exam.examName && !isFinishExam.examName" v-for="exam in exams" :key="exam.id" class="card mt-3 cardBody" style="margin-bottom: 20px;" >
               <div class="card-body">
@@ -179,20 +407,23 @@
 </template>
 
 <script>
-  import * as monaco from "monaco-editor";
-  import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-  import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-  import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-  import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-  import { DomHandler, Parser } from 'htmlparser2';
+import * as monaco from "monaco-editor";
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import { DomHandler, Parser } from 'htmlparser2';
 
-  import Chat from '../components/ChatMessage.vue';
-  import Document from '../components/Dcumental.vue';
+import Chat from '../components/ChatMessage.vue';
+import Document from '../components/Dcumental.vue';
 
-  import { marked } from 'marked';
-  import {action} from "../components/action.js";
-  import { jwtDecode } from 'jwt-decode';
-  export default {
+import { marked } from 'marked';
+import {action} from "../components/action.js";
+import { jwtDecode } from 'jwt-decode';
+import { Toast } from 'bootstrap';
+
+
+export default {
     name: 'MonacoEditor',
     components: {
       Chat,
@@ -212,15 +443,33 @@
         finishExams: [],
         exam: {},
         isFinishExam: {},
-        practiceCode: {
-          html: '',
-          css: '',
-          js: '',
-          context: '',
-        },
+
         badgeHtml: '' ,
         socket: null,
+
+        tasks: [],
+        focusTaskIndex: null,
+        currentSlide: 0,
+        orderIndex:null,
+
+        selectedState:''
       };
+    },
+    computed: {
+      filteredTask() {
+        if(this.selectedState == 6) {
+          return this.tasks.filter(task => task.state == 6);
+        }else if(this.selectedState == '0') {
+          return this.tasks.filter(task => task.state != 6)
+        }else if(this.selectedState == ''){
+          return this.tasks;
+        }
+      },
+      filterTaskTarget() {
+          const focusTask = this.tasks[this.focusTaskIndex];
+          const orderTaskNames = new Set(focusTask.order.map(order => order.taskName));
+          return focusTask.target.filter(target => !orderTaskNames.has(target));
+      }
     },
     methods: {
       updateOutput() {
@@ -436,13 +685,476 @@
       },
       startPractice() {
         if (!this.isStarted) {
-          this.$refs.practice.style.top = '30%';
+          this.$refs.practice.style.top = '50%';
           this.isStarted = true;
-
         } else {
-          this.$refs.practice.style.top = '-100%';
+          this.$refs.practice.style.top = '-50%';
           this.isStarted = false;
         }
+      },
+      watchExm(index) {
+        this.focusTaskIndex = index;
+        if(this.tasks[this.focusTaskIndex].state == 0){
+          this.$swal.fire({
+            title: '第一步',
+            text: '體驗本次任務最終成果',
+          }).then(() => {
+            this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+              this.$refs.practiceCard.classList.add('d-none');
+              this.$refs.practiceIframeCard.classList.remove('d-none');
+              this.$refs.nav.classList.remove('d-none');
+            }, 400);
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+              const iframe2 = this.$refs.practiceIframe;
+              if (iframe2) {
+                const documentContent = `
+                  <html>
+                    <head>
+                      <style>${this.tasks[index].css}<\/style>
+                      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"><\/script>
+                    </head>
+                    <body>
+                      ${this.tasks[index].html}
+                      <script>
+                          ${this.tasks[index].js}
+                      <\/script>
+                    </body>
+                  </html>
+                `;
+                iframe2.srcdoc = documentContent;
+              } else {
+                console.error('Iframe reference is undefined');
+              }
+            }, 800); 
+            setTimeout(() => {
+              this.$refs.one.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black;  transition: all 0.5s ease-in-out;';
+            }, 1500);
+          });
+        }else{
+            this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+              this.$refs.practiceCard.classList.add('d-none');
+              this.$refs.practiceIframeCard.classList.remove('d-none');
+              this.$refs.nav.classList.remove('d-none');
+            
+            }, 400);
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+              const iframe2 = this.$refs.practiceIframe;
+              if (iframe2) {
+                const documentContent = `
+                  <html>
+                    <head>
+                      <style>${this.tasks[index].css}<\/style>
+                      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"><\/script>
+                    </head>
+                    <body>
+                      ${this.tasks[index].html}
+                      <script>
+                          ${this.tasks[index].js}
+                      <\/script>
+                    </body>
+                  </html>
+                `;
+                iframe2.srcdoc = documentContent;
+              } else {
+                console.error('Iframe reference is undefined');
+              }
+            }, 800); 
+            setTimeout(() => {
+              this.$refs.one.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black;  transition: all 0.5s ease-in-out;';
+            }, 1500);
+        }
+
+      },
+      formulate(){
+        if(this.tasks[this.focusTaskIndex].state == 1){
+          let task = {
+            state: 2,
+            taskId: this.tasks[this.focusTaskIndex].taskId,
+          }
+          var storedToken = localStorage.getItem('token');
+          const { id } =  jwtDecode(storedToken);
+          this.$axios.patch(`/task/state/${id}`,task, {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+              'Content-Type': 'application/json',
+            }
+          })
+          .then(response => {
+            this.$swal.fire({
+              title: '完成第二步',
+              text: '進入第三步,接下來會出現幾個小任務,請制定完成順序並寫下如何完成的策略',
+              icon: 'success',
+            }).then(() => {
+              this.tasks[this.focusTaskIndex].state = 2;
+              this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+              setTimeout(() => {
+                this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+                this.$refs.taskInformation.classList.add('d-none');
+                this.$refs.formulate.classList.remove('d-none');
+              }, 400);
+              setTimeout(() => {
+                this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+              }, 800); 
+              setTimeout(() => {
+                document.querySelector('.t1').style.cssText = 'font-size: 25px; border: 1px solid black; border-radius: 10px; padding: 10px;opacity: 1;transition: all 0.5s ease-in-out;';
+                document.querySelector('.t2').style.cssText = 'font-size: 25px; border: 1px solid black; border-radius: 10px; padding: 10px;opacity: 1;transition: all 0.5s ease-in-out;';
+              }, 1500); 
+              setTimeout(() => {
+                document.querySelectorAll('.ts').forEach((tr, index) => {
+                    setTimeout(() => {
+                        tr.style.cssText = 'transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;';
+                    }, 500 * index);
+                });
+                setTimeout(() => {
+                  this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: black; transition: all 0.5s ease-in-out;';
+                }, 1000); 
+                setTimeout(() => {
+                  this.$refs.three.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black; transition: all 0.5s ease-in-out;';
+                }, 1500); 
+              }, 2000); 
+            })
+          })
+        }else{
+            this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+              this.$refs.taskInformation.classList.add('d-none');
+              this.$refs.formulate.classList.remove('d-none');
+            }, 400);
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+            }, 800); 
+            setTimeout(() => {
+              document.querySelector('.t1').style.cssText = 'font-size: 25px; border: 1px solid black; border-radius: 10px; padding: 10px;opacity: 1;transition: all 0.5s ease-in-out;';
+              document.querySelector('.t2').style.cssText = 'font-size: 25px; border: 1px solid black; border-radius: 10px; padding: 10px;opacity: 1;transition: all 0.5s ease-in-out;';
+            }, 1500); 
+            setTimeout(() => {
+              document.querySelectorAll('.ts').forEach((tr, index) => {
+                  setTimeout(() => {
+                      tr.style.cssText = 'transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;';
+                  }, 500 * index);
+              });
+              setTimeout(() => {
+                  this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white; transition: all 0.5s ease-in-out;';
+                }, 1000); 
+                setTimeout(() => {
+                  this.$refs.three.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black; transition: all 0.5s ease-in-out;';
+                }, 1500); 
+            }, 2000); 
+        }
+      },
+      beginTodo(){
+        if(this.tasks[this.focusTaskIndex].state == 2){
+          if(this.tasks[this.focusTaskIndex].order.length!=0){
+            let task = {
+              state: 3,
+              order: this.tasks[this.focusTaskIndex].order,
+              taskId: this.tasks[this.focusTaskIndex].taskId,
+            }
+            var storedToken = localStorage.getItem('token');
+            const { id } =  jwtDecode(storedToken);
+            this.$axios.patch(`/task/state/${id}`,task, {
+              headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+              }
+            })
+            .then(response => {
+              this.$swal.fire({
+                title: '完成第三步',
+                text: '進入第四步,接下來開始實作,請至『編輯器』撰寫程式碼,並回答本次的任務問題',
+                icon: 'success',
+              }).then(() => {
+                this.tasks[this.focusTaskIndex].state = 3;
+                this.orderIndex = null;
+                this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+                setTimeout(() => {
+                  this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+                  this.$refs.formulate.classList.add('d-none');
+                  this.$refs.todo.classList.remove('d-none');
+                }, 400);
+                setTimeout(() => {
+                  this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+                }, 800); 
+                setTimeout(() => {
+                  this.$refs.three.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white; transition: all 0.5s ease-in-out;';
+                }, 1500); 
+                setTimeout(() => {
+                  this.$refs.four.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black; transition: all 0.5s ease-in-out;';
+                }, 2000); 
+              })
+            })
+          }else{
+            this.$swal.fire({
+              title: '有東西未填寫',
+              text: '請先確認引導順序 與 策略',
+              icon: 'error'
+            });
+          }
+        }else{
+          let task = {
+            order: this.tasks[this.focusTaskIndex].order,
+            taskId: this.tasks[this.focusTaskIndex].taskId,
+          }
+          var storedToken = localStorage.getItem('token');
+          const { id } =  jwtDecode(storedToken);
+          this.$axios.patch(`/task/state/${id}`,task, {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+              'Content-Type': 'application/json',
+            }
+          })
+          .then(response => {
+            this.tasks[this.focusTaskIndex].order.forEach((item) => { item.state = 1; });
+
+            this.orderIndex = null;
+            this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+            setTimeout(() => {
+                this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+                this.$refs.formulate.classList.add('d-none');
+                this.$refs.todo.classList.remove('d-none');
+            }, 400);
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+            }, 800); 
+            setTimeout(() => {
+              this.$refs.three.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white; transition: all 0.5s ease-in-out;';
+            }, 1500); 
+            setTimeout(() => {
+              this.$refs.four.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black; transition: all 0.5s ease-in-out;';
+            }, 2000); 
+          })
+        }
+      },
+      finishTask(){
+        console.log(this.tasks[this.focusTaskIndex].state == 3);
+          console.log(this.tasks[this.focusTaskIndex].order.length != this.tasks[this.focusTaskIndex].target.length);
+          console.log(this.tasks[this.focusTaskIndex].order.every(item => item.state != 1));
+        if(this.tasks[this.focusTaskIndex].state == 3  && this.tasks[this.focusTaskIndex].order.length != this.tasks[this.focusTaskIndex].target.length){
+            let task = {
+              html:this.htmlCode,
+              css:this.cssCode,
+              js:this.jsCode,
+              order: this.tasks[this.focusTaskIndex].order,
+              taskId: this.tasks[this.focusTaskIndex].taskId,
+            }
+            var storedToken = localStorage.getItem('token');
+            const { id } =  jwtDecode(storedToken);
+            this.$axios.patch(`/task/state/${id}`,task, {
+              headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+              }
+            })
+            .then(response => {
+              this.$swal.fire({
+                  title: '完成',
+                  text: '繼續完成子任務',
+                  icon: 'success',
+                }).then(() => {
+                  this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0;';
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0; ';
+                    this.$refs.formulate.classList.remove('d-none');
+                    this.$refs.todo.classList.add('d-none');
+                  }, 400);
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+                  }, 800); 
+                  setTimeout(() => {
+                    this.$refs.four.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+                  }, 1500); 
+                  setTimeout(() => {
+                    this.$refs.three.style.cssText = 'font-size: 15px; border: 2px solid white; background-color:chartreuse; color: black;   transition: all 0.5s ease-in-out;';
+                  }, 2000); 
+                })
+            })
+        }else{
+
+          if (this.tasks[this.focusTaskIndex].order.every(item => item.state == 1)){
+              if(this.tasks[this.focusTaskIndex].answer.length == this.tasks[this.focusTaskIndex].question.length){
+                let task = {
+                  state: 4,
+                  answer: this.tasks[this.focusTaskIndex].answer,
+                  taskId: this.tasks[this.focusTaskIndex].taskId,
+                }
+                var storedToken = localStorage.getItem('token');
+                const { id } =  jwtDecode(storedToken);
+                this.$axios.patch(`/task/state/${id}`,task, {
+                  headers: {
+                    'Authorization': `Bearer ${storedToken}`,
+                    'Content-Type': 'application/json',
+                  }
+                })
+                .then(response => {
+                  this.$swal.fire({
+                      title: '完成第四步',
+                      text: '進入第五步,接下來寫下五個問題,不能空白',
+                      icon: 'success',
+                    }).then(() => {
+                      this.tasks[this.focusTaskIndex].state = 4;
+                      this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+                      setTimeout(() => {
+                          this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+                          this.$refs.todo.classList.add('d-none');
+                          this.$refs.finish.classList.remove('d-none');
+                      }, 400);
+                      setTimeout(() => {
+                        this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+                      }, 800); 
+                      setTimeout(() => {
+                        this.$refs.four.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white; transition: all 0.5s ease-in-out;';
+                      }, 1500); 
+                      setTimeout(() => {
+                        this.$refs.five.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black; transition: all 0.5s ease-in-out;';
+                      }, 2000); 
+                    })
+                })
+              }else{
+                this.$swal.fire({
+                  title: '有東西未填寫',
+                  text: '每個問題都要回答',
+                  icon: 'error'
+                });
+              }
+          }
+        }
+      },
+      sendFinish(){
+        if(this.tasks[this.focusTaskIndex].state == 4){
+          if(this.tasks[this.focusTaskIndex].thought.every(item => item !== '')){
+              let task = {
+                state: 5,
+                thoughts: this.tasks[this.focusTaskIndex].thought,
+                taskId: this.tasks[this.focusTaskIndex].taskId,
+              }
+              var storedToken = localStorage.getItem('token');
+              const { id } =  jwtDecode(storedToken);
+              this.$axios.patch(`/task/state/${id}`,task, {
+                headers: {
+                  'Authorization': `Bearer ${storedToken}`,
+                  'Content-Type': 'application/json',
+                }
+              })
+              .then(response => {
+                this.$swal.fire({
+                    title: '恭喜任務完成',
+                    text: '返回任務欄等待老師評分',
+                    icon: 'success',
+                  }).then(() => {
+                    this.tasks[this.focusTaskIndex].state = 5;
+                    this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0;';
+                    setTimeout(() => {
+                      this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0; ';
+                      this.$refs.practiceCard.classList.remove('d-none');
+                      this.$refs.finish.classList.add('d-none');
+                      this.$refs.nav.classList.add('d-none');
+                    }, 400);
+                    setTimeout(() => {
+                      this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+                      this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+                      this.$refs.five.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+                      this.focusTaskIndex = null;
+                    }, 800); 
+                  })
+              })
+          }else{
+            this.$swal.fire({
+              title: '有東西未填寫',
+              text: '每個問題都要回答',
+              icon: 'error'
+            });
+          }
+        }else{
+          this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0;';
+          setTimeout(() => {
+            this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0; ';
+            this.$refs.practiceCard.classList.remove('d-none');
+            this.$refs.finish.classList.add('d-none');
+            this.$refs.nav.classList.add('d-none');
+          }, 400);
+          setTimeout(() => {
+            this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+            this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+            this.$refs.five.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+            this.focusTaskIndex = null;
+          }, 800); 
+        }
+      },
+      closeExample(){
+        this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0;';
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0; ';
+          this.$refs.practiceCard.classList.remove('d-none');
+          this.$refs.practiceIframeCard.classList.add('d-none');
+          this.$refs.nav.classList.add('d-none');
+        }, 400);
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+          this.$refs.one.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+          this.focusTaskIndex = null;
+        }, 800); 
+      },
+      backExample(){
+        this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0;';
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0; ';
+          this.$refs.practiceIframeCard.classList.remove('d-none');
+          this.$refs.taskInformation.classList.add('d-none');
+        }, 400);
+
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+        }, 800); 
+
+        setTimeout(() => {
+          this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+        }, 1500); 
+        setTimeout(() => {
+          this.$refs.one.style.cssText = 'font-size: 15px; border: 2px solid white; background-color:chartreuse; color: black;   transition: all 0.5s ease-in-out;';
+        }, 2000); 
+      },
+      backTaskInformation(){
+        this.orderIndex = null;
+        this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0;';
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0; ';
+          this.$refs.taskInformation.classList.remove('d-none');
+          this.$refs.formulate.classList.add('d-none');
+          this.$refs.todo.classList.add('d-none');
+        }, 400);
+
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+        }, 800); 
+        setTimeout(() => {
+          this.$refs.three.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+          this.$refs.four.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+        }, 1500); 
+        setTimeout(() => {
+          this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color:chartreuse; color: black;   transition: all 0.5s ease-in-out;';
+        }, 2000); 
+      },
+      backTask(){
+        this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0;';
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0; ';
+          this.$refs.practiceCard.classList.remove('d-none');
+          this.$refs.taskInformation.classList.add('d-none');
+          this.$refs.nav.classList.add('d-none');
+        }, 400);
+        setTimeout(() => {
+          this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+          this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+          this.$refs.five.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white;  transition: all 0.5s ease-in-out;';
+          this.focusTaskIndex = null;
+        }, 800); 
       },
       getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -675,7 +1387,6 @@
       },
       firstLogin() {
       if(localStorage.getItem('loginNumber') == 0){
-
           function animateElement(id, delay,  fontSize, width = '', extraStyles = '') {
               setTimeout(() => {
                   const element = document.getElementById(id);
@@ -709,7 +1420,7 @@
                   "大家好 歡迎第一次登陸這個編譯網站<br>現在開始我要慢慢介紹功能按鈕", 
                   "這是撰寫HTML的地方 點擊後會出現編輯器", "這是撰寫CSS的地方 點擊後會出現編輯器", "這是JavaScript的地方 點擊後會出現編輯器", 
                   "這是跑程式碼的地方 點擊後會出現程式碼結果","這是儲存的地方 可以按下crtl+s快速儲存代碼", 
-                  "這是清空代碼的地方 點擊後會清空所有代碼","這是練習的地方 點擊後會出現練習題目",
+                  "這是清空代碼的地方 點擊後會清空所有代碼","這是任務欄的地方 點擊後會出現任務卡片",
                   "這是聊天室的地方 點擊可以打開聊天室<br>與gpt機器人交流", "這是程式碼紀錄的地方 可以查看自己的程式碼紀錄<br>點擊Demo可以還原程式碼", 
                   "這是考試視窗的地方 可以進行考試", 
                   "歡迎 來到編譯網站", "準備好開始學習"
@@ -750,41 +1461,6 @@
           return;
       }
       },
-      watchExm() {
-        this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
-        setTimeout(() => {
-          this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 0; transition: all 0.5s ease-in-out;';
-          this.$refs.practiceCard.classList.add('d-none');
-          this.$refs.practiceIframeCard.classList.remove('d-none');
-        }, 500);
-
-        setTimeout(() => {
-          this.$refs.practice.style.cssText = 'left: 150%; top: 31%; opacity: 0; transition: all 0.5s ease-in-out;';
-          const iframe2 = this.$refs.practiceIframe;
-          if (iframe2) {
-            const documentContent = `
-              <html>
-                <head>
-                  <style>${this.practiceCode.css}<\/style>
-                  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"><\/script>
-                </head>
-                <body>
-                  ${this.practiceCode.html}
-                  <script>
-                      ${this.practiceCode.js}
-                  <\/script>
-                </body>
-              </html>
-            `;
-            iframe2.srcdoc = documentContent;
-          } else {
-            console.error('Iframe reference is undefined');
-          }
-          setTimeout(() => {
-            this.$refs.practice.style.cssText = 'left: 50%; top:31%; opacity: 1; width: 80%;  transition: all 0.5s ease-in-out;';
-          }, 400);
-        }, 500); 
-      },
       closeSocket(){
         var storedToken = localStorage.getItem('token');
         const { studentID } =  jwtDecode(storedToken);
@@ -798,10 +1474,163 @@
         localStorage.removeItem('identity');
         localStorage.removeItem('loginNumber');
         window.location.href = '/';
-      }
-
+      },
+      getTask(){
+        var storedToken = localStorage.getItem('token');
+        const { id } =  jwtDecode(storedToken);
+        this.$axios.get(`/task/student/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${storedToken}`,
+            'Content-Type': 'application/json',
+          }
+        })
+        .then(response => {
+          let tasks = []
+          response.data.data.forEach(element => {
+            let task = {
+              title: element.taskId.title,
+              target: element.taskId.guide,
+              guide: element.taskId.target,
+              question: element.taskId.question,
+              ppt: element.taskId.ppt,
+              html: element.taskId.html,
+              css: element.taskId.css,
+              js: element.taskId.js,
+              taskId: element.taskId._id,
+              
+              state: element.state,
+              answer: element.answer,
+              order: element.order? element.order : [],
+              teacherTalk: element.teacherTalk,
+              thought: element.thought? element.thought : ['','','','',''],
+              finishTime: element.finishTime,
+            }
+            tasks.push(task);
+          });
+          this.tasks = tasks;
+        })
+      },
+      accept(){
+        if(this.tasks[this.focusTaskIndex].state == 0){
+          let task = {
+            state: 1,
+            taskId: this.tasks[this.focusTaskIndex].taskId,
+          }
+          var storedToken = localStorage.getItem('token');
+          const { id } =  jwtDecode(storedToken);
+          this.$axios.patch(`/task/state/${id}`,task, {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+              'Content-Type': 'application/json',
+            }
+          })
+          .then(response => {
+            this.$swal.fire({
+              title: '接受成功',
+              text: '進入第二步,接下來會出現,教材簡報與本次任務目標,請仔細閱讀',
+              icon: 'success',
+            }).then(() => {
+              this.tasks[this.focusTaskIndex].state = 1;
+              this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+              setTimeout(() => {
+                this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+                this.$refs.practiceIframeCard.classList.add('d-none');
+                this.$refs.taskInformation.classList.remove('d-none');
+              }, 400);
+              setTimeout(() => {
+                this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+              }, 800); 
+              setTimeout(() => {
+                document.querySelector('.t3').style.cssText = 'font-size: 20px;height:30px;  padding: 5px;opacity: 1;transition: all 0.5s ease-in-out;';
+                document.querySelector('.t5').style.cssText = 'font-size: 20px;height:30px;  padding: 5px;opacity: 1;transition: all 0.5s ease-in-out;';
+                document.querySelector('.t4').style.cssText = 'opacity: 1;transition: all 0.5s ease-in-out;position: relative;'
+              }, 1500); 
+              setTimeout(() => {
+                document.querySelectorAll('.tr').forEach((tr, index) => {
+                  setTimeout(() => {
+                      tr.style.cssText = 'font-size: 20px;transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;';
+                  }, 500 * index);
+                });
+                setTimeout(() => {
+                  this.$refs.one.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white; transition: all 0.5s ease-in-out;';
+                }, 1000); 
+                setTimeout(() => {
+                  this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black; transition: all 0.5s ease-in-out;';
+                }, 1500); 
+              }, 2000);
+            })
+          })
+        }else{
+            this.$refs.practice.style.cssText = 'left: -50%; top: 50%; opacity: 0;';
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 150%; top: 50%; opacity: 0; ';
+              this.$refs.practiceIframeCard.classList.add('d-none');
+              this.$refs.taskInformation.classList.remove('d-none');
+            }, 400);
+            setTimeout(() => {
+              this.$refs.practice.style.cssText = 'left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;';
+            }, 800); 
+            setTimeout(() => {
+              document.querySelector('.t3').style.cssText = 'font-size: 20px;height:30px;  padding: 5px;opacity: 1;transition: all 0.5s ease-in-out;';
+              document.querySelector('.t5').style.cssText = 'font-size: 20px;height:30px;  padding: 5px;opacity: 1;transition: all 0.5s ease-in-out;';
+              document.querySelector('.t4').style.cssText = 'opacity: 1;transition: all 0.5s ease-in-out;position: relative;'
+            }, 1500); 
+            setTimeout(() => {
+              document.querySelectorAll('.tr').forEach((tr, index) => {
+                setTimeout(() => {
+                    tr.style.cssText = 'font-size: 20px;transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;';
+                }, 500 * index);
+              });
+              setTimeout(() => {
+                this.$refs.one.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: #808A87; color: white; transition: all 0.5s ease-in-out;';
+              }, 1000); 
+              setTimeout(() => {
+                this.$refs.two.style.cssText = 'font-size: 15px; border: 2px solid white; background-color: chartreuse; color: black; transition: all 0.5s ease-in-out;';
+              }, 1500); 
+            }, 2000);
+        }
+      },
+      add() {
+        this.tasks[this.focusTaskIndex].order[this.orderIndex].strategy.push('');
+      },
+      remove(index){
+        this.tasks[this.focusTaskIndex].order[this.orderIndex].strategy.splice(index, 1);
+      },
+      prevSlide() {
+        if (this.currentSlide > 0) {
+          this.currentSlide -= 1;
+        }
+      },
+      nextSlide() {
+        if (this.currentSlide < this.tasks[this.focusTaskIndex].ppt.length - 1) {
+          this.currentSlide += 1;
+        }
+      },
+      selectOrder(index){
+        this.orderIndex = index;
+      },
+      addOrder(option,index){
+        this.tasks[this.focusTaskIndex].order.push({
+          taskName: option,
+          state: 0,
+          strategy: [],    
+        });
+        this.tasks[this.focusTaskIndex].target.splice(index, 1);
+      },
+      removeOrder(option,index){
+        this.orderIndex= null;
+        this.tasks[this.focusTaskIndex].target.push(option.taskName);
+        this.tasks[this.focusTaskIndex].order.splice(index, 1);
+        this.$forceUpdate();
+        this.$nextTick(() => {
+          document.querySelectorAll('.ts').forEach((tr) => {
+            tr.style.cssText = 'font-size: 20px; transform: translateX(0); opacity: 1; transition: all 0.5s ease-in-out;';
+          });
+        });
+      },
     },
     mounted() {
+      
       this.firstLogin()
       this.toggleIframe();
       var storedToken = localStorage.getItem('token');
@@ -1169,20 +1998,20 @@
           }
       });
       ///////////////////////////////////////////////////////////
-      monaco.languages.html.htmlDefaults.setOptions({
-      suggest: { html5: true },
-      });
-      monaco.languages.css.cssDefaults.setOptions({
-        validate: true,
-        lint: {
-          compatibleVendorPrefixes: 'ignore',
-          vendorPrefix: 'warning',
-        },
-      });
-      monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-        target: monaco.languages.typescript.ScriptTarget.ES6,
-        allowNonTsExtensions: true,
-      });
+      // monaco.languages.html.htmlDefaults.setOptions({
+      // suggest: { html5: true },
+      // });
+      // monaco.languages.css.cssDefaults.setOptions({
+      //   validate: true,
+      //   lint: {
+      //     compatibleVendorPrefixes: 'ignore',
+      //     vendorPrefix: 'warning',
+      //   },
+      // });
+      // monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      //   target: monaco.languages.typescript.ScriptTarget.ES6,
+      //   allowNonTsExtensions: true,
+      // });
       ///////////////////////////////////////////////////////////
       this.htmlCode = this.htmlEditor.getValue();
       this.cssCode = this.cssEditor.getValue();
@@ -1285,6 +2114,7 @@
               }
           });
       })
+      this.getTask();
       this.socket = new WebSocket('ws://140.138.147.12:3000');
       this.socket.onopen = () => {
         const { studentID } =  jwtDecode(storedToken);
@@ -1299,10 +2129,10 @@
 
           if (type === 'practice') {
             this.badgeHtml = '<span class="position-absolute translate-middle badge rounded-pill bg-danger" style="left: 90px; top: 10px; font-size: 15px;">!</span>';
-            this.practiceCode.html = jsonObject.content.html;
-            this.practiceCode.css = jsonObject.content.css;
-            this.practiceCode.js = jsonObject.content.js;
-            this.practiceCode.context = jsonObject.content.content;
+            this.getTask();
+            var toastElement = document.getElementById('liveToast');
+            var toast = new Toast(toastElement);
+            toast.show();
           }
 
           if (type === 'stop') {
@@ -1323,6 +2153,7 @@
               showDenyButton: false,
             })
           }
+          
 
           if( type === 'begin') {
             this.$swal.close();
@@ -1333,11 +2164,8 @@
           console.error('JSON 解析错误:', error);
         }
       };
-
       this.socket.onclose = () => {
-        console.log('Socket斷線');
       };
-
       window.addEventListener('beforeunload', this.handleBeforeUnload);
     },
     beforeUnmount() {
@@ -1355,185 +2183,287 @@
       this.SignOut()
       window.removeEventListener('beforeunload', this.handleBeforeUnload);
     },
-  };
+};
 </script>
 
 <style scoped>
-  #iframe-container {
-    width: 100%;
-    height: 100%;
-    backdrop-filter:blur(8px); 
-    -webkit-backdrop-filter:blur(8px);
-    background:rgba(255, 255, 255, 0.37);
-  }
+#iframe-container {
+  width: 100%;
+  height: 100%;
+  backdrop-filter:blur(8px); 
+  -webkit-backdrop-filter:blur(8px);
+  background:rgba(255, 255, 255, 0.37);
+}
+iframe {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  border: none;
+  background-color: #fff;
+}
+label i {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.main {
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  background-color: #454545;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  transition: transform 0.3s ease;
+}
+.row {
+  width: 100%;
+}
+.toggle-chat-btn {
+  position: fixed;
+  right: 0;
+  width: 40px;
+  z-index: 1000;
+  transform: translateX(85%);
+  transition: all 0.3s ease;;
+}
+.toggle-chat-btn:hover {
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+.text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  transition: all 0.5s ease, opacity 0.5s ease;
+  opacity: 1;
+}
+.text-close {
+  flex: 0;
+  transition: all 0.5s ease, opacity 0.5s ease;
+  opacity: 0;
+}
+.toggle-btn {
+  position: fixed;
+  z-index: 1000;
+  transform: translateX(-85%);
+  transition: all 0.5s ease;;
+}
+.toggle-btn:hover {
+  transform: translateX(0);
+  transition: all 0.3s ease;;
+}
+.toggle-btnJS {
+  position: fixed;
+  z-index: 1000;
+  transform: translateX(-90%);
+  transition: all 0.5s ease;;
+}
+.toggle-btnJS:hover {
+  transform: translateX(0);
+  transition: all 0.3s ease;;
+}
+.chat{
+  position: fixed;
+  right: 8px;
+  top: 0;
+  z-index: 999;
+  width: 400px;
+}
+.document{
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  padding: 0 30px;
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+}
+.exam {
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  padding: 0 50px;
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+  background: #fff;
 
-  iframe {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 100vh;
-    border: none;
-    background-color: #fff;
-  }
-  label i {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-  .main {
-    font-family: Arial, sans-serif;
-    box-sizing: border-box;
-    background-color: #454545;
-    color: #fff;
-    margin: 0;
-    padding: 0;
-    transition: transform 0.3s ease;
-  }
-  .row {
-    width: 100%;
-  }
-  .toggle-chat-btn {
-    position: fixed;
-    right: 0;
-    width: 40px;
-    z-index: 1000;
-    transform: translateX(85%);
-    transition: all 0.3s ease;;
-  }
-  .toggle-chat-btn:hover {
-    transform: translateX(0);
-    transition: all 0.3s ease;
-  }
-  .text {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    width: 100%;
-    transition: all 0.5s ease, opacity 0.5s ease;
-    opacity: 1;
-  }
-  .text-close {
-    flex: 0;
-    transition: all 0.5s ease, opacity 0.5s ease;
-    opacity: 0;
-  }
-  .toggle-btn {
-    position: fixed;
-    z-index: 1000;
-    transform: translateX(-85%);
-    transition: all 0.5s ease;;
-  }
-  .toggle-btn:hover {
-    transform: translateX(0);
-    transition: all 0.3s ease;;
-  }
-  .toggle-btnJS {
-    position: fixed;
-    z-index: 1000;
-    transform: translateX(-90%);
-    transition: all 0.5s ease;;
-  }
-  .toggle-btnJS:hover {
-    transform: translateX(0);
-    transition: all 0.3s ease;;
-  }
-  .chat{
-    position: fixed;
-    right: 8px;
-    top: 0;
-    z-index: 999;
-    width: 400px;
-  }
-  .document{
-    position: fixed;
-    top: 0;
-    z-index: 999;
-    padding: 0 50px;
-    width: 100%;
-    height: 100vh;
-    overflow-x: hidden;
-  }
-  .exam {
-    position: fixed;
-    top: 0;
-    z-index: 999;
-    padding: 0 50px;
-    width: 100%;
-    height: 100vh;
-    overflow-x: hidden;
-    background: #fff;
-
-  }
-  .document::-webkit-scrollbar {
-    width: 0; 
-  }
-  .document::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  .text .editor-container {
-    width: 100%;
-    height: 100vh;
-  }
-  .text-close{
-    display: none;
-  }
-  .exam::-webkit-scrollbar {
-    width: 0; 
-  }
-  .exam::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-  .cardBody:hover {
-      background-color: #aaaaaa;
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;;
-  }
-  .checkbox:hover {
-      background-color: #aaaaaa;
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;;
-  }
-  #console-output {
-      padding: 10px;
-      border: 1px solid #ddd;
-      background-color: #f9f9f9;
-      color: #454545;
-      position: absolute;
-      top: calc(100vh - 200px); /* Adjust to place it 200px above the bottom of the viewport */
-      left: 0;
-      right: 0;
-      width: 100%;
-      height: 200px; /* Adjust this value as needed */
-      z-index: 1000;
-      overflow: auto; /* Add overflow to make it scrollable if needed */
-    }
-  .practice {
-    position: fixed;
-    z-index: 9000;
-    left: 50%; 
-    top: -80%; 
-    transform: translate(-50%, -50%); 
-    font-size: 50px; 
-    width: 60%; 
-    height: 60%;  
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-    transition: all 0.5s ease;;
-  }
-  .practiceBtn{
-    background-color:  #292421;
-  }
-  .practiceBtn:hover {
-    background-color: #292421;
+}
+.document::-webkit-scrollbar {
+  width: 0; 
+}
+.document::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.text .editor-container {
+  width: 100%;
+  height: 100vh;
+}
+.text-close{
+  display: none;
+}
+.exam::-webkit-scrollbar {
+  width: 0; 
+}
+.exam::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.cardBody:hover {
+    background-color: #aaaaaa;
     cursor: pointer;
     transition: all 0.3s ease-in-out;;
+}
+.checkbox:hover {
+    background-color: #aaaaaa;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;;
+}
+#console-output {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    color: #454545;
+    position: absolute;
+    top: calc(100vh - 200px); /* Adjust to place it 200px above the bottom of the viewport */
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 200px; /* Adjust this value as needed */
+    z-index: 1000;
+    overflow: auto; /* Add overflow to make it scrollable if needed */
+}
+.practice {
+  position: fixed;
+  z-index: 10;
+  left: 50%; 
+  top: -50%; 
+  transform: translate(-50%, -50%); 
+  font-size: 50px; 
+  width: 95%; 
+  height: 90%;  
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  transition: all 0.5s ease;;
+}
+.practiceBtn{
+  background-color:  #292421;
+}
+.practiceBtn:hover {
+  background-color: #292421;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;;
+}
+.icon-text{
+  color: #fff;
+  font-size: 15px;
+  margin-top: -10px;
+  padding: 0;
+}
+@keyframes rotate {
+  0%, 100% {
+              transform: translateY(10px);
+          }
+          50% {
+              transform: translateY(20px);
+          }
+}
+@keyframes rainbow {
+    0% {
+        color: rgb(54, 54, 54);
+    }
+    50% {
+        color: rgb(36, 31, 21);
+    }
+    100% {
+        color: rgb(152, 152, 152);
+    }
+}
+.task-title {
+    font-size: 25px;
+    animation: rotate 3s linear infinite, rainbow 1s linear infinite;
+    display: inline-block;
+    transform-style: preserve-3d; /* 保持子元素的3D转换 */
+}
+@keyframes rotate2 {
+  0% {
+    opacity: 0;
+    transform: rotateY(180deg);
   }
-  .icon-text{
-    color: #fff;
-    font-size: 15px;
-    margin-top: -10px;
-    padding: 0;
+  100% {
+    opacity: 1;
+    transform: rotateY(0deg);
   }
+}
+@keyframes rotateBack {
+  0% {
+    opacity: 0;
+    transform: rotateY(180deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+}
+.order:hover{
+  background-color: #aaaaaa;
+}
+.taskCard:hover{
+  transition: all 0.5s ease-in-out;;
+  cursor: pointer;
+}
+.card-body {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 50;
+  left: 50;
+}
+.front {
+  opacity: 1;
+}
+.back {
+  opacity: 0;
+}
+.taskCard:hover  {
+  animation: rotate2 0.5s forwards;
+  .back {
+    opacity: 1;
+  }
+  .front {
+    opacity: 0;
+  }
+}
+.taskCard:not(:hover)  {
+  animation: rotateBack 0.5s forwards;
+  .back {
+    opacity: 0;
+  }
+  .front {
+    opacity: 1;
+  }
+}
+.pdf-container {
+  text-align: center;
+}
 
+.slides {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.slide img {
+  width: 1080px;
+  border: 1px solid #ddd;
+  padding: 1px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
 </style>

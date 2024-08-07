@@ -4,7 +4,8 @@
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('student')">學生資料</button>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('exam')">考試系統</button>
     <button class="btn btn-outline-secondary border-0" @click="changeFocus('score')">成績查詢</button>
-    <button class="btn btn-outline-secondary border-0" @click="changeFocus('practice')">練習系統</button>
+    <button class="btn btn-outline-secondary border-0" @click="changeFocus('practice')">任務系統</button>
+    <button class="btn btn-outline-secondary border-0" @click="changeFocus('taskRecord')">任務紀錄</button>
     <button v-if="state === 1"  class="btn btn-outline-warning border-0 ms-auto" @click="stop" >暫停伺服器</button>  
     <button v-if="state === 0"  class="btn btn-outline-success border-0 ms-auto" @click="stop" >啟動伺服器</button>
     <button class="btn btn-outline-danger border-0 ms-1" @click="restartServer">重啟伺服器</button>
@@ -22,6 +23,9 @@
         <div  v-if="focus === 'practice'">
             <practice></practice>
         </div>
+        <div  v-if="focus === 'taskRecord'">
+            <taskRecord></taskRecord>
+        </div>
     </div>
 </div>
 </template>
@@ -31,13 +35,15 @@ import student from '../components/StudentInformation.vue';
 import exam from '../components/ExamSystem.vue';
 import score from '../components/Score.vue';
 import practice from '../components/Practice.vue';
+import taskRecord from '../components/TaskRecord.vue';
 import { jwtDecode } from 'jwt-decode';
 export default {
 components: {
     student,
     exam,
     score,
-    practice
+    practice,
+    taskRecord,
 },
 data() {
     return {

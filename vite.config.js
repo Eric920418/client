@@ -19,6 +19,8 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173 // 确保端口是你想使用的端口
+  },
+  optimizeDeps: {
+    exclude: ['pdfjs-dist']
   }
-  
 });
