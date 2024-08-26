@@ -1,26 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/client/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/f92faa6f66.js" crossorigin="anonymous"></script>
-    <title>Vite App</title>
-    <script type="module" crossorigin src="/client/assets/index-DtvXdsUY.js"></script>
-    <link rel="stylesheet" crossorigin href="/client/assets/index-BOEZXKzo.css">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
+<head>
+  <script>self["MonacoEnvironment"] = (function (paths) {
+          return {
+            globalAPI: false,
+            getWorkerUrl : function (moduleId, label) {
+              var result =  paths[label];
+              if (/^((http:)|(https:)|(file:)|(\/\/))/.test(result)) {
+                var currentUrl = String(window.location);
+                var currentOrigin = currentUrl.substr(0, currentUrl.length - window.location.hash.length - window.location.search.length - window.location.pathname.length);
+                if (result.substring(0, currentOrigin.length) !== currentOrigin) {
+                  var js = '/*' + label + '*/importScripts("' + result + '");';
+                  var blob = new Blob([js], { type: 'application/javascript' });
+                  return URL.createObjectURL(blob);
+                }
+              }
+              return result;
+            }
+          };
+        })({
+  "editorWorkerService": "/client/monacoeditorwork/editor.worker.bundle.js",
+  "css": "/client/monacoeditorwork/css.worker.bundle.js",
+  "html": "/client/monacoeditorwork/html.worker.bundle.js",
+  "json": "/client/monacoeditorwork/json.worker.bundle.js",
+  "typescript": "/client/monacoeditorwork/ts.worker.bundle.js",
+  "javascript": "/client/monacoeditorwork/ts.worker.bundle.js",
+  "less": "/client/monacoeditorwork/css.worker.bundle.js",
+  "scss": "/client/monacoeditorwork/css.worker.bundle.js",
+  "handlebars": "/client/monacoeditorwork/html.worker.bundle.js",
+  "razor": "/client/monacoeditorwork/html.worker.bundle.js"
+});</script>
 
-  <style>
-body {
-    font-family: Arial, sans-serif;
+  <meta charset="UTF-8">
+  <link rel="icon" href="/client/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://kit.fontawesome.com/f92faa6f66.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <title>Vite App</title>
+  <script type="module" crossorigin src="/client/assets/index-DOB8Ohmd.js"></script>
+  <link rel="stylesheet" crossorigin href="/client/assets/index-kpFPOBqn.css">
+</head>
+<body>
+  <div id="app"></div>
+</body>
+
+<style>
+  @import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
+  body {
+    font-family: 'Helvetica', 'Arial', 'Noto Sans TC', '黑體-繁','微軟正黑體', sans-serif !important;
     box-sizing: border-box;
     background-color: #454545;
     color: #fff;
     margin: 0;
+  }
+  /* body::-webkit-scrollbar {
+    width: 0;
+  } */
+  body::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  html {
+    height: 100%;
 }
 </style>
 
+<script>
+  const excludedPaths = ['/client/'];
+  // function checkUser() {
+  //   const storedToken = localStorage.getItem('token');
+  //   const currentPath = window.location.pathname;
+  //   if (excludedPaths.includes(currentPath)) {
+  //     return;
+  //   }
+  //   axios.get(`http://140.138.147.12:3000/auth/${storedToken}`)
+  //     .then((res) => {})
+  //     .catch((err) => {
+  //       Swal.fire({
+  //         title: '帳號被登錄',
+  //         text: '請重新登入',
+  //         icon: 'error',
+  //         confirmButtonText: '確定',
+  //         confirmButtonColor: '#dc3545'
+  //       }).then(() => {
+  //         localStorage.removeItem('token');
+  //         window.location.href = '/';
+  //       });
+  //     });
+  // }
+
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   checkUser();
+  //   setInterval(checkUser, 60000);
+  // });
+
+  function copyToClipboard(button) {
+    const codeElement = button.nextElementSibling;
+    const textarea = document.createElement('textarea');
+    textarea.value = codeElement.textContent;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  }
+</script>
 </html>

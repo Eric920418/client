@@ -228,29 +228,7 @@ export default {
         hljs.highlightAuto(code).value
       }</code></pre>`;
     },
-    exportToExcel() {
-      const header = ["動作", "時間"];
-      const studentInfo = [
-        ["姓名", this.data.name],
-        ["學號", this.data.studentID],
-        ["屆數", this.data.session],
-        [],
-      ];
 
-      const data = this.data.action.flatMap((message) =>
-        message.actions.actions.map((action) => [
-          action.action,
-          action.timestamp,
-        ])
-      );
-
-      const ws_data = [...studentInfo, header, ...data];
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Sheet JS");
-
-      XLSX.writeFile(wb, "學生動作紀錄.xlsx");
-    },
     gotoChat() {
       this.scrollToElement(this.$refs.chat, 100);
     },
