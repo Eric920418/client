@@ -94,11 +94,10 @@
                 <div class="text " id="js-code" ref="js">
                     <div class="editor-container" ref="jsEditorContainer"></div>
                 </div>
-
             </div>
             <div id="iframe-container" class="text-close " ref="iframe">
                     <iframe id="output" ref="output"></iframe>
-                </div>
+            </div>
             <div class="d-flex mt-2 ">
                 <button  type="button" class="btn btn-primary ms-auto m-2" @click="sendPractice">
                     <div v-if="loading" class="spinner-border" role="status">
@@ -238,7 +237,6 @@ export default {
                 }
 
                 this.task.slides = images;
-                console.log(this.task.slides); 
                 } catch (error) {
                 console.error('Error loading PDF:', error);
                 }

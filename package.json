@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "apexcharts": "^3.52.0",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
@@ -28,10 +29,13 @@
     "vite-plugin-monaco-editor": "^1.1.0",
     "vue": "^3.4.21",
     "vue-advanced-chat": "^2.1.0",
+    "vue-apexcharts": "^1.6.2",
     "vue-bubble-chat": "^1.1.2",
     "vue-cookies": "^1.8.4",
     "vue-router": "^4.3.0",
     "vue-sweetalert2": "^5.0.9",
+    "vue3-apexcharts": "^1.5.3",
+    "vuetify": "^3.6.14",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
