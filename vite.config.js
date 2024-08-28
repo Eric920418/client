@@ -1,15 +1,21 @@
 import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import ViteMonacoPlugin from "vite-plugin-monaco-editor";
+import MonacoEditorPlugin from "vite-plugin-monaco-editor";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/client/",
+  base: "/client/", // 设置基础路径
   plugins: [
     vue(),
-    // MonacoEditorPlugin({ languages: ['javascript', 'typescript', 'html', 'css', 'json'] })
-    ViteMonacoPlugin({}),
+    MonacoEditorPlugin({
+      customWorkers: [
+        {
+          label: "editorWorkerService",
+          entry: "monaco-editor/esm/vs/editor/editor.worker.js",
+        },
+      ],
+    }),
   ],
   resolve: {
     alias: {
@@ -18,14 +24,20 @@ export default defineConfig({
   },
   server: {
     host: "0.0.0.0",
-    port: 5173, // 确保端口是你想使用的端口
+    port: 4173,
   },
+
   optimizeDeps: {
     exclude: ["pdfjs-dist"],
   },
-  build: {
-    rollupOptions: {
-      external: ["vuetify"],
-    },
-  },
+  // build: {
+  //   rollupOptions: {
+  //     output: {
+  //       manualChunks: {
+  //         // 將 Monaco Editor 的 Worker 分開打包
+  //         "monaco-editor": ["monaco-editor"],
+  //       },
+  //     },
+  //   },
+  // },
 });
