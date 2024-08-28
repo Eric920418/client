@@ -3,6 +3,7 @@
     <div class="containers" ref="code">
       <div>
         <button
+          v-if="studentClassNum == 'B'"
           class="toggle-btn btn btn-danger"
           id="html"
           style="font-size: 50px; top: 0%"
@@ -22,6 +23,7 @@
       </div>
       <div>
         <button
+          v-if="studentClassNum == 'B'"
           class="toggle-btn btn btn-primary"
           id="css"
           style="font-size: 50px; top: 11.5%"
@@ -33,6 +35,7 @@
       </div>
       <div>
         <button
+          v-if="studentClassNum == 'B'"
           class="toggle-btn btn btn-warning"
           id="js"
           style="font-size: 50px; top: 23.5%"
@@ -44,6 +47,7 @@
       </div>
       <div>
         <button
+          v-if="studentClassNum == 'B'"
           class="toggle-btn btn"
           id="code"
           style="font-size: 23px; background-color: #454545; top: 40%"
@@ -55,6 +59,7 @@
       </div>
       <div>
         <button
+          v-if="studentClassNum == 'B'"
           class="toggle-btn btn"
           id="save"
           style="font-size: 23px; background-color: #454545; top: 45.5%"
@@ -66,6 +71,7 @@
       </div>
       <div>
         <button
+          v-if="studentClassNum == 'B'"
           class="toggle-btn btn btn-light"
           id="restart"
           style="font-size: 50px; top: 59%"
@@ -804,7 +810,7 @@
           width: 40px;
           top: 0%;
         "
-        v-if="isCollapsed"
+        v-if="isCollapsed && studentClassNum == 'A'"
         @click="toggleChat"
         ref="chat"
       >
@@ -1122,9 +1128,6 @@
 
 <script>
 import * as monaco from "monaco-editor";
-import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
-import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
-import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { DomHandler, Parser } from "htmlparser2";
 
@@ -1171,6 +1174,7 @@ export default {
       action: [],
 
       NowState: 0,
+      studentClassNum: "",
     };
   },
   computed: {
@@ -1227,7 +1231,6 @@ export default {
             .replace(",", ""),
         });
       }
-      console.log(this.jsEditor.getValue());
       this.isActionPushed = false;
       let storedToken = localStorage.getItem("token");
       this.$axios
@@ -2152,7 +2155,6 @@ export default {
         this.focusTaskIndex = null;
       }, 800);
     },
-
     getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -2560,6 +2562,7 @@ export default {
       localStorage.removeItem("token");
       localStorage.removeItem("identity");
       localStorage.removeItem("loginNumber");
+      localStorage.removeItem("classNum");
       window.location.href = "/";
     },
     getTask() {
@@ -2687,6 +2690,7 @@ export default {
     },
   },
   mounted() {
+    this.studentClassNum = localStorage.getItem("classNum");
     this.firstLogin();
     this.toggleIframe();
     var storedToken = localStorage.getItem("token");
@@ -2726,22 +2730,7 @@ export default {
         this.runOutput();
       }
     });
-    ////////////////////////////////////////////////////////////
-    this.$refs.htmlEditorContainer.MonacoEnvironment = {
-      getWorkerUrl: (moduleId, label) => {
-        return new htmlWorker();
-      },
-    };
-    this.$refs.cssEditorContainer.MonacoEnvironment = {
-      getWorkerUrl: (moduleId, label) => {
-        return new cssWorker();
-      },
-    };
-    this.$refs.jsEditorContainer.MonacoEnvironment = {
-      getWorkerUrl: (moduleId, label) => {
-        return new tsWorker();
-      },
-    };
+
     // 初始化 HTML 编辑器
     this.htmlEditor = monaco.editor.create(this.$refs.htmlEditorContainer, {
       value: `
@@ -3029,29 +3018,6 @@ export default {
     this.jsEditor.onDidChangeModelContent(() => {
       this.jsCode = this.jsEditor.getValue();
 
-      // function captureConsoleOutput() {
-      //   const originalLog = console.log;
-      //   const consoleOutput = document.getElementById("console-output");
-
-      //   console.log = function (message) {
-      //     consoleOutput.innerHTML += `<div>${message}</div>`;
-      //     originalLog.apply(console, arguments);
-      //   };
-
-      //   return function resetConsole() {
-      //     console.log = originalLog;
-      //   };
-      // }
-
-      // const consoleOutput = document.getElementById("console-output");
-      // consoleOutput.innerHTML = "";
-      // const resetConsole = captureConsoleOutput();
-
-      // try {
-      //   eval(this.jsCode);
-      // } catch (e) {}
-
-      // resetConsole();
       if (!this.isActionPushed) {
         if (this.time > 0) {
           this.action.push({
@@ -3073,20 +3039,7 @@ export default {
       }
     });
     ///////////////////////////////////////////////////////////
-    // monaco.languages.html.htmlDefaults.setOptions({
-    // suggest: { html5: true },
-    // });
-    // monaco.languages.css.cssDefaults.setOptions({
-    //   validate: true,
-    //   lint: {
-    //     compatibleVendorPrefixes: 'ignore',
-    //     vendorPrefix: 'warning',
-    //   },
-    // });
-    // monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-    //   target: monaco.languages.typescript.ScriptTarget.ES6,
-    //   allowNonTsExtensions: true,
-    // });
+
     ///////////////////////////////////////////////////////////
     this.htmlCode = this.htmlEditor.getValue();
     this.cssCode = this.cssEditor.getValue();
@@ -3286,7 +3239,9 @@ export default {
 iframe {
   position: fixed;
   top: 0;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 98%;
   height: 100vh;
   border: none;
   background-color: #fff;

@@ -1,18 +1,21 @@
 <template>
   <div
-    class="chat d-flex align-content-end flex-wrap bg-black"
+    class="chat d-flex align-content-end flex-wrap bg-black me-3"
     :class="{ 'chat-collapsed': isCollapsed }"
   >
-    <label class="ms-1 mb-1 w-100">
-      <i class="fa-solid fa-comment-dots"></i> AI Chat
-      <button
-        v-if="thisLog"
-        class="btn btn-sm btn-outline-secondary float-end"
-        @click="back"
-      >
-        返回
-      </button>
-    </label>
+    <div v-if="thisLog" class="d-flex justify-content-between ms-1 mb-1 w-100">
+      <div class="m-1">
+        <i class="fa-solid fa-comment-dots"></i> {{ this.nowModel }} Chat
+      </div>
+      <div class="m-1">
+        <button class="btn btn-sm btn-outline-secondary mx-3" @click="back">
+          返回
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" @click="changeModel">
+          切換模型
+        </button>
+      </div>
+    </div>
     <div v-if="!thisLog" class="log w-100" ref="log">
       <div
         class="thisLog"
@@ -105,6 +108,7 @@ export default {
       chatOpen: true,
       isSubmitting: false,
       action: [],
+      nowModel: "ChatGPT",
     };
   },
   methods: {
@@ -124,7 +128,7 @@ export default {
           const { id } = jwtDecode(storedToken);
           let chatId = this.thisLog._id;
           const response = await this.$axios.post(
-            "/chat",
+            `/chat/${this.nowModel}`,
             { messages: this.chat },
             {
               headers: {
@@ -294,6 +298,13 @@ export default {
         this.scrollToBottom();
       });
     },
+    changeModel() {
+      if (this.nowModel == "ChatGPT") {
+        this.nowModel = "Ollama";
+      } else {
+        this.nowModel = "ChatGPT";
+      }
+    },
   },
   mounted() {
     this.loadingChat();
@@ -404,5 +415,8 @@ export default {
 .int::-webkit-scrollbar {
   width: 0px; /* 寬度設置為0來隱藏滾動條 */
   background: transparent; /* 背景設置為透明 */
+}
+.custom-hover:hover {
+  background-color: #745959;
 }
 </style>
