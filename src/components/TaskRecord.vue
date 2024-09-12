@@ -330,6 +330,21 @@
             ></apexchart>
           </div>
         </div>
+        <h3 class="text-center my-3">動作時間</h3>
+        <div class="d-flex justify-content-around align-items-center my-3">
+          <div
+            class="card shadow-sm border-3"
+            style="width: 95%; height: 700px"
+          >
+            <apexchart
+              width="100%"
+              height="700"
+              type="bubble"
+              :options="chartOptions2"
+              :series="series2"
+            ></apexchart>
+          </div>
+        </div>
         <h3 class="text-center my-3">動作紀錄</h3>
         <div class="d-flex justify-content-around align-items-center my-3">
           <div
@@ -471,6 +486,45 @@ export default {
           data: [],
         },
       ],
+      // 第一格 時間 第二格 事件 第三格 固定
+
+      chartOptions2: {
+        chart: {
+          type: "bubble",
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        fill: {
+          opacity: 0.8,
+        },
+        title: {
+          text: "Custom Bubble Chart",
+        },
+        xaxis: {
+          type: "datetime",
+          labels: {
+            format: "MM-dd HH:mm", // 显示为 "09-02 17:58" 格式
+          },
+        },
+        yaxis: {
+          labels: {
+            formatter: function (value) {
+              const events = ["一", "二", "三", "四", "五"];
+              return events[value - 1]; // 根据你设置的事件顺序返回事件名称
+            },
+          },
+          min: 0,
+          max: 5,
+          tickAmount: 5, // 根据事件数量设置刻度数量
+        },
+      },
+      series2: [
+        {
+          name: "動作",
+          data: [],
+        },
+      ],
     };
   },
   computed: {
@@ -606,6 +660,7 @@ export default {
     },
     updateChart() {
       const finishTimes = this.student?.task[0]?.finishTime || [];
+
       let stateTimes = {
         1: 0,
         2: 0,
@@ -629,6 +684,66 @@ export default {
         stateTimes[5],
       ];
 
+      let FilterData = [];
+      const data = this.student.task[0].finishTime.filter(
+        (item) => item && item.actions.length > 0
+      );
+      const mergedFinishTimes = new Map();
+      data.forEach((task) => {
+        let NewActions = [];
+        task.actions.forEach((action) => {
+          NewActions.push({
+            state: task.state,
+            timestamp: action.timestamp,
+          });
+        });
+        mergedFinishTimes.set(task.state, {
+          actions: NewActions,
+          state: task.state,
+          time: task.time,
+        });
+      });
+
+      const sortedMergedFinishTimes = Array.from(
+        mergedFinishTimes.values()
+      ).sort((a, b) => a.state - b.state);
+      // const eventMapping = {
+      //   跑程式碼: 1,
+      //   開啟HTML編輯器: 2,
+      //   開啟CSS: 3,
+      //   開啟JavaScript: 4,
+      //   存程式碼: 5,
+      //   打開程式碼紀錄: 6,
+      //   關閉程式碼紀錄: 7,
+      //   編寫html: 8,
+      //   編寫css: 9,
+      //   編寫JavaScript: 10,
+      //   開啟聊天室: 11,
+      //   關閉聊天室: 12,
+      //   打開程式碼: 13,
+      //   關閉程式碼: 14,
+      //   讀取了: 15,
+      //   發送問題: 16,
+      //   關閉考試視窗: 17,
+      //   打開考試視窗: 18,
+      // };
+
+      let newData = []; // 用來存放所有生成的 data
+
+      sortedMergedFinishTimes.forEach((item) => {
+        item.actions.forEach((action) => {
+          const data = [
+            new Date(action.timestamp).getTime(), // 时间戳
+            action.state, // 狀態
+            10, // 固定值
+          ];
+          newData.push(data); // 將每個 data 推入 newData 陣列
+        });
+      });
+
+      console.log(newData);
+      this.series2[0].data = newData;
+
       // 更新 chartOptions 的 tooltip 和 dataLabels
       this.chartOptions.tooltip.y.formatter = (value) => this.formatTime(value); // 再次赋值确保正确绑定
       this.chartOptions.dataLabels.formatter = (value) =>
@@ -637,30 +752,64 @@ export default {
       // 渲染图表
       if (this.chart) {
         this.chart.destroy(); // 销毁之前的图表实例
+        this.chart.render();
       }
-      //   if (this.student.task) {
-      //     this.chart = new ApexCharts(this.$el, {
-      //       ...this.chartOptions,
-      //       series: this.series,
-      //     });
-      //   }
-
-      this.chart.render();
     },
     exportToExcel() {
-      const header = ["動作", "時間"];
-      const studentInfo = [
-        ["姓名", this.student.name],
-        ["學號", this.student.studentID],
-        [],
-      ];
+      const header = ["姓名", "學號", "步驟", "動作", "對話內容", "時間"];
 
-      const data = this.student.task[0].finishTime
-        .filter((item) => item && item.actions) // 確保 item 存在且有 actions
-        .flatMap((item) => item.actions) // 提取所有 actions 並展平成單一數組
-        .map((action) => [action.action, action.timestamp]); // 將每個 action 轉換為所需的格式
+      let FilterData = [];
 
-      const ws_data = [...studentInfo, header, ...data];
+      const data = this.student.task[0].finishTime.filter(
+        (item) => item && item.actions.length > 0
+      );
+
+      const mergedFinishTimes = new Map();
+
+      data.forEach((task) => {
+        let NewActions = [];
+        task.actions.forEach((action) => {
+          let talkContent = "";
+
+          if (action.action && action.action.includes("發送問題")) {
+            const contentMatch = action.action.match(/發送問題 問題內容：(.*)/);
+            if (contentMatch && contentMatch[1]) {
+              talkContent = contentMatch[1];
+              action.action = "發送問題";
+            }
+          }
+
+          NewActions.push({
+            action: action.action,
+            timestamp: action.timestamp,
+            talkContent: talkContent,
+          });
+        });
+
+        mergedFinishTimes.set(task.state, {
+          actions: NewActions,
+          state: task.state,
+          time: task.time,
+          name: this.student.name,
+          studentID: this.student.studentID,
+        });
+      });
+
+      mergedFinishTimes.forEach((task) => {
+        if (task && task.actions) {
+          const stepData = task.actions.map((action) => [
+            task.name,
+            task.studentID,
+            task.state,
+            action.action,
+            action.talkContent,
+            action.timestamp,
+          ]);
+          FilterData.push(...stepData);
+        }
+      });
+      FilterData = FilterData.reverse();
+      const ws_data = [header, ...FilterData];
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Sheet JS");
@@ -668,6 +817,7 @@ export default {
       XLSX.writeFile(wb, "學生動作紀錄.xlsx");
     },
   },
+
   mounted() {
     this.getHistory();
   },

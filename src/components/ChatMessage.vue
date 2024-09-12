@@ -11,7 +11,10 @@
         <button class="btn btn-sm btn-outline-secondary mx-3" @click="back">
           返回
         </button>
-        <button class="btn btn-sm btn-outline-secondary" @click="changeModel">
+        <button
+          class="btn btn-sm btn-outline-secondary d-none"
+          @click="changeModel"
+        >
           切換模型
         </button>
       </div>
@@ -59,7 +62,7 @@
           @input="autoResize"
           @keypress.enter="handleEnter"
         ></textarea>
-        <div class="icon-Loading" v-if="isSubmitting">
+        <div class="icon-Loading me-2 w-25" v-if="isSubmitting">
           <div class="spinner-border" style="color: black" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
@@ -122,6 +125,21 @@ export default {
         });
         this.$refs.textarea.disabled = true;
         this.$refs.textarea.style.height = "30px";
+        const newAction = {
+          action: `發送問題 問題內容：${this.que}`,
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        };
+        this.action.push(newAction);
         this.que = "";
         try {
           let storedToken = localStorage.getItem("token");
@@ -156,21 +174,7 @@ export default {
           console.error("Failed to send/receive chat:", err);
           this.chat.push({ ai: "發生錯誤" });
         }
-        const newAction = {
-          action: `發送問題 問題內容：${this.que}`,
-          timestamp: new Date()
-            .toLocaleString("zh-TW", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })
-            .replace(/\//g, "-")
-            .replace(",", ""),
-        };
-        this.action.push(newAction);
+
         this.$emit("update-action", this.action);
       }
       this.isSubmitting = false;
@@ -183,10 +187,10 @@ export default {
         if (lang && hljs.getLanguage(lang)) {
           try {
             const highlighted = hljs.highlight(lang, code, true).value;
-            return `<pre><button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard(this)">複製</button><code class="hljs ${lang}">${highlighted}</code></pre>`;
+            return `<pre><button class="btn btn-sm btn-dark" onclick="copyToClipboard(this)">複製</button><code class="hljs ${lang}">${highlighted}</code></pre>`;
           } catch (__) {}
         }
-        return `<pre><button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard(this)">複製</button><code class="hljs">${
+        return `<pre><button class="btn btn-sm btn-dark" onclick="copyToClipboard(this)">複製</button><code class="hljs">${
           hljs.highlightAuto(code).value
         }</code></pre>`;
       };
@@ -213,7 +217,8 @@ export default {
             this.thisLog._id = res.data._id;
           });
       }
-      action.pushAction({
+
+      const newAction = {
         action: `載入${log.time}這個時間點的對話 標題：${log.title}`,
         timestamp: new Date()
           .toLocaleString("zh-TW", {
@@ -226,7 +231,8 @@ export default {
           })
           .replace(/\//g, "-")
           .replace(",", ""),
-      });
+      };
+      this.action.push(newAction);
       this.$nextTick(() => {
         this.scrollToBottom();
       });
@@ -362,19 +368,23 @@ export default {
 }
 
 .user-message {
-  background-color: #212121;
+  background-color: #6c6c6c;
   color: white;
   border-radius: 20px;
   padding: 10px;
   margin-bottom: 10px;
+  margin-left: 30px;
+  margin-right: 5px;
 }
 .ai-message {
-  background-color: #212121;
+  background-color: #6c6c6c;
   border-radius: 20px;
   padding: 10px;
   margin-bottom: 10px;
   white-space: pre-wrap;
   word-break: break-word;
+  margin-left: 5px;
+  margin-right: 30px;
 }
 .ai-message pre {
   margin: 0;
