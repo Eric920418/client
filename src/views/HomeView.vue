@@ -10,15 +10,25 @@
           @click="toggleHtml"
         >
           <i class="fa-brands fa-html5 m-0 p-0"></i>
-          <div class="icon-text">
-            HTML
-            <div style="position: absolute; top: 5%; left: 87%">
-              <span style="display: block">H</span>
-              <span style="display: block">T</span>
-              <span style="display: block">M</span>
-              <span style="display: block">L</span>
+          <div class="icon-text">HTML</div>
+          <transition name="fade">
+            <div
+              v-if="documentBtn"
+              style="
+                position: absolute;
+                top: 10%;
+                left: 120%;
+                padding: 20px;
+                font-size: 25px;
+                text-wrap: nowrap;
+                color: white;
+                width: 450px;
+                background-color: rgba(125, 125, 125, 0.5);
+              "
+            >
+              這是打開寫JavaScript視窗的按鈕
             </div>
-          </div>
+          </transition>
         </button>
       </div>
       <div>
@@ -31,6 +41,24 @@
         >
           <i class="fa-brands fa-css3-alt"></i>
           <div class="icon-text">CSS</div>
+          <transition name="fade">
+            <div
+              v-if="documentBtn"
+              style="
+                position: absolute;
+                top: 10%;
+                left: 120%;
+                padding: 20px;
+                font-size: 25px;
+                text-wrap: nowrap;
+                color: white;
+                width: 450px;
+                background-color: rgba(125, 125, 125, 0.5);
+              "
+            >
+              這是打開寫CSS視窗的按鈕
+            </div>
+          </transition>
         </button>
       </div>
       <div>
@@ -43,6 +71,24 @@
         >
           <i class="fa-brands fa-square-js m-0 p-0"></i>
           <div class="icon-text" style="font-size: 12px">JavaScript</div>
+          <transition name="fade">
+            <div
+              v-if="documentBtn"
+              style="
+                position: absolute;
+                top: 10%;
+                left: 120%;
+                padding: 20px;
+                font-size: 25px;
+                text-wrap: nowrap;
+                color: white;
+                width: 450px;
+                background-color: rgba(125, 125, 125, 0.5);
+              "
+            >
+              這是打開寫JavaScript視窗的按鈕
+            </div>
+          </transition>
         </button>
       </div>
       <div>
@@ -50,11 +96,29 @@
           v-if="studentClassNum == 'B'"
           class="toggle-btn btn"
           id="code"
-          style="font-size: 23px; background-color: #454545; top: 40%"
+          style="font-size: 23px; background-color: #9d9d9d; top: 40%"
           @click.stop="runOutput"
           ref="run"
         >
           執行
+          <transition name="fade">
+            <div
+              v-if="documentBtn"
+              style="
+                position: absolute;
+                top: 5%;
+                left: 120%;
+                padding: 9px;
+                font-size: 18px;
+                text-wrap: nowrap;
+                color: white;
+                width: 450px;
+                background-color: rgba(125, 125, 125, 0.5);
+              "
+            >
+              這是執行程式碼的功能，點擊直接出現結果
+            </div>
+          </transition>
         </button>
       </div>
       <div>
@@ -62,11 +126,29 @@
           v-if="studentClassNum == 'B'"
           class="toggle-btn btn"
           id="save"
-          style="font-size: 23px; background-color: #454545; top: 45.5%"
+          style="font-size: 23px; background-color: #9d9d9d; top: 46%"
           @click.stop="saveButton"
           ref="save"
         >
           儲存
+          <transition name="fade">
+            <div
+              v-if="documentBtn"
+              style="
+                position: absolute;
+                top: 5%;
+                left: 120%;
+                padding: 9px;
+                font-size: 18px;
+                text-wrap: nowrap;
+                color: white;
+                width: 450px;
+                background-color: rgba(125, 125, 125, 0.5);
+              "
+            >
+              這是儲存程式碼的功能，ctrl+s快捷鍵
+            </div>
+          </transition>
         </button>
       </div>
       <div>
@@ -74,10 +156,29 @@
           v-if="studentClassNum == 'B'"
           class="toggle-btn btn btn-light"
           id="restart"
-          style="font-size: 50px; top: 59%"
+          style="font-size: 50px; top: 58%"
           @click="restart"
         >
           <i class="fa-solid fa-rotate-left"></i>
+          <div class="icon-text">刷新</div>
+          <transition name="fade">
+            <div
+              v-if="documentBtn"
+              style="
+                position: absolute;
+                top: 10%;
+                left: 120%;
+                padding: 20px;
+                font-size: 25px;
+                text-wrap: nowrap;
+                color: white;
+                width: 450px;
+                background-color: rgba(125, 125, 125, 0.5);
+              "
+            >
+              這是清空程式碼的功能，點擊刷新
+            </div>
+          </transition>
         </button>
       </div>
       <div>
@@ -85,11 +186,54 @@
           class="toggle-btn btn practiceBtn"
           id="practice"
           ref="tip"
-          style="font-size: 50px; top: 70%"
+          style="font-size: 40px; top: 70%"
           @click="startPractice"
         >
           <i class="fa-solid fa-laptop-code"></i>
           <span v-html="badgeHtml"></span>
+          <div class="icon-text">練習</div>
+
+          <transition name="fade">
+            <div
+              v-if="documentBtn"
+              style="
+                position: absolute;
+                top: 10%;
+                left: 120%;
+                padding: 20px;
+                font-size: 25px;
+                text-wrap: nowrap;
+                color: white;
+                width: 450px;
+                background-color: rgba(125, 125, 125, 0.5);
+              "
+            >
+              這是練習視窗開關，點擊開始接任務
+            </div>
+          </transition>
+        </button>
+      </div>
+
+      <div>
+        <button
+          class="btn"
+          id="documentBtn"
+          style="
+            color: #f8f9fa;
+            padding: 0;
+            font-size: 15px;
+            top: 90%;
+            position: fixed;
+            z-index: 1000;
+            background-color: #9d9d9d;
+            height: 10%;
+            width: 1%;
+            transition: all 0.5s ease;
+          "
+          @mousedown="this.documentBtn = true"
+          @mouseup="this.documentBtn = false"
+        >
+          <i class="fa-solid fa-question"></i>
         </button>
       </div>
 
@@ -806,8 +950,8 @@
         id="chatbot"
         style="
           font-size: large;
-          background-color: #6c6c6c;
-          width: 40px;
+          background-color: #9d9d9d;
+          width: 50px;
           top: 0%;
         "
         v-if="isCollapsed && studentClassNum == 'A'"
@@ -815,25 +959,89 @@
         ref="chat"
       >
         開啟聊天
+        <transition name="fade">
+          <div
+            v-if="documentBtn"
+            style="
+              position: absolute;
+              top: 15%;
+              right: 120%;
+              padding: 20px;
+              font-size: 25px;
+              text-wrap: nowrap;
+              color: white;
+              width: 450px;
+              background-color: rgba(125, 125, 125, 0.5);
+            "
+          >
+            這是打開ChatGPT聊天視窗的開關
+          </div>
+        </transition>
       </button>
       <button
-        class="toggle-chat-btn btn btn-secondary"
+        class="toggle-chat-btn btn"
         id="log"
-        style="font-size: large; width: 40px; top: 13.5%"
-        v-if="isOpenLog"
+        style="
+          font-size: large;
+          width: 50px;
+          top: 14%;
+          background-color: #9d9d9d;
+        "
+        v-if="isOpenLog && studentClassNum == 'B'"
         @click="openLog"
         ref="log"
       >
         打開紀錄
+        <transition name="fade">
+          <div
+            v-if="documentBtn"
+            style="
+              position: absolute;
+              top: 20%;
+              right: 130%;
+              padding: 20px;
+              font-size: 17px;
+              text-wrap: nowrap;
+              color: white;
+              width: 450px;
+              background-color: rgba(125, 125, 125, 0.5);
+            "
+          >
+            這是打開儲存程式碼紀錄的開關，可以直接復原程式碼
+          </div>
+        </transition>
       </button>
       <button
-        class="toggle-chat-btn btn btn-secondary"
+        class="toggle-chat-btn btn"
         id="test"
-        style="font-size: large; width: 40px; top: 26.5%"
+        style="
+          font-size: large;
+          width: 50px;
+          top: 27%;
+          background-color: #9d9d9d;
+        "
         v-if="isTest"
         @click="openTest"
       >
         開啟考試視窗
+        <transition name="fade">
+          <div
+            v-if="documentBtn"
+            style="
+              position: absolute;
+              top: 30%;
+              right: 120%;
+              padding: 20px;
+              font-size: 25px;
+              text-wrap: nowrap;
+              color: white;
+              width: 450px;
+              background-color: rgba(125, 125, 125, 0.5);
+            "
+          >
+            這是考試視窗開關
+          </div>
+        </transition>
         <span
           class="position-absolute translate-middle badge rounded-pill bg-danger"
           style="left: -5px; top: 10px"
@@ -847,6 +1055,24 @@
         @click="SignOut"
       >
         登出
+        <transition name="fade">
+          <div
+            v-if="documentBtn"
+            style="
+              position: absolute;
+              top: -5%;
+              right: 120%;
+              padding: 20px;
+              font-size: 25px;
+              text-wrap: nowrap;
+              color: white;
+              width: 450px;
+              background-color: rgba(125, 125, 125, 0.5);
+            "
+          >
+            登出按鈕
+          </div>
+        </transition>
       </button>
     </div>
 
@@ -878,8 +1104,8 @@
         class="toggle-chat-btn btn"
         style="
           font-size: large;
-          background-color: #6c6c6c;
-          width: 40px;
+          background-color: #9d9d9d;
+          width: 50px;
           top: 0%;
         "
       >
@@ -890,8 +1116,13 @@
     <div v-if="!isOpenLog">
       <button
         @click="openLog"
-        class="toggle-chat-btn btn btn-secondary"
-        style="font-size: large; width: 40px; top: 13.5%"
+        class="toggle-chat-btn btn"
+        style="
+          font-size: large;
+          width: 50px;
+          top: 14%;
+          background-color: #9d9d9d;
+        "
       >
         關閉紀錄
       </button>
@@ -905,8 +1136,13 @@
     <div v-if="!isTest">
       <button
         @click="openTest"
-        class="toggle-chat-btn btn btn-secondary"
-        style="font-size: large; width: 40px; top: 26.5%"
+        class="toggle-chat-btn btn"
+        style="
+          font-size: large;
+          width: 50px;
+          top: 27%;
+          background-color: #9d9d9d;
+        "
       >
         關閉考試視窗
       </button>
@@ -927,7 +1163,7 @@
             </button>
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                考券名稱:{{ exam.examName }} (類型: {{ exam.examType }})
+                考卷名稱:{{ exam.examName }} (類型: {{ exam.examType }})
               </div>
               <div>題數: {{ exam.questionCount }}題</div>
             </div>
@@ -957,7 +1193,7 @@
             <div class="my-2 fs-5">分數: {{ exam.examScore }}分</div>
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                考券名稱:{{ exam.examName }} (類型: {{ exam.examType }})
+                考卷名稱:{{ exam.examName }} (類型: {{ exam.examType }})
               </div>
               <div>題數: {{ exam.questionCount }}題</div>
             </div>
@@ -1037,7 +1273,7 @@
             class="btn btn-success d-flex justify-content-between align-items-center mt-4"
             @click="finishExam"
           >
-            交券
+            交卷
           </button>
         </div>
         <div v-if="isFinishExam.examName" class="container my-4">
@@ -1053,6 +1289,7 @@
             v-for="ques in isFinishExam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
+            style="height: 200px"
           >
             <div class="card-body">
               <div
@@ -1175,6 +1412,7 @@ export default {
 
       NowState: 0,
       studentClassNum: "",
+      documentBtn: false,
     };
   },
   computed: {
@@ -1454,17 +1692,15 @@ export default {
     startPractice() {
       if (!this.isStarted) {
         this.$refs.practice.style.top = "50%";
-        if (this.focusTaskIndex) {
-          setTimeout(() => {
-            this.$refs.nav.classList.remove("d-none");
-          }, 1000);
+        if (this.focusTaskIndex != null) {
+          this.$refs.nav.classList.remove("d-none");
         }
         this.isStarted = true;
       } else {
         this.$refs.practice.style.top = "-50%";
-        setTimeout(() => {
+        if (this.focusTaskIndex != null) {
           this.$refs.nav.classList.add("d-none");
-        }, 1000);
+        }
         this.isStarted = false;
       }
     },
@@ -1490,12 +1726,13 @@ export default {
           .fire({
             title: "第一步",
             text: "體驗本次任務最終成果",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "ok",
           })
           .then(() => {
             this.startTimer();
             this.NowState = 1;
-            this.$refs.one.style.cssText =
-              "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out; :";
             this.$refs.practice.style.cssText =
               "left: -50%; top: 50%; opacity: 0;";
             setTimeout(() => {
@@ -1505,9 +1742,11 @@ export default {
               this.$refs.practiceIframeCard.classList.remove("d-none");
               this.$refs.nav.classList.remove("d-none");
             }, 400);
-            this.$refs.practice.style.cssText =
-              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
             setTimeout(() => {
+              this.$refs.practice.style.cssText =
+                "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+              this.$refs.one.style.cssText =
+                "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out; :";
               const iframe2 = this.$refs.practiceIframe;
               if (iframe2) {
                 const documentContent = `
@@ -1570,6 +1809,11 @@ export default {
       }
     },
     accept() {
+      this.$refs.one.classList.remove("indexFocus");
+      this.$refs.two.classList.remove("indexFocus");
+      this.$refs.three.classList.remove("indexFocus");
+      this.$refs.four.classList.remove("indexFocus");
+      this.$refs.five.classList.remove("indexFocus");
       this.stopTimer();
       this.startTimer();
       this.NowState = 2;
@@ -1649,6 +1893,11 @@ export default {
       }
     },
     formulate() {
+      this.$refs.one.classList.remove("indexFocus");
+      this.$refs.two.classList.remove("indexFocus");
+      this.$refs.three.classList.remove("indexFocus");
+      this.$refs.four.classList.remove("indexFocus");
+      this.$refs.five.classList.remove("indexFocus");
       this.stopTimer();
       setTimeout(() => {
         this.startTimer();
@@ -1730,6 +1979,11 @@ export default {
       }
     },
     beginTodo() {
+      this.$refs.one.classList.remove("indexFocus");
+      this.$refs.two.classList.remove("indexFocus");
+      this.$refs.three.classList.remove("indexFocus");
+      this.$refs.four.classList.remove("indexFocus");
+      this.$refs.five.classList.remove("indexFocus");
       if (this.tasks[this.focusTaskIndex].state == 2) {
         if (this.tasks[this.focusTaskIndex].order.length != 0) {
           let task = {
@@ -1830,6 +2084,11 @@ export default {
       }
     },
     finishTask() {
+      this.$refs.one.classList.remove("indexFocus");
+      this.$refs.two.classList.remove("indexFocus");
+      this.$refs.three.classList.remove("indexFocus");
+      this.$refs.four.classList.remove("indexFocus");
+      this.$refs.five.classList.remove("indexFocus");
       this.tasks[this.focusTaskIndex].order.forEach((item) => {
         item.state = 1;
       });
@@ -2045,85 +2304,103 @@ export default {
       }
     },
     changeFocus(index) {
-      this.orderIndex = null;
-      this.NowState = index;
-      if (index == 1) {
-        this.$refs.practice.style.cssText = "left: -50%; top: 50%; opacity: 0;";
-        setTimeout(() => {
+      if (this.tasks[this.focusTaskIndex].state > index) {
+        this.orderIndex = null;
+        this.NowState = index;
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.three.classList.remove("indexFocus");
+        this.$refs.four.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+        if (index == 1) {
           this.$refs.practice.style.cssText =
-            "left: 150%; top: 50%; opacity: 0; ";
-          this.$refs.practiceIframeCard.classList.remove("d-none");
-          this.$refs.taskInformation.classList.add("d-none");
-          this.$refs.formulate.classList.add("d-none");
-          this.$refs.todo.classList.add("d-none");
-          this.$refs.finish.classList.add("d-none");
-        }, 400);
-        setTimeout(() => {
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.practiceIframeCard.classList.remove("d-none");
+            this.$refs.taskInformation.classList.add("d-none");
+            this.$refs.formulate.classList.add("d-none");
+            this.$refs.todo.classList.add("d-none");
+            this.$refs.finish.classList.add("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.one.classList.add("indexFocus");
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+        } else if (index == 2) {
           this.$refs.practice.style.cssText =
-            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-        }, 800);
-      } else if (index == 2) {
-        this.$refs.practice.style.cssText = "left: -50%; top: 50%; opacity: 0;";
-        setTimeout(() => {
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.practiceIframeCard.classList.add("d-none");
+            this.$refs.taskInformation.classList.remove("d-none");
+            this.$refs.formulate.classList.add("d-none");
+            this.$refs.todo.classList.add("d-none");
+            this.$refs.finish.classList.add("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.two.classList.add("indexFocus");
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+        } else if (index == 3) {
           this.$refs.practice.style.cssText =
-            "left: 150%; top: 50%; opacity: 0; ";
-          this.$refs.practiceIframeCard.classList.add("d-none");
-          this.$refs.taskInformation.classList.remove("d-none");
-          this.$refs.formulate.classList.add("d-none");
-          this.$refs.todo.classList.add("d-none");
-          this.$refs.finish.classList.add("d-none");
-        }, 400);
-        setTimeout(() => {
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.practiceIframeCard.classList.add("d-none");
+            this.$refs.taskInformation.classList.add("d-none");
+            this.$refs.formulate.classList.remove("d-none");
+            this.$refs.todo.classList.add("d-none");
+            this.$refs.finish.classList.add("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.three.classList.add("indexFocus");
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+        } else if (index == 4) {
           this.$refs.practice.style.cssText =
-            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-        }, 800);
-      } else if (index == 3) {
-        this.$refs.practice.style.cssText = "left: -50%; top: 50%; opacity: 0;";
-        setTimeout(() => {
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.practiceIframeCard.classList.add("d-none");
+            this.$refs.taskInformation.classList.add("d-none");
+            this.$refs.formulate.classList.add("d-none");
+            this.$refs.todo.classList.remove("d-none");
+            this.$refs.finish.classList.add("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.four.classList.add("indexFocus");
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+        } else if (index == 5) {
           this.$refs.practice.style.cssText =
-            "left: 150%; top: 50%; opacity: 0; ";
-          this.$refs.practiceIframeCard.classList.add("d-none");
-          this.$refs.taskInformation.classList.add("d-none");
-          this.$refs.formulate.classList.remove("d-none");
-          this.$refs.todo.classList.add("d-none");
-          this.$refs.finish.classList.add("d-none");
-        }, 400);
-        setTimeout(() => {
-          this.$refs.practice.style.cssText =
-            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-        }, 800);
-      } else if (index == 4) {
-        this.$refs.practice.style.cssText = "left: -50%; top: 50%; opacity: 0;";
-        setTimeout(() => {
-          this.$refs.practice.style.cssText =
-            "left: 150%; top: 50%; opacity: 0; ";
-          this.$refs.practiceIframeCard.classList.add("d-none");
-          this.$refs.taskInformation.classList.add("d-none");
-          this.$refs.formulate.classList.add("d-none");
-          this.$refs.todo.classList.remove("d-none");
-          this.$refs.finish.classList.add("d-none");
-        }, 400);
-        setTimeout(() => {
-          this.$refs.practice.style.cssText =
-            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-        }, 800);
-      } else if (index == 5) {
-        this.$refs.practice.style.cssText = "left: -50%; top: 50%; opacity: 0;";
-        setTimeout(() => {
-          this.$refs.practice.style.cssText =
-            "left: 150%; top: 50%; opacity: 0; ";
-          this.$refs.practiceIframeCard.classList.add("d-none");
-          this.$refs.taskInformation.classList.add("d-none");
-          this.$refs.formulate.classList.add("d-none");
-          this.$refs.todo.classList.add("d-none");
-          this.$refs.finish.classList.remove("d-none");
-        }, 400);
-        setTimeout(() => {
-          this.$refs.practice.style.cssText =
-            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-        }, 800);
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.practiceIframeCard.classList.add("d-none");
+            this.$refs.taskInformation.classList.add("d-none");
+            this.$refs.formulate.classList.add("d-none");
+            this.$refs.todo.classList.add("d-none");
+            this.$refs.finish.classList.remove("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.five.classList.add("indexFocus");
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+        }
       }
     },
+
     backTask() {
       this.stopTimer();
       this.orderIndex = null;
@@ -2408,31 +2685,6 @@ export default {
     },
     firstLogin() {
       if (localStorage.getItem("loginNumber") == 0) {
-        function animateElement(
-          id,
-          delay,
-          fontSize,
-          width = "",
-          extraStyles = ""
-        ) {
-          setTimeout(() => {
-            const element = document.getElementById(id);
-            element.style.cssText = `transform: translateX(0); transition: all 0.3s ease;  font-size: ${fontSize}; top: ${
-              element.style.top
-            }; ${width ? `width: ${width};` : ""} ${extraStyles}`;
-          }, delay);
-        }
-
-        function goBack(id, delay, fontSize, width = "", extraClass) {
-          setTimeout(() => {
-            const element = document.getElementById(id);
-            element.style.cssText = `font-size: ${fontSize};  top: ${
-              element.style.top
-            }; ${width ? `width: ${width};` : ""}`;
-            element.classList.add(extraClass);
-          }, delay);
-        }
-
         function changeText(content, delay) {
           setTimeout(() => {
             const text = output.contentWindow.document.getElementById("text");
@@ -2451,101 +2703,32 @@ export default {
             "backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);background:rgba(255, 255, 255, 0.37);";
 
           const messages = [
-            "大家好 歡迎第一次登陸這個編譯網站<br>現在開始我要慢慢介紹功能按鈕",
-            "這是撰寫HTML的地方 點擊後會出現編輯器",
-            "這是撰寫CSS的地方 點擊後會出現編輯器",
-            "這是JavaScript的地方 點擊後會出現編輯器",
-            "這是跑程式碼的地方 點擊後會出現程式碼結果",
-            "這是儲存的地方 可以按下crtl+s快速儲存代碼",
-            "這是清空代碼的地方 點擊後會清空所有代碼",
-            "這是任務欄的地方 點擊後會出現任務卡片",
-            "這是聊天室的地方 點擊可以打開聊天室<br>與gpt機器人交流",
-            "這是程式碼紀錄的地方 可以查看自己的程式碼紀錄<br>點擊Demo可以還原程式碼",
-            "這是考試視窗的地方 可以進行考試",
             "歡迎 來到編譯網站",
+            "左下角這裡有一個按鈕當你點擊按住不放<br>會顯示說明欄",
             "準備好開始學習",
           ];
 
-          messages.forEach((message, index) =>
-            changeText(message, index * 4000)
-          );
+          messages.forEach((message, index) => {
+            changeText(message, index * 5000);
+
+            if (
+              message === "左下角這裡有一個按鈕當你點擊按住不放<br>會顯示說明欄"
+            ) {
+              setTimeout(() => {
+                const button = document.getElementById("documentBtn");
+                button.classList.add("active"); // 添加 active 效果
+                setTimeout(() => {
+                  button.classList.remove("active"); // 4秒後移除 active 效果
+                }, 5000);
+              }, index * 5000);
+            }
+          });
         };
-
-        const elements = [
-          { id: "html", delay: 4500, fontSize: "50px", class: "toggle-btn" },
-          { id: "css", delay: 8500, fontSize: "50px", class: "toggle-btn" },
-          { id: "js", delay: 12500, fontSize: "50px", class: "toggle-btnJS" },
-          { id: "code", delay: 16500, fontSize: "23px", class: "toggle-btn" },
-          { id: "save", delay: 20500, fontSize: "23px", class: "toggle-btn" },
-          {
-            id: "restart",
-            delay: 24500,
-            fontSize: "50px",
-            class: "toggle-btn",
-          },
-          {
-            id: "practice",
-            delay: 28500,
-            fontSize: "50px",
-            class: "toggle-btn",
-          },
-          {
-            id: "chatbot",
-            delay: 32500,
-            fontSize: "large",
-            width: "40px",
-            class: "toggle-chat-btn",
-          },
-          {
-            id: "log",
-            delay: 36500,
-            fontSize: "large",
-            width: "40px",
-            class: "toggle-chat-btn",
-          },
-          {
-            id: "test",
-            delay: 40500,
-            fontSize: "large",
-            width: "40px",
-            class: "toggle-chat-btn",
-          },
-          // { id: 'document', delay: 44500, fontSize: 'large', width: '40px', class: 'toggle-chat-btn' }
-        ];
-
-        elements.forEach((element) => {
-          animateElement(
-            element.id,
-            element.delay,
-            element.fontSize,
-            element.width ? `width: ${element.width};` : ""
-          );
-          goBack(
-            element.id,
-            element.delay + 3000,
-            element.fontSize,
-            element.class
-          );
-        });
-
-        const buttons = [
-          "html",
-          "css",
-          "js",
-          "restart",
-          "practice",
-          "code",
-          "save",
-          "chatbot",
-          "log",
-          "test",
-        ];
-        buttons.forEach((id) => (document.getElementById(id).disabled = true));
 
         setTimeout(() => {
           localStorage.setItem("loginNumber", 1);
           window.location.reload();
-        }, 54000);
+        }, 17000);
       } else {
         return;
       }
@@ -2563,7 +2746,7 @@ export default {
       localStorage.removeItem("identity");
       localStorage.removeItem("loginNumber");
       localStorage.removeItem("classNum");
-      window.location.href = "/";
+      window.location.href = "/client/auth";
     },
     getTask() {
       var storedToken = localStorage.getItem("token");
@@ -2680,23 +2863,29 @@ export default {
     },
     handleActionUpdate(updatedAction) {
       if (this.time > 0) {
-        this.action.push(updatedAction);
+        updatedAction.forEach((action) => {
+          this.action.push(action);
+        });
       }
     },
     handleLogActionUpdate(updatedAction) {
       if (this.time > 0) {
-        this.logAction.push(updatedAction);
+        updatedAction.forEach((action) => {
+          this.logAction.push(action);
+        });
       }
     },
   },
+
   mounted() {
     this.studentClassNum = localStorage.getItem("classNum");
     this.firstLogin();
     this.toggleIframe();
     var storedToken = localStorage.getItem("token");
     if (storedToken == null) {
-      this.$router.push("/");
+      this.$router.push("/auth");
     }
+
     if (this.getCookie("state") == 0) {
       this.$swal({
         title: "目前暫停操作",
@@ -3175,7 +3364,7 @@ export default {
 
         if (type === "practice") {
           this.badgeHtml =
-            '<span class="position-absolute translate-middle badge rounded-pill bg-danger" style="left: 90px; top: 10px; font-size: 15px;">!</span>';
+            '<span class="position-absolute translate-middle badge rounded-pill bg-danger" style="left: 110px; top: 10px; font-size: 15px;">!</span>';
           this.getTask();
           var toastElement = document.getElementById("liveToast");
           var toast = new Toast(toastElement);
@@ -3205,11 +3394,17 @@ export default {
           this.$swal.close();
           this.$cookies.set("state", 1);
         }
+
+        if (type === "signOut") {
+          this.SignOut();
+        }
       } catch (error) {
         console.error("JSON 解析错误:", error);
       }
     };
-    this.socket.onclose = () => {};
+    this.socket.onclose = () => {
+      console.log("Socket斷線");
+    };
   },
   beforeUnmount() {
     if (this.htmlEditor) {
@@ -3253,7 +3448,7 @@ label i {
 .main {
   font-family: Arial, sans-serif;
   box-sizing: border-box;
-  background-color: #454545;
+  background-color: #1c1c1c;
   color: #fff;
   margin: 0;
   padding: 0;
@@ -3265,9 +3460,9 @@ label i {
 .toggle-chat-btn {
   position: fixed;
   right: 0;
-  width: 40px;
   z-index: 1000;
-  transform: translateX(85%);
+  text-wrap: wrap;
+  transform: translateX(75%);
   transition: all 0.3s ease;
 }
 .toggle-chat-btn:hover {
@@ -3294,6 +3489,7 @@ label i {
   transform: translateX(-85%);
   transition: all 0.5s ease;
 }
+
 .toggle-btn:hover {
   transform: translateX(0);
   transition: all 0.3s ease;
@@ -3303,7 +3499,7 @@ label i {
   right: 8px;
   top: 0;
   z-index: 999;
-  width: 400px;
+  width: 500px;
 }
 .document {
   position: fixed;
@@ -3342,6 +3538,12 @@ label i {
 }
 .exam::-webkit-scrollbar-track {
   background-color: transparent;
+}
+
+.cardBody {
+  height: 200px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease-in-out;
 }
 .cardBody:hover {
   background-color: #aaaaaa;
@@ -3384,10 +3586,10 @@ label i {
   transition: all 0.5s ease;
 }
 .practiceBtn {
-  background-color: #292421;
+  background-color: #9d9d9d;
 }
 .practiceBtn:hover {
-  background-color: #292421;
+  background-color: #9d9d9d;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 }
@@ -3506,5 +3708,17 @@ label i {
 
 .sidebar:hover {
   background-color: #5b5b5b !important;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s ease-in-out;
+}
+.fade-enter, .fade-leave-to /* Vue 3 會是 .fade-leave-active */ {
+  opacity: 0;
+}
+.indexFocus {
+  border: 4px solid #242424;
+  transition: all 0.5s ease-in-out;
 }
 </style>

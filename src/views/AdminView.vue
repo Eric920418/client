@@ -82,12 +82,27 @@
 </template>
 
 <script>
-import student from "../components/StudentInformation.vue";
-import exam from "../components/ExamSystem.vue";
-import score from "../components/Score.vue";
-import practice from "../components/Practice.vue";
-import taskRecord from "../components/TaskRecord.vue";
-import group from "../components/Group.vue";
+// import student from "../components/StudentInformation.vue";
+// import exam from "../components/ExamSystem.vue";
+// import score from "../components/Score.vue";
+// import practice from "../components/Practice.vue";
+// import taskRecord from "../components/TaskRecord.vue";
+// import group from "../components/Group.vue";
+
+import { defineAsyncComponent } from "vue";
+
+const exam = defineAsyncComponent(() => import("../components/ExamSystem.vue"));
+const student = defineAsyncComponent(() =>
+  import("../components/StudentInformation.vue")
+);
+const score = defineAsyncComponent(() => import("../components/Score.vue"));
+const practice = defineAsyncComponent(() =>
+  import("../components/Practice.vue")
+);
+const taskRecord = defineAsyncComponent(() =>
+  import("../components/TaskRecord.vue")
+);
+const group = defineAsyncComponent(() => import("../components/Group.vue"));
 import { jwtDecode } from "jwt-decode";
 export default {
   components: {

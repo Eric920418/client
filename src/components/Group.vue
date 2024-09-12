@@ -1,5 +1,5 @@
 <template>
-  <div class="m-2 mt-4 d-flex justify-content-between">
+  <div class="m-2 mt-4 d-flex justify-content-between align-items-center">
     <select
       class="form-select w-25"
       aria-label="Default select example"
@@ -14,6 +14,9 @@
         {{ ClassNum }}
       </option>
     </select>
+    <div class="bg-secondary text-white p-2">A班沒有編譯器</div>
+    <div class="bg-secondary text-white p-2">Ｂ班沒有ＧＰＴ</div>
+    <div class="bg-secondary text-white p-2">Ｃ班沒有編譯器和ＧＰＴ</div>
 
     <button
       class="btn btn-primary"
@@ -65,6 +68,21 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-body">
+          <select
+            class="form-select w-25"
+            aria-label="Default select example"
+            v-model="NewSelectedClassNum"
+            @change="changeManyClass()"
+          >
+            <option value="">班級</option>
+            <option
+              v-for="ClassNum in uniqueClassNum"
+              :key="ClassNum"
+              :value="ClassNum"
+            >
+              {{ ClassNum }}
+            </option>
+          </select>
           <table class="table mt-3 table-striped table-hover align-middle">
             <thead>
               <tr>
@@ -75,7 +93,7 @@
             </thead>
             <tbody>
               <tr
-                v-for="(student, index) in NoClassNumStudents"
+                v-for="(student, index) in NewClassNumStudents"
                 :key="student.studentID"
               >
                 <td>{{ student.name }}</td>
@@ -83,7 +101,7 @@
                 <td>
                   <select
                     class="form-select w-100"
-                    v-model="NoClassNumStudents[index].classNum"
+                    v-model="NewClassNumStudents[index].classNum"
                   >
                     <option value="A">A</option>
                     <option value="B">B</option>
@@ -116,8 +134,9 @@ export default {
   data() {
     return {
       students: [],
-      NoClassNumStudents: [],
+      NewClassNumStudents: [],
       selectedClassNum: "",
+      NewSelectedClassNum: "",
       select: "重新分班",
     };
   },
@@ -125,7 +144,7 @@ export default {
     uniqueClassNum() {
       const classSet = new Set();
       this.students.forEach((student) => {
-        if (!student.classNum) {
+        if (student.classNum == "") {
           classSet.add("未分班");
         } else {
           classSet.add(student.classNum);
@@ -135,7 +154,6 @@ export default {
     },
     filteredStudents() {
       if (this.selectedClassNum === "未分班") {
-        console.log(this.selectedClassNum);
         return this.students.filter((student) => !student.classNum);
       } else if (this.selectedClassNum) {
         return this.students.filter(
@@ -189,7 +207,7 @@ export default {
     saveManyData() {
       const yourToken = localStorage.getItem("token");
       this.$axios
-        .put(`/auth/students`, this.NoClassNumStudents, {
+        .put(`/auth/students`, this.NewClassNumStudents, {
           headers: {
             Authorization: `Bearer ${yourToken}`,
           },
@@ -213,6 +231,19 @@ export default {
             });
         });
     },
+    changeManyClass() {
+      if (this.NewSelectedClassNum === "未分班") {
+        this.NewClassNumStudents = this.students.filter(
+          (student) => !student.classNum
+        );
+      } else if (this.NewSelectedClassNum) {
+        this.NewClassNumStudents = this.students.filter(
+          (student) => student.classNum === this.NewSelectedClassNum
+        );
+      } else {
+        this.NewClassNumStudents = this.students;
+      }
+    },
   },
 
   mounted() {
@@ -226,14 +257,6 @@ export default {
       })
       .then((res) => {
         res.data.data.students.forEach((student) => {
-          if (!student.classNum) {
-            this.NoClassNumStudents.push({
-              name: student.name,
-              studentID: student.studentID,
-              classNum: student.classNum,
-              _id: student._id,
-            });
-          }
           this.students.push({
             name: student.name,
             studentID: student.studentID,
@@ -246,6 +269,7 @@ export default {
       .catch((err) => {
         console.error("Error fetching students:", err);
       });
+    this.changeManyClass();
   },
 };
 </script>

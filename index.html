@@ -1,76 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" href="/favicon.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://kit.fontawesome.com/f92faa6f66.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <title>Vite App</title>
-</head>
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/f92faa6f66.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Vite App</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 
-<style>
-  @import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
-  body {
-    font-family: 'Helvetica', 'Arial', 'Noto Sans TC', '黑體-繁','微軟正黑體', sans-serif !important;
-    box-sizing: border-box;
-    background-color: #454545;
-    color: #fff;
-    margin: 0;
-  }
-  /* body::-webkit-scrollbar {
+  <style>
+    @import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
+    body {
+      font-family: "Helvetica", "Arial", "Noto Sans TC", "黑體-繁", "微軟正黑體",
+        sans-serif !important;
+      box-sizing: border-box;
+      background-color: #1c1c1c;
+      color: #fff;
+      margin: 0;
+    }
+    /* body::-webkit-scrollbar {
     width: 0;
   } */
-  body::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-  html {
-    height: 100%;
-}
-</style>
+    body::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    html {
+      height: 100%;
+    }
+  </style>
 
-<script>
-  const excludedPaths = ['/client/'];
-  // function checkUser() {
-  //   const storedToken = localStorage.getItem('token');
-  //   const currentPath = window.location.pathname;
-  //   if (excludedPaths.includes(currentPath)) {
-  //     return;
-  //   }
-  //   axios.get(`http://140.138.147.12:3000/auth/${storedToken}`)
-  //     .then((res) => {})
-  //     .catch((err) => {
-  //       Swal.fire({
-  //         title: '帳號被登錄',
-  //         text: '請重新登入',
-  //         icon: 'error',
-  //         confirmButtonText: '確定',
-  //         confirmButtonColor: '#dc3545'
-  //       }).then(() => {
-  //         localStorage.removeItem('token');
-  //         window.location.href = '/';
-  //       });
-  //     });
-  // }
+  <script>
+    const excludedPaths = ["/client/"];
+    // function checkUser() {
+    //   const storedToken = localStorage.getItem('token');
+    //   const currentPath = window.location.pathname;
+    //   if (excludedPaths.includes(currentPath)) {
+    //     return;
+    //   }
+    //   axios.get(`http://140.138.147.12:3000/auth/${storedToken}`)
+    //     .then((res) => {})
+    //     .catch((err) => {
+    //       Swal.fire({
+    //         title: '帳號被登錄',
+    //         text: '請重新登入',
+    //         icon: 'error',
+    //         confirmButtonText: '確定',
+    //         confirmButtonColor: '#dc3545'
+    //       }).then(() => {
+    //         localStorage.removeItem('token');
+    //         window.location.href = '/';
+    //       });
+    //     });
+    // }
 
-  // document.addEventListener('DOMContentLoaded', () => {
-  //   checkUser();
-  //   setInterval(checkUser, 60000);
-  // });
+    // document.addEventListener('DOMContentLoaded', () => {
+    //   checkUser();
+    //   setInterval(checkUser, 60000);
+    // });
 
-  function copyToClipboard(button) {
-    const codeElement = button.nextElementSibling;
-    const textarea = document.createElement('textarea');
-    textarea.value = codeElement.textContent;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-  }
-</script>
+    function copyToClipboard(button) {
+      const codeElement = button.nextElementSibling;
+      const textarea = document.createElement("textarea");
+      textarea.value = codeElement.textContent;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+  </script>
 </html>

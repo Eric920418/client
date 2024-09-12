@@ -83,7 +83,7 @@ export default {
                   })
                   .then((result) => {
                     if (result.isConfirmed) {
-                      this.$router.push("/home");
+                      this.$router.push("/");
                     }
                   });
               }
@@ -118,7 +118,7 @@ export default {
             })
             .then((result) => {
               if (result.isConfirmed) {
-                this.$router.push("/");
+                this.$router.push("/auth");
                 this.status = true;
               } else if (result.isDismissed) {
                 console.log("Modal closed");
@@ -141,6 +141,10 @@ export default {
     },
   },
   mounted() {
+    var storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      this.$router.push("/");
+    }
     this.socket = new WebSocket("ws://140.138.147.12:3000");
     this.socket.onopen = () => {
       this.socket.send(JSON.stringify({ type: "watch" }));
