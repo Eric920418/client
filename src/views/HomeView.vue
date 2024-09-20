@@ -3,7 +3,7 @@
     <div class="containers" ref="code">
       <div>
         <button
-          v-if="studentClassNum == 'B'"
+          v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn btn-danger"
           id="html"
           style="font-size: 50px; top: 0%"
@@ -33,7 +33,7 @@
       </div>
       <div>
         <button
-          v-if="studentClassNum == 'B'"
+          v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn btn-primary"
           id="css"
           style="font-size: 50px; top: 11.5%"
@@ -63,7 +63,7 @@
       </div>
       <div>
         <button
-          v-if="studentClassNum == 'B'"
+          v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn btn-warning"
           id="js"
           style="font-size: 50px; top: 23.5%"
@@ -93,7 +93,7 @@
       </div>
       <div>
         <button
-          v-if="studentClassNum == 'B'"
+          v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn"
           id="code"
           style="font-size: 23px; background-color: #9d9d9d; top: 40%"
@@ -123,7 +123,7 @@
       </div>
       <div>
         <button
-          v-if="studentClassNum == 'B'"
+          v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn"
           id="save"
           style="font-size: 23px; background-color: #9d9d9d; top: 46%"
@@ -153,7 +153,7 @@
       </div>
       <div>
         <button
-          v-if="studentClassNum == 'B'"
+          v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn btn-light"
           id="restart"
           style="font-size: 50px; top: 58%"
@@ -954,7 +954,7 @@
           width: 50px;
           top: 0%;
         "
-        v-if="isCollapsed && studentClassNum == 'A'"
+        v-if="isCollapsed"
         @click="toggleChat"
         ref="chat"
       >
@@ -987,7 +987,7 @@
           top: 14%;
           background-color: #9d9d9d;
         "
-        v-if="isOpenLog && studentClassNum == 'B'"
+        v-if="(isOpenLog && studentClassNum == 'B') || studentClassNum == 'C'"
         @click="openLog"
         ref="log"
       >
@@ -2845,7 +2845,6 @@ export default {
         },
         taskId: this.tasks[this.focusTaskIndex].taskId,
       };
-      console.log(task);
       var storedToken = localStorage.getItem("token");
       const { id } = jwtDecode(storedToken);
       this.$axios
@@ -2922,8 +2921,7 @@ export default {
 
     // 初始化 HTML 编辑器
     this.htmlEditor = monaco.editor.create(this.$refs.htmlEditorContainer, {
-      value: `
-<!DOCTYPE html>
+      value: `<!DOCTYPE html>
 <html>
   <head>
     <title>My Page</title>
