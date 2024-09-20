@@ -14,9 +14,9 @@
         {{ ClassNum }}
       </option>
     </select>
-    <div class="bg-secondary text-white p-2">A班沒有編譯器</div>
-    <div class="bg-secondary text-white p-2">Ｂ班沒有ＧＰＴ</div>
-    <div class="bg-secondary text-white p-2">Ｃ班沒有編譯器和ＧＰＴ</div>
+    <div class="bg-secondary text-white p-2">A班只有GPT</div>
+    <div class="bg-secondary text-white p-2">Ｂ班有編譯器跟GPT</div>
+    <div class="bg-secondary text-white p-2">Ｃ班有編譯器和GPT有提示語</div>
 
     <button
       class="btn btn-primary"
