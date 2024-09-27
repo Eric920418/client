@@ -1101,12 +1101,15 @@
     <div v-if="!isCollapsed">
       <button
         @click="toggleChat"
-        class="toggle-chat-btn btn"
+        class="btn"
         style="
-          font-size: large;
+          position: absolute;
+          font-size: small;
           background-color: #9d9d9d;
           width: 50px;
+          height: 100px;
           top: 0%;
+          right: 36.5%;
         "
       >
         關閉聊天
@@ -1542,6 +1545,15 @@ export default {
     },
     toggleChat() {
       this.isCollapsed = !this.isCollapsed;
+      if (this.isCollapsed) {
+        this.$refs.html.style.width = 100 + "%";
+        this.$refs.css.style.width = 100 + "%";
+        this.$refs.js.style.width = 100 + "%";
+      } else {
+        this.$refs.html.style.width = 60 + "%";
+        this.$refs.css.style.width = 60 + "%";
+        this.$refs.js.style.width = 60 + "%";
+      }
       if (this.time > 0) {
         if (this.isCollapsed) {
           this.action.push({
@@ -2534,11 +2546,7 @@ export default {
       this.$refs.css.classList.remove("text");
       this.$refs.iframe.classList.remove("text");
       this.$refs.js.classList.remove("text");
-      this.$refs.chat.disabled = true;
-      this.$refs.log.disabled = true;
-      this.$refs.run.disabled = true;
-      this.$refs.save.disabled = true;
-      this.$refs.tip.disabled = true;
+
       if (this.time > 0) {
         if (this.isTest) {
           this.action.push({
@@ -2555,12 +2563,6 @@ export default {
               .replace(/\//g, "-")
               .replace(",", ""),
           });
-          this.isActionPushed = false;
-          this.$refs.chat.disabled = false;
-          this.$refs.log.disabled = false;
-          this.$refs.run.disabled = false;
-          this.$refs.save.disabled = false;
-          this.$refs.tip.disabled = false;
         } else {
           this.action.push({
             action: "打開考試視窗",

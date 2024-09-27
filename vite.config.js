@@ -2,6 +2,8 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import MonacoEditorPlugin from "vite-plugin-monaco-editor";
+import fs from "fs";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -25,6 +27,20 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 4173,
+    https: {
+      key: fs.readFileSync(
+        path.resolve(
+          __dirname,
+          "/etc/letsencrypt/live/ccj.infocom.yzu.edu.tw/privkey.pem"
+        )
+      ),
+      cert: fs.readFileSync(
+        path.resolve(
+          __dirname,
+          "/etc/letsencrypt/live/ccj.infocom.yzu.edu.tw/fullchain.pem"
+        )
+      ),
+    },
   },
 
   optimizeDeps: {
