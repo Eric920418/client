@@ -27,7 +27,7 @@
         @click="checkLog(log)"
       >
         <div
-          class="my-3 px-2 d-flex justify-content-between align-items-center w-100"
+          class="my-2 px-2 d-flex justify-content-between align-items-center w-100 bg-opacity-10"
         >
           <div style="width: 220px; overflow: hidden">{{ log.title }}</div>
           <div>{{ log.time }}</div>
@@ -92,7 +92,7 @@ export default {
       chat: [],
       log: [
         {
-          title: "新對話",
+          title: "新對話 (以下是舊聊天紀錄)",
           time: new Date()
             .toLocaleString("zh-TW", {
               year: "numeric",
@@ -390,8 +390,11 @@ export default {
   margin: 0;
   padding: 0;
 }
+.thisLog {
+  background-color: rgb(36, 35, 35);
+}
 .thisLog:hover {
-  background-color: #745959;
+  background-color: grey;
   color: white;
 }
 .icon-wrapper {
