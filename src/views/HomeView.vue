@@ -1049,6 +1049,38 @@
         >
       </button>
       <button
+        class="toggle-chat-btn btn"
+        id="test"
+        style="
+          font-size: large;
+          width: 50px;
+          top: 47.5%;
+          background-color: #9d9d9d;
+        "
+        @mousedown="this.promptBtn = true"
+        @mouseup="this.promptBtn = false"
+      >
+        提示詞
+        <transition name="fade">
+          <div
+            v-if="documentBtn"
+            style="
+              position: absolute;
+              top: 15%;
+              right: 120%;
+              padding: 20px;
+              font-size: 25px;
+              text-wrap: nowrap;
+              color: white;
+              width: 450px;
+              background-color: rgba(125, 125, 125, 0.5);
+            "
+          >
+            這是提示詞 如何與AI對話
+          </div>
+        </transition>
+      </button>
+      <button
         class="toggle-chat-btn btn btn-light"
         id="document"
         style="font-size: large; width: 40px; top: 90%"
@@ -1075,6 +1107,67 @@
         </transition>
       </button>
     </div>
+
+    <transition name="fade">
+      <div
+        v-if="promptBtn"
+        class="position-fixed"
+        style="
+          top: 50%;
+          right: 50%;
+          width: 850px;
+          height: 400px;
+          z-index: 900;
+          background-color: rgba(125, 125, 125, 0.5);
+          transform: translate(50%, -50%);
+        "
+      >
+        <div class="p-3 fs-4">Prompt 功能類型示範</div>
+        <div class="px-2">
+          <table class="table table-middle visible" style="">
+            <thead>
+              <tr class="text-center text-nowrap">
+                <th scope="col" style="width: 25%">Prompt 功能類型</th>
+                <th scope=" ">範例</th>
+              </tr>
+            </thead>
+            <tbody class="table-middle">
+              <tr>
+                <th scope="row text-nowrap">查詢程式知識</th>
+                <td>
+                  你現在是一個網頁程式設計專家，請告訴我flex是什麼？flex有哪些使用方法
+                </td>
+              </tr>
+              <tr>
+                <th scope="row text-nowrap">解釋程式碼</th>
+                <td>
+                  你現在是一個網頁程式設計專家，請解釋以下的程式碼在做什麼。
+                  (需要附上程式碼)
+                </td>
+              </tr>
+              <tr>
+                <th scope="row text-nowrap">提供範例和應用程式碼</th>
+                <td>
+                  請告訴我什麼是監聽事件，如何使用監聽事件在元素物件，並且提供一段範例程式碼。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row text-nowrap">偵錯和修正程式碼</th>
+                <td>
+                  你現在是一個網頁程式設計專家，我寫了一段HTML和CSS程式碼，預期這段程式碼在畫面上方會顯示一個表單，下方會顯示待辦事項，我遇到的問題是沒有辦法正確顯示在網頁上，請幫我找出程式碼中錯誤的地方，並且修正程式碼。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row text-nowrap">流程處理</th>
+                <td>
+                  你是一位網頁程式專家，我現在要設計一個網頁的版型，請描述你的設計，請提供網頁排版設計處理流程。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </transition>
 
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
       <div
@@ -1416,6 +1509,7 @@ export default {
       NowState: 0,
       studentClassNum: "",
       documentBtn: false,
+      promptBtn: false,
     };
   },
   computed: {
@@ -1851,6 +1945,20 @@ export default {
                 icon: "success",
               })
               .then(() => {
+                this.action.push({
+                  action: "接受任務",
+                  timestamp: new Date()
+                    .toLocaleString("zh-TW", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })
+                    .replace(/\//g, "-")
+                    .replace(",", ""),
+                });
                 this.tasks[this.focusTaskIndex].state = 1;
                 this.$refs.practice.style.cssText =
                   "left: -50%; top: 50%; opacity: 0;";
@@ -1937,6 +2045,20 @@ export default {
                 icon: "success",
               })
               .then(() => {
+                this.action.push({
+                  action: "完成第二步",
+                  timestamp: new Date()
+                    .toLocaleString("zh-TW", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })
+                    .replace(/\//g, "-")
+                    .replace(",", ""),
+                });
                 this.tasks[this.focusTaskIndex].state = 2;
                 this.$refs.practice.style.cssText =
                   "left: -50%; top: 50%; opacity: 0;";
@@ -2025,6 +2147,20 @@ export default {
                     this.startTimer(); // 啟動新的計時器
                     this.NowState = 4;
                   }, 0);
+                  this.action.push({
+                    action: "完成第三步",
+                    timestamp: new Date()
+                      .toLocaleString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })
+                      .replace(/\//g, "-")
+                      .replace(",", ""),
+                  });
                   this.tasks[this.focusTaskIndex].state = 3;
                   this.orderIndex = null;
                   this.$refs.practice.style.cssText =
@@ -2137,6 +2273,20 @@ export default {
                   this.startTimer(); // 啟動新的計時器
                   this.NowState = 5;
                 }, 0);
+                this.action.push({
+                  action: "完成子任務",
+                  timestamp: new Date()
+                    .toLocaleString("zh-TW", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })
+                    .replace(/\//g, "-")
+                    .replace(",", ""),
+                });
                 this.$refs.practice.style.cssText =
                   "left: 150%; top: 50%; opacity: 0;";
                 setTimeout(() => {

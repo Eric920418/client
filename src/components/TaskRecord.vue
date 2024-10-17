@@ -499,7 +499,7 @@ export default {
           opacity: 0.8,
         },
         title: {
-          text: "Custom Bubble Chart",
+          text: "",
         },
         xaxis: {
           type: "datetime",
