@@ -458,8 +458,9 @@
               <div class="slides">
                 <div class="slide" style="position: relative">
                   <img
-                    :src="this.tasks[this.focusTaskIndex].ppt[currentSlide]"
+                    :src="tasks[focusTaskIndex].ppt[currentSlide]"
                     alt="PDF Page"
+                    @contextmenu.prevent="disableRightClick"
                   />
                   <button
                     class="btn btn-secondary me-2"
@@ -577,7 +578,7 @@
                         >
                           {{ option }}
                           <button
-                            class="btn btn-secondary btn-sm"
+                            class="btn btn-secondary btn-sm text-nowrap"
                             @click="addOrder(option, index)"
                           >
                             加入順序
@@ -832,11 +833,12 @@
           "
         >
           <div class="px-5 py-4">
-            <div class="my-4">
-              <div class="form-label" style="font-size: 30px">任務檢查</div>
+            <div class="my-2">
+              <div class="form-label m-0" style="font-size: 30px">任務檢查</div>
               <label
                 v-for="(option, index) in tasks[focusTaskIndex].order"
                 class="mx-3"
+                style="font-size: 20px"
                 :for="'task-' + index"
                 :key="'label-' + index"
               >
@@ -851,8 +853,11 @@
               </label>
             </div>
             <div class="my-4">
-              <div class="form-label" style="font-size: 30px">學到什麼</div>
+              <div class="form-label" style="font-size: 30px">
+                從此次的學習任務中，我學習到了....
+              </div>
               <textarea
+                placeholder="盡可能詳細描述，可列點式說明"
                 name=""
                 id=""
                 class="form-control"
@@ -860,8 +865,11 @@
               ></textarea>
             </div>
             <div class="my-4">
-              <div class="form-label" style="font-size: 30px">遇到問題</div>
+              <div class="form-label" style="font-size: 30px">
+                我遇到了什麼問題...
+              </div>
               <textarea
+                placeholder="盡可能詳細描述，可列點式說明"
                 name=""
                 id=""
                 class="form-control"
@@ -870,9 +878,10 @@
             </div>
             <div class="my-4">
               <div class="form-label" style="font-size: 30px">
-                覺得哪些需要改進
+                我覺得有那些方面可以做得更好，或是可以改善的地方...
               </div>
               <textarea
+                placeholder="盡可能詳細描述，可列點式說明"
                 name=""
                 id=""
                 class="form-control"
@@ -1242,7 +1251,7 @@
       >
         關閉考試視窗
       </button>
-      <div class="exam" style="height: 100vh; overflow-y: scroll">
+      <div class="exam" style="max-height: 100vh; overflow-y: auto">
         <div
           v-if="exams && !exam.examName && !isFinishExam.examName"
           v-for="exam in exams"
@@ -1308,15 +1317,18 @@
             </button>
           </div>
           <div
-            v-for="ques in exam.examQues.questions"
+            v-for="(ques, index) in exam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
+            style="height: 300px"
           >
             <div class="card-body">
               <div
                 class="d-flex justify-content-between align-items-center my-2"
               >
-                <h5 class="card-title">題目: {{ ques.title }}</h5>
+                <h5 class="card-title">
+                  第{{ index + 1 }}題: {{ ques.title }}
+                </h5>
                 <span class="badge bg-primary">{{
                   ques.types == "short-answer" ? "問答題" : "選擇題"
                 }}</span>
@@ -1324,13 +1336,21 @@
               <div v-if="ques.types != 'short-answer'" class="my-3">
                 <button
                   @click="ques.answer = '0'"
-                  class="btn btn-outline-primary w-25 my-2 mx-2 text-black"
+                  :class="
+                    ques.answer == '0'
+                      ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
+                      : 'btn btn-outline-primary w-25 my-2 mx-2 text-black'
+                  "
                 >
                   選項A: {{ ques.options[0] }}
                 </button>
                 <button
                   @click="ques.answer = '1'"
-                  class="btn btn-outline-primary w-25 my-2 mx-2 text-black"
+                  :class="
+                    ques.answer == '1'
+                      ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
+                      : 'btn btn-outline-primary w-25 my-2 mx-2 text-black'
+                  "
                 >
                   選項B: {{ ques.options[1] }}
                 </button>
@@ -1338,13 +1358,21 @@
               <div v-if="ques.types != 'short-answer'" class="my-3">
                 <button
                   @click="ques.answer = '2'"
-                  class="btn btn-outline-primary w-25 my-2 mx-2 text-black"
+                  :class="
+                    ques.answer == '2'
+                      ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
+                      : 'btn btn-outline-primary w-25 my-2 mx-2 text-black'
+                  "
                 >
                   選項C: {{ ques.options[2] }}
                 </button>
                 <button
                   @click="ques.answer = '3'"
-                  class="btn btn-outline-primary w-25 my-2 mx-2 text-black"
+                  :class="
+                    ques.answer == '3'
+                      ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
+                      : 'btn btn-outline-primary w-25 my-2 mx-2 text-black'
+                  "
                 >
                   選項D: {{ ques.options[3] }}
                 </button>
@@ -1382,16 +1410,18 @@
             </button>
           </div>
           <div
-            v-for="ques in isFinishExam.examQues.questions"
+            v-for="(ques, index) in isFinishExam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
-            style="height: 200px"
+            style="height: 300px"
           >
             <div class="card-body">
               <div
                 class="d-flex justify-content-between align-items-center my-2"
               >
-                <h5 class="card-title">題目: {{ ques.title }}</h5>
+                <h5 class="card-title">
+                  第{{ index + 1 }}題: {{ ques.title }}
+                </h5>
                 <span class="badge bg-primary">{{
                   ques.types == "short-answer" ? "問答題" : "選擇題"
                 }}</span>
@@ -2466,7 +2496,7 @@ export default {
       }
     },
     changeFocus(index) {
-      if (this.tasks[this.focusTaskIndex].state > index) {
+      if (this.tasks[this.focusTaskIndex].state > index - 1) {
         this.orderIndex = null;
         this.NowState = index;
         this.$refs.one.classList.remove("indexFocus");
@@ -3868,7 +3898,8 @@ label i {
   opacity: 0;
 }
 .indexFocus {
-  border: 4px solid #242424;
+  /* border: 3px solid #1fae4c !important; */
+  background-color: #1fae4c !important;
   transition: all 0.5s ease-in-out;
 }
 </style>
