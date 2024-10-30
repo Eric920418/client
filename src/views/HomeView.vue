@@ -447,7 +447,10 @@
             align-self: center;
           "
         >
-          <div class="d-flex justify-content-around" style="height: 100%">
+          <div
+            class="d-flex justify-content-around align-items-center"
+            style="height: 100%"
+          >
             <div
               v-if="this.tasks[this.focusTaskIndex].ppt.length > 0"
               style="margin-top: 20px"
@@ -828,6 +831,8 @@
           class="card d-none w-100 h-100"
           style="
             background-color: #f8f9fa;
+            overflow-y: scroll;
+            height: 100%;
             position: relative;
             align-self: center;
           "
@@ -853,7 +858,7 @@
               </label>
             </div>
             <div class="my-4">
-              <div class="form-label" style="font-size: 30px">
+              <div class="form-label" style="font-size: 25px">
                 從此次的學習任務中，我學習到了....
               </div>
               <textarea
@@ -865,7 +870,7 @@
               ></textarea>
             </div>
             <div class="my-4">
-              <div class="form-label" style="font-size: 30px">
+              <div class="form-label" style="font-size: 25px">
                 我遇到了什麼問題...
               </div>
               <textarea
@@ -877,7 +882,7 @@
               ></textarea>
             </div>
             <div class="my-4">
-              <div class="form-label" style="font-size: 30px">
+              <div class="form-label" style="font-size: 25px">
                 我覺得有那些方面可以做得更好，或是可以改善的地方...
               </div>
               <textarea
@@ -889,7 +894,7 @@
               ></textarea>
             </div>
             <div class="my-4">
-              <div class="form-label" style="font-size: 30px">
+              <div class="form-label" style="font-size: 25px">
                 自我評估（分數）
               </div>
               <v-slider
@@ -901,7 +906,7 @@
               ></v-slider>
             </div>
           </div>
-          <div class="d-flex bottom-0 end-0 m-1" style="position: absolute">
+          <div class="d-flex bottom-0 end-0 m-2" style="position: fixed">
             <button class="btn btn-danger mx-1" @click="backTask">返回</button>
             <button class="btn btn-primary mx-1" @click="sendFinish">
               送出
@@ -1066,8 +1071,7 @@
           top: 47.5%;
           background-color: #9d9d9d;
         "
-        @mousedown="this.promptBtn = true"
-        @mouseup="this.promptBtn = false"
+        @click="promptBtn = !promptBtn"
       >
         提示詞
         <transition name="fade">
@@ -1208,14 +1212,16 @@
           position: absolute;
           font-size: small;
           background-color: #9d9d9d;
-          width: 50px;
+          width: 3%;
           height: 100px;
-          top: 0%;
-          right: 36.5%;
+          top: 0.5%;
+          z-index: 9000;
+          right: 35%;
         "
       >
         關閉聊天
       </button>
+
       <chat @update-action="handleActionUpdate" class="chat"></chat>
     </div>
     <div v-if="!isOpenLog">
@@ -1668,15 +1674,16 @@ export default {
         });
     },
     toggleChat() {
+      this.$refs.practice.style.top = "-50%";
       this.isCollapsed = !this.isCollapsed;
       if (this.isCollapsed) {
         this.$refs.html.style.width = 100 + "%";
         this.$refs.css.style.width = 100 + "%";
         this.$refs.js.style.width = 100 + "%";
       } else {
-        this.$refs.html.style.width = 60 + "%";
-        this.$refs.css.style.width = 60 + "%";
-        this.$refs.js.style.width = 60 + "%";
+        this.$refs.html.style.width = 65 + "%";
+        this.$refs.css.style.width = 65 + "%";
+        this.$refs.js.style.width = 65 + "%";
       }
       if (this.time > 0) {
         if (this.isCollapsed) {
@@ -1715,6 +1722,8 @@ export default {
       }
     },
     toggleHtml() {
+      this.isOpenLog = true;
+      this.isTest = true;
       this.$refs.html.classList.add("text");
       this.$refs.css.classList.remove("text");
       this.$refs.js.classList.remove("text");
@@ -1723,6 +1732,8 @@ export default {
       this.$refs.css.classList.add("text-close");
       this.$refs.js.classList.add("text-close");
       this.$refs.iframe.classList.add("text-close");
+      this.$refs.practice.style.top = "-50%";
+
       this.htmlEditor.layout();
       if (this.time > 0) {
         this.action.push({
@@ -1743,6 +1754,8 @@ export default {
       this.isActionPushed = false;
     },
     toggleCss() {
+      this.isOpenLog = true;
+      this.isTest = true;
       this.$refs.css.classList.add("text");
       this.$refs.html.classList.remove("text");
       this.$refs.js.classList.remove("text");
@@ -1751,6 +1764,7 @@ export default {
       this.$refs.html.classList.add("text-close");
       this.$refs.js.classList.add("text-close");
       this.$refs.iframe.classList.add("text-close");
+      this.$refs.practice.style.top = "-50%";
       this.cssEditor.layout();
       if (this.time > 0) {
         this.action.push({
@@ -1771,6 +1785,8 @@ export default {
       this.isActionPushed = false;
     },
     toggleJs() {
+      this.isOpenLog = true;
+      this.isTest = true;
       this.$refs.js.classList.add("text");
       this.$refs.html.classList.remove("text");
       this.$refs.css.classList.remove("text");
@@ -1779,6 +1795,7 @@ export default {
       this.$refs.html.classList.add("text-close");
       this.$refs.css.classList.add("text-close");
       this.$refs.iframe.classList.add("text-close");
+      this.$refs.practice.style.top = "-50%";
       this.jsEditor.layout();
       if (this.time > 0) {
         this.action.push({
@@ -2195,7 +2212,7 @@ export default {
                   this.orderIndex = null;
                   this.$refs.practice.style.cssText =
                     "left: -50%; top: 50%; opacity: 0;";
-                  this.restart();
+
                   this.$refs.three.style.cssText =
                     "font-size: 15px; z-index:30; background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
                   this.$refs.four.style.cssText =
@@ -2247,7 +2264,7 @@ export default {
               "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
             this.$refs.four.style.cssText =
               "font-size: 15px; background-color: #6C6C6C; color: black; transition: all 0.5s ease-in-out;";
-            this.restart();
+
             setTimeout(() => {
               this.$refs.practice.style.cssText =
                 "left: 150%; top: 50%; opacity: 0; ";
@@ -2724,7 +2741,7 @@ export default {
       this.$refs.js.classList.add("text-close");
       this.$refs.html.classList.remove("text");
       this.$refs.css.classList.remove("text");
-      this.$refs.iframe.classList.remove("text");
+      this.$refs.iframe.classList.remove("text-close");
       this.$refs.js.classList.remove("text");
 
       if (this.time > 0) {
@@ -3083,6 +3100,23 @@ export default {
         showDenyButton: false,
       });
     }
+
+    this.$refs.output.onload = () => {
+      const iframe = this.$refs.output;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+      iframeDoc.addEventListener("click", (e) => {
+        const target = e.target;
+        if (
+          (target.tagName === "A" && target.getAttribute("href") === "/") ||
+          target.getAttribute("href") === "#"
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      });
+    };
+
     ////////////////////////////////////////////////////////////
     document.addEventListener("keydown", (event) => {
       if (
