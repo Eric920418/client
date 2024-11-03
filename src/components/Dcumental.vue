@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2">
+  <div class="py-3">
     <div class="card shadow-lg mb-5">
       <button
         class="btn btn-danger ms-auto"
