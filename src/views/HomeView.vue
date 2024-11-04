@@ -4,13 +4,18 @@
       <div>
         <button
           v-if="studentClassNum == 'B' || studentClassNum == 'C'"
-          class="toggle-btn btn btn-danger"
+          class="toggle-btn btn"
           id="html"
-          style="font-size: 50px; top: 0%"
+          :style="
+            isHtmlFocused
+              ? 'transform: translateX(0); background-color: red'
+              : 'background-color: #9d9d9d'
+          "
+          style="font-size: 50px; top: 0%; width: 60px"
           @click="toggleHtml"
         >
           <i class="fa-brands fa-html5 m-0 p-0"></i>
-          <div class="icon-text">HTML</div>
+          <div class="icon-text" style="color: black">HTML</div>
           <transition name="fade">
             <div
               v-if="documentBtn"
@@ -34,13 +39,18 @@
       <div>
         <button
           v-if="studentClassNum == 'B' || studentClassNum == 'C'"
-          class="toggle-btn btn btn-primary"
+          class="toggle-btn btn"
           id="css"
-          style="font-size: 50px; top: 11.5%"
+          :style="
+            isCssFocused
+              ? 'transform: translateX(0); background-color: #0d6efd'
+              : 'background-color: #9d9d9d'
+          "
+          style="font-size: 50px; top: 11.5%; width: 60px"
           @click="toggleCss"
         >
           <i class="fa-brands fa-css3-alt"></i>
-          <div class="icon-text">CSS</div>
+          <div class="icon-text" style="color: black">CSS</div>
           <transition name="fade">
             <div
               v-if="documentBtn"
@@ -64,13 +74,18 @@
       <div>
         <button
           v-if="studentClassNum == 'B' || studentClassNum == 'C'"
-          class="toggle-btn btn btn-warning"
+          class="toggle-btn btn"
           id="js"
-          style="font-size: 50px; top: 23.5%"
+          :style="
+            isJsFocused
+              ? 'transform: translateX(0); background-color: yellow'
+              : 'background-color: #9d9d9d'
+          "
+          style="font-size: 45px; top: 23.5%; width: 60px"
           @click="toggleJs"
         >
           <i class="fa-brands fa-square-js m-0 p-0"></i>
-          <div class="icon-text" style="font-size: 12px">JavaScript</div>
+          <div class="icon-text" style="color: black">JS</div>
           <transition name="fade">
             <div
               v-if="documentBtn"
@@ -94,13 +109,20 @@
       <div>
         <button
           v-if="studentClassNum == 'B' || studentClassNum == 'C'"
-          class="toggle-btn btn"
+          class="toggle-btn3 btn"
           id="code"
-          style="font-size: 23px; background-color: #9d9d9d; top: 40%"
+          style="
+            font-size: 18px;
+            background-color: #9d9d9d;
+            top: 40%;
+            padding-left: 0;
+            padding-right: 0;
+            width: 70px;
+          "
           @click.stop="runOutput"
           ref="run"
         >
-          執行
+          執行 <i class="fa-solid fa-play"></i>
           <transition name="fade">
             <div
               v-if="documentBtn"
@@ -124,13 +146,20 @@
       <div>
         <button
           v-if="studentClassNum == 'B' || studentClassNum == 'C'"
-          class="toggle-btn btn"
+          class="toggle-btn3 btn"
           id="save"
-          style="font-size: 23px; background-color: #9d9d9d; top: 46%"
+          style="
+            font-size: 18px;
+            background-color: #9d9d9d;
+            top: 46%;
+            padding-left: 0;
+            padding-right: 0;
+            width: 70px;
+          "
           @click.stop="saveButton"
           ref="save"
         >
-          儲存
+          儲存 <i class="fa-solid fa-floppy-disk"></i>
           <transition name="fade">
             <div
               v-if="documentBtn"
@@ -156,11 +185,11 @@
           v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn btn-light"
           id="restart"
-          style="font-size: 50px; top: 58%"
+          style="font-size: 35px; top: 58%; width: 60px"
           @click="restart"
         >
           <i class="fa-solid fa-rotate-left"></i>
-          <div class="icon-text">刷新</div>
+          <div class="icon-text" style="color: black">清空</div>
           <transition name="fade">
             <div
               v-if="documentBtn"
@@ -176,7 +205,7 @@
                 background-color: rgba(125, 125, 125, 0.5);
               "
             >
-              這是清空程式碼的功能，點擊刷新
+              這是清空程式碼的功能
             </div>
           </transition>
         </button>
@@ -186,12 +215,17 @@
           class="toggle-btn btn practiceBtn"
           id="practice"
           ref="tip"
-          style="font-size: 40px; top: 70%"
+          style="font-size: 30px; top: 70%; width: 60px"
           @click="startPractice"
         >
           <i class="fa-solid fa-laptop-code"></i>
           <span v-html="badgeHtml"></span>
-          <div class="icon-text">練習</div>
+          <div
+            class="icon-text"
+            style="font-size: 11px; padding-top: 3px; color: black"
+          >
+            主任務
+          </div>
 
           <transition name="fade">
             <div
@@ -245,7 +279,7 @@
           position: fixed;
           top: 20px;
           left: 50%;
-          width: 96%;
+          width: 90%;
           transform: translate(-50%, -50%);
           z-index: 10;
           background-color: #f8f9fa;
@@ -304,6 +338,13 @@
           class="card w-100 h-100"
           style="background-color: #f8f9fa; position: relative"
         >
+          <button
+            class="btn btn-danger ms-auto"
+            style="width: 50px"
+            @click="startPractice"
+          >
+            X
+          </button>
           <h5 class="card-title text-center task-title">任務欄</h5>
           <select
             class="form-select top-0 start-0 m-1"
@@ -419,9 +460,10 @@
           class="card d-none w-100 h-100"
           style="background-color: transparent; position: relative"
         >
+          <h1 class="text-center">體驗最終成果</h1>
           <iframe
             ref="practiceIframe"
-            style="height: 100%; width: 100%"
+            style="height: 95%; width: 100%; margin-top: 50px"
           ></iframe>
           <div class="d-flex bottom-0 end-0 m-1" style="position: absolute">
             <button class="btn btn-danger mx-1" @click="backTask">返回</button>
@@ -638,7 +680,7 @@
                               >
                                 <span
                                   class="mx-auto h-100 d-flex"
-                                  style="font-size: 30px; align-items: center"
+                                  style="font-size: 20px; align-items: center"
                                 >
                                   {{ order.taskName }}
                                 </span>
@@ -679,10 +721,31 @@
                     </div>
                   </div>
                   <div class="col-6">
+                    <table
+                      class="table table-striped mt-5"
+                      style="font-size: 17px; overflow-y: scroll"
+                    >
+                      <tbody>
+                        <tr
+                          v-for="(option, index) in this.tasks[
+                            this.focusTaskIndex
+                          ].order"
+                          :key="option.id"
+                        >
+                          <td>
+                            <div
+                              class="d-flex justify-content-between align-items-center"
+                            >
+                              {{ index + 1 }}. : {{ option.strategy }}
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                     <div
                       v-if="this.orderIndex != null"
                       class="card border-1 w-100"
-                      style="height: 600px"
+                      style="height: 350px"
                     >
                       <div
                         v-for="(strategy, index) in tasks[this.focusTaskIndex]
@@ -839,7 +902,9 @@
         >
           <div class="px-5 py-4">
             <div class="my-2">
-              <div class="form-label m-0" style="font-size: 30px">任務檢查</div>
+              <div class="form-label m-0" style="font-size: 30px">
+                任務檢查(請確認子任務是否完成並打勾)
+              </div>
               <label
                 v-for="(option, index) in tasks[focusTaskIndex].order"
                 class="mx-3"
@@ -866,6 +931,7 @@
                 name=""
                 id=""
                 class="form-control"
+                @keydown="preventSpace"
                 v-model="tasks[this.focusTaskIndex].thought[1]"
               ></textarea>
             </div>
@@ -878,6 +944,7 @@
                 name=""
                 id=""
                 class="form-control"
+                @keydown="preventSpace"
                 v-model="tasks[this.focusTaskIndex].thought[2]"
               ></textarea>
             </div>
@@ -890,6 +957,7 @@
                 name=""
                 id=""
                 class="form-control"
+                @keydown="preventSpace"
                 v-model="tasks[this.focusTaskIndex].thought[3]"
               ></textarea>
             </div>
@@ -944,7 +1012,7 @@
         </div>
       </div>
 
-      <div>
+      <div style="width: 95%; margin: 0 auto">
         <div class="text-close" id="html-code" ref="html">
           <div class="editor-container" ref="htmlEditorContainer"></div>
         </div>
@@ -968,7 +1036,7 @@
           width: 50px;
           top: 0%;
         "
-        v-if="isCollapsed"
+        v-if="isCollapsed && activeButton !== 'test' && activeButton !== 'log'"
         @click="toggleChat"
         ref="chat"
       >
@@ -1001,7 +1069,7 @@
           top: 14%;
           background-color: #9d9d9d;
         "
-        v-if="(isOpenLog && studentClassNum == 'B') || studentClassNum == 'C'"
+        v-if="isOpenLog && activeButton !== 'test' && activeButton !== 'chat'"
         @click="openLog"
         ref="log"
       >
@@ -1025,6 +1093,7 @@
           </div>
         </transition>
       </button>
+
       <button
         class="toggle-chat-btn btn"
         id="test"
@@ -1034,7 +1103,7 @@
           top: 27%;
           background-color: #9d9d9d;
         "
-        v-if="isTest"
+        v-if="isTest && activeButton !== 'log' && activeButton !== 'chat'"
         @click="openTest"
       >
         開啟考試視窗
@@ -1062,6 +1131,7 @@
           >{{ exams.length }}</span
         >
       </button>
+
       <button
         class="toggle-chat-btn btn"
         id="test"
@@ -1094,12 +1164,19 @@
         </transition>
       </button>
       <button
-        class="toggle-chat-btn btn btn-light"
+        class="toggle-chat-btn3 btn btn-light"
         id="document"
-        style="font-size: large; width: 40px; top: 90%"
+        style="
+          font-size: large;
+          width: 90px;
+          top: 90%;
+          right: 0.1%;
+          padding-left: 0;
+          padding-right: 0;
+        "
         @click="SignOut"
       >
-        登出
+        <i class="fa-solid fa-right-from-bracket"></i> 登出
         <transition name="fade">
           <div
             v-if="documentBtn"
@@ -1129,7 +1206,7 @@
           top: 50%;
           right: 50%;
           width: 850px;
-          height: 400px;
+          height: 490px;
           z-index: 900;
           background-color: rgba(125, 125, 125, 0.5);
           transform: translate(50%, -50%);
@@ -1149,6 +1226,16 @@
                 <th scope="row text-nowrap">查詢程式知識</th>
                 <td>
                   你現在是一個網頁程式設計專家，請告訴我flex是什麼？flex有哪些使用方法
+                  <button
+                    class="btn btn-sm btn-dark"
+                    @click="
+                      copyToClipboard(
+                        '你現在是一個網頁程式設計專家，請告訴我flex是什麼？flex有哪些使用方法'
+                      )
+                    "
+                  >
+                    複製
+                  </button>
                 </td>
               </tr>
               <tr>
@@ -1156,24 +1243,64 @@
                 <td>
                   你現在是一個網頁程式設計專家，請解釋以下的程式碼在做什麼。
                   (需要附上程式碼)
+                  <button
+                    class="btn btn-sm btn-dark"
+                    @click="
+                      copyToClipboard(
+                        '你現在是一個網頁程式設計專家，請解釋以下的程式碼在做什麼。 (需要附上程式碼)'
+                      )
+                    "
+                  >
+                    複製
+                  </button>
                 </td>
               </tr>
               <tr>
                 <th scope="row text-nowrap">提供範例和應用程式碼</th>
                 <td>
                   請告訴我什麼是監聽事件，如何使用監聽事件在元素物件，並且提供一段範例程式碼。
+                  <button
+                    class="btn btn-sm btn-dark"
+                    @click="
+                      copyToClipboard(
+                        '請告訴我什麼是監聽事件，如何使用監聽事件在元素物件，並且提供一段範例程式碼。'
+                      )
+                    "
+                  >
+                    複製
+                  </button>
                 </td>
               </tr>
               <tr>
                 <th scope="row text-nowrap">偵錯和修正程式碼</th>
                 <td>
                   你現在是一個網頁程式設計專家，我寫了一段HTML和CSS程式碼，預期這段程式碼在畫面上方會顯示一個表單，下方會顯示待辦事項，我遇到的問題是沒有辦法正確顯示在網頁上，請幫我找出程式碼中錯誤的地方，並且修正程式碼。
+                  <button
+                    class="btn btn-sm btn-dark"
+                    @click="
+                      copyToClipboard(
+                        '你現在是一個網頁程式設計專家，我寫了一段HTML和CSS程式碼，預期這段程式碼在畫面上方會顯示一個表單，下方會顯示待辦事項，我遇到的問題是沒有辦法正確顯示在網頁上，請幫我找出程式碼中錯誤的地方，並且修正程式碼。'
+                      )
+                    "
+                  >
+                    複製
+                  </button>
                 </td>
               </tr>
               <tr>
                 <th scope="row text-nowrap">流程處理</th>
                 <td>
                   你是一位網頁程式專家，我現在要設計一個網頁的版型，請描述你的設計，請提供網頁排版設計處理流程。
+                  <button
+                    class="btn btn-sm btn-dark"
+                    @click="
+                      copyToClipboard(
+                        '你是一位網頁程式專家，我現在要設計一個網頁的版型，請描述你的設計，請提供網頁排版設計處理流程。'
+                      )
+                    "
+                  >
+                    複製
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -1207,16 +1334,12 @@
     <div v-if="!isCollapsed">
       <button
         @click="toggleChat"
-        class="btn"
+        class="toggle-chat-btn btn"
         style="
-          position: absolute;
-          font-size: small;
-          background-color: #9d9d9d;
-          width: 3%;
-          height: 100px;
+          font-size: large;
+          width: 50px;
           top: 0.5%;
-          z-index: 9000;
-          right: 35%;
+          background-color: #9d9d9d;
         "
       >
         關閉聊天
@@ -1258,6 +1381,14 @@
         關閉考試視窗
       </button>
       <div class="exam" style="max-height: 100vh; overflow-y: auto">
+        <button
+          v-if="!exam.examName && !isFinishExam.examName"
+          class="btn btn-danger float-end m-2"
+          style="width: 50px"
+          @click="openTest"
+        >
+          X
+        </button>
         <div
           v-if="exams && !exam.examName && !isFinishExam.examName"
           v-for="exam in exams"
@@ -1546,6 +1677,12 @@ export default {
       studentClassNum: "",
       documentBtn: false,
       promptBtn: false,
+
+      isHtmlFocused: false,
+      isCssFocused: false,
+      isJsFocused: false,
+
+      activeButton: "null",
     };
   },
   computed: {
@@ -1681,9 +1818,9 @@ export default {
         this.$refs.css.style.width = 100 + "%";
         this.$refs.js.style.width = 100 + "%";
       } else {
-        this.$refs.html.style.width = 65 + "%";
-        this.$refs.css.style.width = 65 + "%";
-        this.$refs.js.style.width = 65 + "%";
+        this.$refs.html.style.width = 71 + "%";
+        this.$refs.css.style.width = 71 + "%";
+        this.$refs.js.style.width = 71 + "%";
       }
       if (this.time > 0) {
         if (this.isCollapsed) {
@@ -1719,6 +1856,12 @@ export default {
           });
           this.isActionPushed = false;
         }
+      } else {
+        if (this.isCollapsed) {
+          this.activeButton = null;
+        } else {
+          this.activeButton = "chat";
+        }
       }
     },
     toggleHtml() {
@@ -1733,6 +1876,14 @@ export default {
       this.$refs.js.classList.add("text-close");
       this.$refs.iframe.classList.add("text-close");
       this.$refs.practice.style.top = "-50%";
+
+      this.isHtmlFocused = true;
+      this.isCssFocused = false;
+      this.isJsFocused = false;
+
+      if (this.isStarted) {
+        this.startPractice();
+      }
 
       this.htmlEditor.layout();
       if (this.time > 0) {
@@ -1765,6 +1916,14 @@ export default {
       this.$refs.js.classList.add("text-close");
       this.$refs.iframe.classList.add("text-close");
       this.$refs.practice.style.top = "-50%";
+
+      this.isHtmlFocused = false;
+      this.isCssFocused = true;
+      this.isJsFocused = false;
+      if (this.isStarted) {
+        this.startPractice();
+      }
+
       this.cssEditor.layout();
       if (this.time > 0) {
         this.action.push({
@@ -1796,6 +1955,15 @@ export default {
       this.$refs.css.classList.add("text-close");
       this.$refs.iframe.classList.add("text-close");
       this.$refs.practice.style.top = "-50%";
+
+      this.isHtmlFocused = false;
+      this.isCssFocused = false;
+      this.isJsFocused = true;
+
+      if (this.isStarted) {
+        this.startPractice();
+      }
+
       this.jsEditor.layout();
       if (this.time > 0) {
         this.action.push({
@@ -2731,6 +2899,12 @@ export default {
           });
           this.isActionPushed = false;
         }
+      } else {
+        if (this.isOpenLog) {
+          this.activeButton = null;
+        } else {
+          this.activeButton = "log";
+        }
       }
     },
     openTest() {
@@ -2746,6 +2920,7 @@ export default {
 
       if (this.time > 0) {
         if (this.isTest) {
+          this.activeButton = null;
           this.action.push({
             action: "關閉考試視窗",
             timestamp: new Date()
@@ -2761,6 +2936,7 @@ export default {
               .replace(",", ""),
           });
         } else {
+          this.activeButton = "test";
           this.action.push({
             action: "打開考試視窗",
             timestamp: new Date()
@@ -2776,6 +2952,12 @@ export default {
               .replace(",", ""),
           });
           this.isActionPushed = false;
+        }
+      } else {
+        if (this.isTest) {
+          this.activeButton = null;
+        } else {
+          this.activeButton = "test";
         }
       }
     },
@@ -3073,6 +3255,16 @@ export default {
         });
       }
     },
+
+    copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+    },
+
+    preventSpace(event) {
+      if (event.key === " ") {
+        event.preventDefault(); // 阻止輸入空白鍵
+      }
+    },
   },
 
   mounted() {
@@ -3143,10 +3335,7 @@ export default {
     <title>My Page</title>
   </head>
 <body>
-      <div id="large-header" class="large-header">
-        <canvas id="demo-canvas"></canvas>
-            <h1 class="main-title" id="text"></h1>
-        </div>
+
 </body>
 </html>
         `,
@@ -3186,8 +3375,7 @@ export default {
     });
     // 初始化 CSS 编辑器
     this.cssEditor = monaco.editor.create(this.$refs.cssEditorContainer, {
-      value:
-        "body {\n\tfont-family: Arial, sans-serif;\n\tmargin: 0;\n}\n.large-header {\n\tposition: relative;\n\twidth: 100%;\n\tbackground: #333;\n\toverflow: hidden;\n\tbackground-size: cover;\n\tbackground-position: center center;\n\tz-index: 1;\n}\n#large-header {\n\tbackground-image: url('https://www.marcoguglie.it/Codepen/AnimatedHeaderBg/demo-1/img/demo-1-bg.jpg');\n}\n.main-title {\n\tposition: absolute;\n\tmargin: 0;\n\tpadding: 0;\n\tcolor: #f9f1e9;\n\ttext-align: center;\n\ttop: 50%;\n\tleft: 50%;\n\t-webkit-transform: translate3d(-50%,-50%,0);\n\ttransform: translate3d(-50%,-50%,0);\n}\n.demo-1 .main-title {\n\ttext-transform: uppercase;\n\tfont-size: 4.2em;\n\tletter-spacing: 0.1em;\n}\n.main-title .thin {\n\tfont-weight: 200;\n}\n@media only screen and (max-width : 768px) {\n\t.demo-1 .main-title {\n\t\tfont-size: 3em;\n\t}\n}\nh1 {\n\tmargin-top: 50px;\n\tz-index: 10;\n\ttext-align: center;\n}\n.content{\n\tdisplay: flex;\n\tflex-direction: column;\n\tmargin: 0 0 0 40px;\n}",
+      value: "",
       language: "css",
       theme: "vs-dark",
       codeLens: false,
@@ -3224,190 +3412,7 @@ export default {
     });
     // 初始化 JavaScript 编辑器
     this.jsEditor = monaco.editor.create(this.$refs.jsEditorContainer, {
-      value: `
-        document.addEventListener('DOMContentLoaded', () => {
-            (function() {
-                var width, height, largeHeader, canvas, ctx, points, target, animateHeader = true;
-
-                // Main
-                initHeader();
-                initAnimation();
-                addListeners();
-
-                function initHeader() {
-                    width = window.innerWidth;
-                    height = window.innerHeight;
-                    target = {x: width/2, y: height/2};
-
-                    largeHeader = document.getElementById('large-header');
-                    largeHeader.style.height = height+'px';
-
-                    canvas = document.getElementById('demo-canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx = canvas.getContext('2d');
-
-                    // create points
-                    points = [];
-                    for(var x = 0; x < width; x = x + width/20) {
-                        for(var y = 0; y < height; y = y + height/20) {
-                            var px = x + Math.random()*width/20;
-                            var py = y + Math.random()*height/20;
-                            var p = {x: px, originX: px, y: py, originY: py };
-                            points.push(p);
-                        }
-                    }
-
-                    // for each point find the 5 closest points
-                    for(var i = 0; i < points.length; i++) {
-                        var closest = [];
-                        var p1 = points[i];
-                        for(var j = 0; j < points.length; j++) {
-                            var p2 = points[j];
-                            if(!(p1 == p2)) {
-                                var placed = false;
-                                for(var k = 0; k < 5; k++) {
-                                    if(!placed) {
-                                        if(closest[k] == undefined) {
-                                            closest[k] = p2;
-                                            placed = true;
-                                        }
-                                    }
-                                }
-
-                                for(var k = 0; k < 5; k++) {
-                                    if(!placed) {
-                                        if(getDistance(p1, p2) < getDistance(p1, closest[k])) {
-                                            closest[k] = p2;
-                                            placed = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        p1.closest = closest;
-                    }
-
-                    // assign a circle to each point
-                    for(var i in points) {
-                        var c = new Circle(points[i], 2+Math.random()*2, 'rgba(255,255,255,0.3)');
-                        points[i].circle = c;
-                    }
-                }
-
-                // Event handling
-                function addListeners() {
-                    if(!('ontouchstart' in window)) {
-                        window.addEventListener('mousemove', mouseMove);
-                    }
-                    window.addEventListener('scroll', scrollCheck);
-                    window.addEventListener('resize', resize);
-                }
-
-                function mouseMove(e) {
-                    var posx = posy = 0;
-                    if (e.pageX || e.pageY) {
-                        posx = e.pageX;
-                        posy = e.pageY;
-                    } else if (e.clientX || e.clientY) {
-                        posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-                        posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-                    }
-                    target.x = posx;
-                    target.y = posy;
-                }
-
-                function scrollCheck() {
-                    if(document.body.scrollTop > height) animateHeader = false;
-                    else animateHeader = true;
-                }
-
-                function resize() {
-                    width = window.innerWidth;
-                    height = window.innerHeight;
-                    largeHeader.style.height = height+'px';
-                    canvas.width = width;
-                    canvas.height = height;
-                }
-
-                // animation
-                function initAnimation() {
-                    animate();
-                    for(var i in points) {
-                        shiftPoint(points[i]);
-                    }
-                }
-
-                function animate() {
-                    if(animateHeader) {
-                        ctx.clearRect(0,0,width,height);
-                        for(var i in points) {
-                            // detect points in range
-                            if(Math.abs(getDistance(target, points[i])) < 4000) {
-                                points[i].active = 0.3;
-                                points[i].circle.active = 0.6;
-                            } else if(Math.abs(getDistance(target, points[i])) < 20000) {
-                                points[i].active = 0.1;
-                                points[i].circle.active = 0.3;
-                            } else if(Math.abs(getDistance(target, points[i])) < 40000) {
-                                points[i].active = 0.02;
-                                points[i].circle.active = 0.1;
-                            } else {
-                                points[i].active = 0;
-                                points[i].circle.active = 0;
-                            }
-
-                            drawLines(points[i]);
-                            points[i].circle.draw();
-                        }
-                    }
-                    requestAnimationFrame(animate);
-                }
-
-                function shiftPoint(p) {
-                    gsap.to(p, {duration: 1 + Math.random(), x: p.originX - 50 + Math.random() * 100, y: p.originY - 50 + Math.random() * 100, ease: "power1.inOut", onComplete: function() {
-                        shiftPoint(p);
-                    }});
-                }
-
-                // Canvas manipulation
-                function drawLines(p) {
-                    if(!p.active) return;
-                    for(var i in p.closest) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p.closest[i].x, p.closest[i].y);
-                        ctx.strokeStyle = 'rgba(156,217,249,'+ p.active+')';
-                        ctx.stroke();
-                    }
-                }
-
-                function Circle(pos,rad,color) {
-                    var _this = this;
-
-                    // constructor
-                    (function() {
-                        _this.pos = pos || null;
-                        _this.radius = rad || null;
-                        _this.color = color || null;
-                    })();
-
-                    this.draw = function() {
-                        if(!_this.active) return;
-                        ctx.beginPath();
-                        ctx.arc(_this.pos.x, _this.pos.y, _this.radius, 0, 2 * Math.PI, false);
-                        ctx.fillStyle = 'rgba(156,217,249,'+ _this.active+')';
-                        ctx.fill();
-                    };
-                }
-
-                // Util
-                function getDistance(p1, p2) {
-                    return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
-                }
-            })();
-        });
-        `,
+      value: ``,
       language: "javascript",
       theme: "vs-dark",
       automaticLayout: true, // 启用自动布局
@@ -3676,10 +3681,22 @@ label i {
   right: 0;
   z-index: 1000;
   text-wrap: wrap;
-  transform: translateX(75%);
+  transform: translateX(20%);
   transition: all 0.3s ease;
 }
 .toggle-chat-btn:hover {
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+.toggle-chat-btn3 {
+  position: fixed;
+  right: 0;
+  z-index: 1000;
+  text-wrap: wrap;
+  transform: translateX(60%);
+  transition: all 0.3s ease;
+}
+.toggle-chat-btn3:hover {
   transform: translateX(0);
   transition: all 0.3s ease;
 }
@@ -3700,7 +3717,14 @@ label i {
   position: fixed;
   z-index: 1000;
   width: 6%;
-  transform: translateX(-85%);
+  transform: translateX(-20%);
+  transition: all 0.5s ease;
+}
+.toggle-btn3 {
+  position: fixed;
+  z-index: 1000;
+  width: 6%;
+  transform: translateX(-60%);
   transition: all 0.5s ease;
 }
 
@@ -3708,9 +3732,13 @@ label i {
   transform: translateX(0);
   transition: all 0.3s ease;
 }
+.toggle-btn3:hover {
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
 .chat {
   position: fixed;
-  right: 8px;
+  right: 50px;
   top: 0;
   z-index: 999;
   width: 500px;
@@ -3718,18 +3746,24 @@ label i {
 .document {
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
   z-index: 999;
   padding: 0 30px;
-  width: 100%;
+  width: 90%;
   height: 100vh;
   overflow-x: hidden;
 }
 .exam {
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 999;
+  margin: auto;
   padding: 0 50px;
-  width: 100%;
+  width: 90%;
   height: 100vh;
   overflow-x: hidden;
   background: #fff;
@@ -3792,7 +3826,7 @@ label i {
   top: -50%;
   transform: translate(-50%, -50%);
   font-size: 50px;
-  width: 95%;
+  width: 90%;
   height: 90%;
   display: flex;
   justify-content: center;
@@ -3834,10 +3868,11 @@ label i {
   }
 }
 .task-title {
+  margin-top: -30px;
   font-size: 25px;
   animation: rotate 3s linear infinite, rainbow 1s linear infinite;
   display: inline-block;
-  transform-style: preserve-3d; /* 保持子元素的3D转换 */
+  transform-style: preserve-3d;
 }
 @keyframes rotate2 {
   0% {
@@ -3859,12 +3894,39 @@ label i {
     transform: rotateY(0deg);
   }
 }
+
+.taskCard {
+  animation-fill-mode: forwards;
+}
+
+.taskCard:hover {
+  animation: rotate2 0.5s forwards;
+  animation-fill-mode: forwards;
+  cursor: pointer;
+}
+
+.taskCard:not(:hover) {
+  animation: rotateBack 0.5s forwards;
+  animation-fill-mode: forwards;
+}
+
+.front {
+  opacity: 1;
+}
+
+.back {
+  opacity: 0;
+}
+
+.taskCard:hover .back {
+  opacity: 1;
+}
+
+.taskCard:hover .front {
+  opacity: 0;
+}
 .order:hover {
   background-color: #aaaaaa;
-}
-.taskCard:hover {
-  transition: all 0.5s ease-in-out;
-  cursor: pointer;
 }
 .card-body {
   height: 100%;
@@ -3873,30 +3935,7 @@ label i {
   top: 50;
   left: 50;
 }
-.front {
-  opacity: 1;
-}
-.back {
-  opacity: 0;
-}
-.taskCard:hover {
-  animation: rotate2 0.5s forwards;
-  .back {
-    opacity: 1;
-  }
-  .front {
-    opacity: 0;
-  }
-}
-.taskCard:not(:hover) {
-  animation: rotateBack 0.5s forwards;
-  .back {
-    opacity: 0;
-  }
-  .front {
-    opacity: 1;
-  }
-}
+
 .pdf-container {
   text-align: center;
 }
