@@ -8,10 +8,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "apexcharts": "^3.52.0",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "domutils": "^3.1.0",
+    "entities": "^5.0.0",
     "fathom-client": "^3.7.2",
     "highlight.js": "^11.9.0",
     "htmlparser2": "^9.1.0",
@@ -26,7 +29,6 @@
     "read-excel-file": "^5.8.1",
     "reveal.js": "^5.1.0",
     "sweetalert2": "^11.11.0",
-    "vite-plugin-monaco-editor": "^1.1.0",
     "vue": "^3.4.21",
     "vue-advanced-chat": "^2.1.0",
     "vue-apexcharts": "^1.6.2",
@@ -39,7 +41,8 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.2.8"
+    "@rollup/plugin-alias": "^5.1.1",
+    "@vitejs/plugin-vue": "^4.6.2",
+    "vite": "^3.2.11"
   }
 }
