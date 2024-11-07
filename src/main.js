@@ -30,7 +30,7 @@ if (window.VueAdvancedChat) {
   app.component("VueAdvancedChat", window.VueAdvancedChat);
 }
 app.config.globalProperties.$axios = axios.create({
-  baseURL: "http://140.138.147.12:3000",
+  baseURL: "http://140.138.147.12:80",
 });
 
 app.config.globalProperties.$apexcharts = ApexCharts;

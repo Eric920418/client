@@ -112,17 +112,17 @@
           class="toggle-btn3 btn"
           id="code"
           style="
-            font-size: 18px;
+            font-size: 30px;
             background-color: #9d9d9d;
             top: 40%;
             padding-left: 0;
             padding-right: 0;
-            width: 70px;
+            width: 120px;
           "
           @click.stop="runOutput"
           ref="run"
         >
-          執行 <i class="fa-solid fa-play"></i>
+          執行 <i class="fa-solid fa-play p-0 m-0"></i>
           <transition name="fade">
             <div
               v-if="documentBtn"
@@ -149,12 +149,12 @@
           class="toggle-btn3 btn"
           id="save"
           style="
-            font-size: 18px;
+            font-size: 30px;
             background-color: #9d9d9d;
-            top: 46%;
+            top: 46.5%;
             padding-left: 0;
             padding-right: 0;
-            width: 70px;
+            width: 120px;
           "
           @click.stop="saveButton"
           ref="save"
@@ -1198,116 +1198,127 @@
       </button>
     </div>
 
-    <transition name="fade">
-      <div
-        v-if="promptBtn"
-        class="position-fixed"
-        style="
-          top: 50%;
-          right: 50%;
-          width: 850px;
-          height: 490px;
-          z-index: 900;
-          background-color: rgba(125, 125, 125, 0.5);
-          transform: translate(50%, -50%);
-        "
-      >
+    <!-- <transition name="fade"> -->
+    <div
+      v-if="promptBtn"
+      class="position-fixed"
+      style="
+        top: 50%;
+        right: 50%;
+        width: 850px;
+        height: 490px;
+        z-index: 900;
+        background-color: rgba(125, 125, 125, 0.5);
+        transform: translate(50%, -50%);
+      "
+    >
+      <div class="d-flex justify-content-between">
         <div class="p-3 fs-4">Prompt 功能類型示範</div>
-        <div class="px-2">
-          <table class="table table-middle visible" style="">
-            <thead>
-              <tr class="text-center text-nowrap">
-                <th scope="col" style="width: 25%">Prompt 功能類型</th>
-                <th scope=" ">範例</th>
-              </tr>
-            </thead>
-            <tbody class="table-middle">
-              <tr>
-                <th scope="row text-nowrap">查詢程式知識</th>
-                <td>
-                  你現在是一個網頁程式設計專家，請告訴我flex是什麼？flex有哪些使用方法
-                  <button
-                    class="btn btn-sm btn-dark"
-                    @click="
-                      copyToClipboard(
-                        '你現在是一個網頁程式設計專家，請告訴我flex是什麼？flex有哪些使用方法'
-                      )
-                    "
-                  >
-                    複製
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row text-nowrap">解釋程式碼</th>
-                <td>
-                  你現在是一個網頁程式設計專家，請解釋以下的程式碼在做什麼。
-                  (需要附上程式碼)
-                  <button
-                    class="btn btn-sm btn-dark"
-                    @click="
-                      copyToClipboard(
-                        '你現在是一個網頁程式設計專家，請解釋以下的程式碼在做什麼。 (需要附上程式碼)'
-                      )
-                    "
-                  >
-                    複製
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row text-nowrap">提供範例和應用程式碼</th>
-                <td>
-                  請告訴我什麼是監聽事件，如何使用監聽事件在元素物件，並且提供一段範例程式碼。
-                  <button
-                    class="btn btn-sm btn-dark"
-                    @click="
-                      copyToClipboard(
-                        '請告訴我什麼是監聽事件，如何使用監聽事件在元素物件，並且提供一段範例程式碼。'
-                      )
-                    "
-                  >
-                    複製
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row text-nowrap">偵錯和修正程式碼</th>
-                <td>
-                  你現在是一個網頁程式設計專家，我寫了一段HTML和CSS程式碼，預期這段程式碼在畫面上方會顯示一個表單，下方會顯示待辦事項，我遇到的問題是沒有辦法正確顯示在網頁上，請幫我找出程式碼中錯誤的地方，並且修正程式碼。
-                  <button
-                    class="btn btn-sm btn-dark"
-                    @click="
-                      copyToClipboard(
-                        '你現在是一個網頁程式設計專家，我寫了一段HTML和CSS程式碼，預期這段程式碼在畫面上方會顯示一個表單，下方會顯示待辦事項，我遇到的問題是沒有辦法正確顯示在網頁上，請幫我找出程式碼中錯誤的地方，並且修正程式碼。'
-                      )
-                    "
-                  >
-                    複製
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row text-nowrap">流程處理</th>
-                <td>
-                  你是一位網頁程式專家，我現在要設計一個網頁的版型，請描述你的設計，請提供網頁排版設計處理流程。
-                  <button
-                    class="btn btn-sm btn-dark"
-                    @click="
-                      copyToClipboard(
-                        '你是一位網頁程式專家，我現在要設計一個網頁的版型，請描述你的設計，請提供網頁排版設計處理流程。'
-                      )
-                    "
-                  >
-                    複製
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <button
+          v-if="!exam.examName && !isFinishExam.examName"
+          class="btn btn-danger float-end m-2"
+          style="width: 50px"
+          @click="promptBtn = !promptBtn"
+        >
+          X
+        </button>
       </div>
-    </transition>
+
+      <div class="px-2">
+        <table class="table table-middle visible" style="">
+          <thead>
+            <tr class="text-center text-nowrap">
+              <th scope="col" style="width: 25%">Prompt 功能類型</th>
+              <th scope=" ">範例</th>
+            </tr>
+          </thead>
+          <tbody class="table-middle">
+            <tr>
+              <th scope="row text-nowrap">查詢程式知識</th>
+              <td>
+                你現在是一個網頁程式設計專家，請告訴我flex是什麼？flex有哪些使用方法
+                <button
+                  class="btn btn-sm btn-dark"
+                  @click="
+                    copyToClipboard(
+                      '你現在是一個網頁程式設計專家，請告訴我flex是什麼？flex有哪些使用方法'
+                    )
+                  "
+                >
+                  複製
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row text-nowrap">解釋程式碼</th>
+              <td>
+                你現在是一個網頁程式設計專家，請解釋以下的程式碼在做什麼。
+                (需要附上程式碼)
+                <button
+                  class="btn btn-sm btn-dark"
+                  @click="
+                    copyToClipboard(
+                      '你現在是一個網頁程式設計專家，請解釋以下的程式碼在做什麼。 (需要附上程式碼)'
+                    )
+                  "
+                >
+                  複製
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row text-nowrap">提供範例和應用程式碼</th>
+              <td>
+                請告訴我什麼是監聽事件，如何使用監聽事件在元素物件，並且提供一段範例程式碼。
+                <button
+                  class="btn btn-sm btn-dark"
+                  @click="
+                    copyToClipboard(
+                      '請告訴我什麼是監聽事件，如何使用監聽事件在元素物件，並且提供一段範例程式碼。'
+                    )
+                  "
+                >
+                  複製
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row text-nowrap">偵錯和修正程式碼</th>
+              <td>
+                你現在是一個網頁程式設計專家，我寫了一段HTML和CSS程式碼，預期這段程式碼在畫面上方會顯示一個表單，下方會顯示待辦事項，我遇到的問題是沒有辦法正確顯示在網頁上，請幫我找出程式碼中錯誤的地方，並且修正程式碼。
+                <button
+                  class="btn btn-sm btn-dark"
+                  @click="
+                    copyToClipboard(
+                      '你現在是一個網頁程式設計專家，我寫了一段HTML和CSS程式碼，預期這段程式碼在畫面上方會顯示一個表單，下方會顯示待辦事項，我遇到的問題是沒有辦法正確顯示在網頁上，請幫我找出程式碼中錯誤的地方，並且修正程式碼。'
+                    )
+                  "
+                >
+                  複製
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row text-nowrap">流程處理</th>
+              <td>
+                你是一位網頁程式專家，我現在要設計一個網頁的版型，請描述你的設計，請提供網頁排版設計處理流程。
+                <button
+                  class="btn btn-sm btn-dark"
+                  @click="
+                    copyToClipboard(
+                      '你是一位網頁程式專家，我現在要設計一個網頁的版型，請描述你的設計，請提供網頁排版設計處理流程。'
+                    )
+                  "
+                >
+                  複製
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- </transition> -->
 
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
       <div
@@ -1629,6 +1640,10 @@
 <script>
 import * as monaco from "monaco-editor";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
+import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
+import CssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
+import HtmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
+import TsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import { DomHandler, Parser } from "htmlparser2";
 
 import Chat from "../components/ChatMessage.vue";
@@ -1638,6 +1653,7 @@ import { marked } from "marked";
 import { jwtDecode } from "jwt-decode";
 import { Toast } from "bootstrap";
 
+import "monaco-editor/esm/vs/basic-languages/html/html.contribution";
 export default {
   name: "MonacoEditor",
   components: {
@@ -3326,6 +3342,23 @@ export default {
         this.runOutput();
       }
     });
+    self.MonacoEnvironment = {
+      getWorker: function (moduleId, label) {
+        if (label === "json") {
+          return new JsonWorker();
+        }
+        if (label === "css") {
+          return new CssWorker();
+        }
+        if (label === "html") {
+          return new HtmlWorker();
+        }
+        if (label === "typescript" || label === "javascript") {
+          return new TsWorker();
+        }
+        return new EditorWorker();
+      },
+    };
 
     // 初始化 HTML 编辑器
     this.htmlEditor = monaco.editor.create(this.$refs.htmlEditorContainer, {
@@ -3724,7 +3757,7 @@ label i {
   position: fixed;
   z-index: 1000;
   width: 6%;
-  transform: translateX(-60%);
+  transform: translateX(-62%);
   transition: all 0.5s ease;
 }
 
@@ -3900,13 +3933,13 @@ label i {
 }
 
 .taskCard:hover {
-  animation: rotate2 0.5s forwards;
+  animation: rotate2 1.5s forwards 1;
   animation-fill-mode: forwards;
   cursor: pointer;
 }
 
 .taskCard:not(:hover) {
-  animation: rotateBack 0.5s forwards;
+  animation: rotateBack 1.5s forwards 1;
   animation-fill-mode: forwards;
 }
 
