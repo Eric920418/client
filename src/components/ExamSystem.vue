@@ -153,12 +153,12 @@
             :key="index"
           >
             <div class="card-body border-0">
-              <input
+              <textarea
                 type="text"
                 class="form-control"
                 placeholder="題目"
                 v-model="q.title"
-              />
+              ></textarea>
               <div
                 v-for="(option, optionIndex) in q.options"
                 :key="optionIndex"
@@ -352,12 +352,13 @@
             :key="index"
           >
             <div class="card-body border-0">
-              <input
+              <textarea
                 type="text"
                 class="form-control"
                 placeholder="題目"
                 v-model="q.title"
-              />
+              ></textarea>
+
               <div
                 v-for="(option, optionIndex) in q.options"
                 :key="optionIndex"
