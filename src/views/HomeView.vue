@@ -398,6 +398,9 @@
                       {{ task.title }}
                     </h5>
                   </div>
+                  <div style="font-size: 10px">
+                    目前第：{{ task.state + 1 }}步驟
+                  </div>
                   <div
                     class="card-body back"
                     style="
@@ -1570,7 +1573,7 @@
             v-for="(ques, index) in isFinishExam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
-            style="height: 40 0px"
+            style="height: 400px"
           >
             <div class="card-body">
               <div
