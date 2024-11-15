@@ -89,6 +89,7 @@ export default {
     return {
       history: [],
       students: [],
+      filterStudent: [],
       exam: null,
     };
   },
@@ -105,7 +106,6 @@ export default {
         .then((res) => {
           const uniqueExamIds = new Set();
           const filteredHistory = [];
-          const filteredStudents = [];
 
           // 筛选唯一的 examTicket
           res.data.data.students.forEach((student) => {
@@ -116,8 +116,26 @@ export default {
               }
             });
           });
+          this.history = filteredHistory;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    checkExam(exam) {
+      this.exam = exam.examId._id;
+      const filteredStudents = [];
 
-          // 处理学生信息
+      const yourToken = localStorage.getItem("token");
+      this.$axios
+        .get("/auth/students/examTicket", {
+          headers: {
+            Authorization: `Bearer ${yourToken}`,
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          const filteredStudents = [];
           res.data.data.students.forEach((student) => {
             let newStudent = {
               name: student.name,
@@ -127,26 +145,22 @@ export default {
             };
 
             const specificTicket = student.ExamTicket.find(
-              (ticket) => ticket.examId.name === this.exam
+              (ticket) => ticket.examId._id === this.exam
             );
             if (specificTicket) {
               newStudent.score = specificTicket.score;
               newStudent.answer = specificTicket.answer;
+              filteredStudents.push(newStudent);
             }
-
-            filteredStudents.push(newStudent);
           });
 
           this.students = filteredStudents;
-          this.history = filteredHistory;
         })
         .catch((error) => {
           console.error(error);
         });
-    },
-    checkExam(exam) {
-      this.exam = exam.examId.name;
-      this.getHistory();
+      // this.filterStudent = filteredStudents;
+      // console.log(this.filterStudent);
     },
   },
   mounted() {
