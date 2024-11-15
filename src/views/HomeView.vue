@@ -1468,14 +1468,16 @@
             v-for="(ques, index) in exam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
-            style="height: 300px"
+            style="height: 400px"
           >
             <div class="card-body">
               <div
                 class="d-flex justify-content-between align-items-center my-2"
               >
-                <h5 class="card-title">
-                  第{{ index + 1 }}題: {{ ques.title }}
+                <h5 class="card-title" style="white-space: pre-wrap">
+                  <div style="color: #6b6b6b">第{{ index + 1 }}題:</div>
+                  <br />
+                  <div>{{ ques.title }}</div>
                 </h5>
                 <span class="badge bg-primary">{{
                   ques.types == "short-answer" ? "問答題" : "選擇題"
@@ -1561,14 +1563,16 @@
             v-for="(ques, index) in isFinishExam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
-            style="height: 300px"
+            style="height: 400px"
           >
             <div class="card-body">
               <div
                 class="d-flex justify-content-between align-items-center my-2"
               >
-                <h5 class="card-title">
-                  第{{ index + 1 }}題: {{ ques.title }}
+                <h5 class="card-title" style="white-space: pre-wrap">
+                  <div style="color: #6b6b6b">第{{ index + 1 }}題:</div>
+                  <br />
+                  <div>{{ ques.title }}</div>
                 </h5>
                 <span class="badge bg-primary">{{
                   ques.types == "short-answer" ? "問答題" : "選擇題"
@@ -2027,6 +2031,15 @@ export default {
       this.isActionPushed = false;
     },
     startPractice() {
+      if (this.isCollapsed == false) {
+        this.toggleChat();
+      }
+      if (this.isOpenLog == false) {
+        this.openLog();
+      }
+      if (this.isTest == false) {
+        this.openTest();
+      }
       if (!this.isStarted) {
         this.$refs.practice.style.top = "50%";
         if (this.focusTaskIndex != null) {
@@ -3284,6 +3297,7 @@ export default {
   },
 
   mounted() {
+    this.startPractice();
     this.studentClassNum = localStorage.getItem("classNum");
     this.firstLogin();
     this.toggleIframe();
