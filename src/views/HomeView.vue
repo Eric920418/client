@@ -1472,9 +1472,12 @@
           >
             <div class="card-body">
               <div
-                class="d-flex justify-content-between align-items-center my-2"
+                class="d-flex justify-content-between align-items-center my-1"
               >
-                <h5 class="card-title" style="white-space: pre-wrap">
+                <h5
+                  class="card-title"
+                  style="white-space: pre-wrap; height: 120px; overflow: scroll"
+                >
                   <div style="color: #6b6b6b">第{{ index + 1 }}題:</div>
                   <br />
                   <div>{{ ques.title }}</div>
@@ -1486,6 +1489,7 @@
               <div v-if="ques.types != 'short-answer'" class="my-3">
                 <button
                   @click="ques.answer = '0'"
+                  style="height: 70px"
                   :class="
                     ques.answer == '0'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
@@ -1496,6 +1500,7 @@
                 </button>
                 <button
                   @click="ques.answer = '1'"
+                  style="height: 70px"
                   :class="
                     ques.answer == '1'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
@@ -1508,6 +1513,7 @@
               <div v-if="ques.types != 'short-answer'" class="my-3">
                 <button
                   @click="ques.answer = '2'"
+                  style="height: 70px"
                   :class="
                     ques.answer == '2'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
@@ -1518,6 +1524,7 @@
                 </button>
                 <button
                   @click="ques.answer = '3'"
+                  style="height: 70px"
                   :class="
                     ques.answer == '3'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-primary'
@@ -1563,13 +1570,16 @@
             v-for="(ques, index) in isFinishExam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
-            style="height: 400px"
+            style="height: 40 0px"
           >
             <div class="card-body">
               <div
                 class="d-flex justify-content-between align-items-center my-2"
               >
-                <h5 class="card-title" style="white-space: pre-wrap">
+                <h5
+                  class="card-title"
+                  style="white-space: pre-wrap; height: 120px; overflow: scroll"
+                >
                   <div style="color: #6b6b6b">第{{ index + 1 }}題:</div>
                   <br />
                   <div>{{ ques.title }}</div>
@@ -1581,6 +1591,7 @@
               <div v-if="ques.types != 'short-answer'" class="my-3">
                 <button
                   disabled
+                  style="height: 70px"
                   :class="
                     ques.answer == '0'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-success'
@@ -1591,6 +1602,7 @@
                 </button>
                 <button
                   disabled
+                  style="height: 70px"
                   :class="
                     ques.answer == '1'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-success'
@@ -1603,6 +1615,7 @@
               <div v-if="ques.types != 'short-answer'" class="my-3">
                 <button
                   disabled
+                  style="height: 70px"
                   :class="
                     ques.answer == '2'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-success'
@@ -1613,6 +1626,7 @@
                 </button>
                 <button
                   disabled
+                  style="height: 70px"
                   :class="
                     ques.answer == '3'
                       ? 'btn btn-outline-primary w-25 my-2 mx-2 text-black bg-success'
