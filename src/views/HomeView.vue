@@ -1573,7 +1573,7 @@
             v-for="(ques, index) in isFinishExam.examQues.questions"
             :key="ques.id"
             class="card mb-4 shadow-sm"
-            style="height: 400px"
+            style="height: 450px"
           >
             <div class="card-body">
               <div

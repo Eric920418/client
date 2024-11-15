@@ -1,6 +1,13 @@
 <template>
   <!-- <button type="button" class="btn btn-primary my-3">紀錄</button> -->
   <div class="card shadow-lg my-3">
+    <button
+      class="btn btn-warning m-3"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
+      任務檔案
+    </button>
     <div class="card-body p-0">
       <div class="mx-auto" style="width: 90%">
         <div class="d-flex justify-content-between mb-3 mt-4">
@@ -136,39 +143,9 @@
             accept="application/pdf"
           />
         </div>
-        <!-- <div id="presentation">
-                    <div v-for="(slide, slideIndex) in task.slides" :key="slideIndex" v-show="currentSlide === slideIndex" class="slide"  @mouseup="endDrag"
-                    @mouseleave="endDrag">
-                        <div v-for="(element, elementIndex) in slide.elements"
-                            :key="elementIndex"
-                            class="editable"
-                            :class="element.type"
-                            :contenteditable="element.type !== 'image'"
-                            :style="{ position: 'absolute', top: element.style.top, left: element.style.left }"
-                            @click="selectElement(slideIndex, elementIndex)"
-                            @mousedown="startDrag($event, slideIndex, elementIndex)"
-                            @mousemove="onDrag"
-                            @input="updateContent(slideIndex, elementIndex, $event)">
-                            <img v-if="element.type === 'image'" :src="element.content" alt="Image" />
-                            <span v-else-if="element.type === 'code'" v-html="element.content"></span>
-                            <span v-else>{{ element.content }}</span>
-                        </div>
-                    </div>
-                </div> -->
-        <!-- <div class="controls mt-3">
-                    <button class="btn btn-secondary me-2" @click="prevSlide" :disabled="currentSlide === 0">上一頁</button>
-                    <button class="btn btn-secondary me-2" @click="nextSlide" :disabled="currentSlide === task.slides.length - 1">下一頁</button>
-                    <button class="btn btn-danger me-2" @click="removeElement">刪除元素</button>
-                    <button class="btn btn-primary me-2" @click="addTitle">新增標題</button>
-                    <button class="btn btn-primary me-2" @click="addContent">新增一般文字</button>
-                    <button class="btn btn-dark me-2" @click="addCode">新增code</button>
-                    <button class="btn btn-warning me-2" >
-                        <label for="image">新增圖片</label>
-                        <input type="file" id="image" class="form-control" @change="handleImageUpload" accept="image/*">
-                    </button>
-                    <button class="btn btn-success me-2" @click="addSlide">新增頁面</button>
-                    <button class="btn btn-danger " @click="removeSlide">刪除分頁</button>
-                </div> -->
+        <div v-if="this.task.slides.length != 0" class="text-danger">
+          目前已經有檔案
+        </div>
       </div>
       <h4 class="ms-1" style="margin-top: 50px">體驗範例</h4>
       <div class="d-flex my-3">
@@ -187,15 +164,109 @@
       </div>
       <div class="d-flex mt-2">
         <button
-          type="button"
-          class="btn btn-primary ms-auto m-2"
-          @click="sendPractice"
+          class="btn btn-success ms-auto m-2"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal2"
         >
+          發送單一同學考卷
+        </button>
+        <button type="button" class="btn btn-primary m-2" @click="sendPractice">
           <div v-if="loading" class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
+
           <div v-else class="fs-4">發送</div>
         </button>
+      </div>
+    </div>
+  </div>
+  <div
+    class="modal fade"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-black" id="exampleModalLabel">
+            全部任務(點擊載入)
+          </h5>
+        </div>
+        <div class="modal-body text-black">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th scope="col">任務名稱</th>
+                <th scope="col">班級</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(task, index) in allTask"
+                :key="index"
+                @click="checkTask(task)"
+                data-bs-dismiss="modal"
+              >
+                <td>{{ task.title }}</td>
+                <td>{{ task.type }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            關閉
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="exampleModal2"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel2"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body text-black">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th scope="col">姓名</th>
+                <th scope="col">學號</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(student, index) in AllStudent"
+                :key="index"
+                @click="pushOnlyOne(student._id)"
+              >
+                <td>{{ student.name }}</td>
+                <td>{{ student.studentID }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            關閉
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -203,10 +274,11 @@
 
 <script>
 import * as monaco from "monaco-editor";
-import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
-import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
-import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
+import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
+import CssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
+import HtmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
+import TsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 
 import * as pdfjsLib from "pdfjs-dist/webpack";
 
@@ -224,6 +296,7 @@ export default {
         cssCode: "",
         jsCode: "",
       },
+      AllStudent: [],
       isDragging: false,
       dragIndex: null,
       dragElementIndex: null,
@@ -232,6 +305,7 @@ export default {
       selectIndex: null,
       selectElementIndex: null,
       loading: false,
+      allTask: [],
     };
   },
   methods: {
@@ -285,6 +359,7 @@ export default {
             text: "發送失敗",
             icon: "error",
           });
+          console.log(err);
         });
     },
     add(i) {
@@ -329,116 +404,53 @@ export default {
 
       fileReader.readAsArrayBuffer(file);
     },
-
-    // nextSlide() {
-    // if (this.currentSlide < this.task.slides.length - 1) {
-    //     this.currentSlide++;
-    // }
-    // },
-    // prevSlide() {
-    //     if (this.currentSlide > 0) {
-    //         this.currentSlide--;
-    //     }
-    // },
-    // selectElement(slideIndex, elementIndex) {
-    //     this.dragIndex = slideIndex;
-    //     this.dragElementIndex = elementIndex;
-    //     this.selectIndex = slideIndex;
-    //     this.selectElementIndex = elementIndex;
-    // },
-    // startDrag(event, slideIndex, elementIndex) {
-    //     this.isDragging = true;
-    //     this.dragIndex = slideIndex;
-    //     this.dragElementIndex = elementIndex;
-    //     this.offsetX = event.clientX - event.target.offsetLeft;
-    //     this.offsetY = event.clientY - event.target.offsetTop;
-    // },
-    // onDrag(event) {
-    // if (this.isDragging && this.dragIndex !== null && this.dragElementIndex !== null) {
-    //     const newTop = event.clientY - this.offsetY + 'px';
-    //     const newLeft = event.clientX - this.offsetX + 'px';
-    //     this.task.slides[this.dragIndex].elements[this.dragElementIndex].style.top = newTop;
-    //     this.task.slides[this.dragIndex].elements[this.dragElementIndex].style.left = newLeft;
-    // }
-    // },
-    // endDrag() {
-    //     this.isDragging = false;
-    //     this.dragIndex = null;
-    //     this.dragElementIndex = null;
-    // },
-    // updateContent(slideIndex, elementIndex, event) {
-    //     this.task.slides[slideIndex].elements[this.dragElementIndex].content = event.target.innerText;
-    // },
-    // removeElement() {
-    //     this.task.slides[this.selectIndex].elements.splice(this.selectElementIndex, 1)
-    // },
-    // addTitle() {
-    //     const newElement = {
-    //         type: 'title',
-    //         content: 'New Title',
-    //         style: { top: '0px', left: '0px' },
-    //     };
-    //     this.task.slides[this.currentSlide].elements.push(newElement);
-    // },
-    // addContent() {
-    //     const newElement = {
-    //         type: 'content',
-    //         content: 'New Content',
-    //         style: { top: '0px', left: '0px' },
-    //     };
-    //     this.task.slides[this.currentSlide].elements.push(newElement);
-    // },
-    // addCode() {
-    //     const newElement = {
-    //         type: 'code',
-    //         content: 'New Code',
-    //         style: { top: '0px', left: '0px' },
-    //     };
-    //     this.task.slides[this.currentSlide].elements.push(newElement);
-    // },
-    // handleImageUpload(event) {
-    //     const file = event.target.files[0];
-    //     const reader = new FileReader();
-    //     reader.onload = (e) => {
-    //         const imageUrl = e.target.result;
-    //         const newElement = {
-    //             type: 'image',
-    //             content: imageUrl,
-    //             style: { top: '0px', left: '0px' },
-    //         };
-    //         this.task.slides[this.currentSlide].elements.push(newElement);
-    //     };
-    //     reader.readAsDataURL(file);
-    // },
-    // addSlide() {
-    //     const newSlide = {
-    //         elements: [
-    //             { type: 'title', content: 'New Slide', style: { top: '0px', left: '0px' } },
-    //             { type: 'content', content: 'New Content', style: { top: '50px', left: '0px' } },
-    //         ],
-    //     };
-    //     this.task.slides.push(newSlide);
-    // },
-    // removeSlide() {
-    //     this.task.slides.pop();
-    // },
+    checkTask(event) {
+      this.task.taskName = event.title;
+      this.task.guide = event.guide;
+      this.task.target = event.target;
+      this.task.question = event.question;
+      this.task.htmlCode = event.html;
+      this.htmlEditor.setValue(event.html);
+      this.task.cssCode = event.css;
+      this.cssEditor.setValue(event.css);
+      this.task.jsCode = event.js;
+      this.jsEditor.setValue(event.js);
+      this.task.slides = event.ppt;
+      this.updateOutput();
+    },
+    pushOnlyOne(student) {
+      const practice = {
+        title: this.task.taskName,
+        type: this.task.class,
+        html: this.task.htmlCode,
+        css: this.task.cssCode,
+        js: this.task.jsCode,
+        target: this.task.target,
+        guide: this.task.guide,
+        question: this.task.question,
+        ppt: this.task.slides,
+      };
+      this.$axios
+        .post(`/task/${student}`, practice)
+        .then((res) => {
+          this.loading = false;
+          this.$swal.fire({
+            title: "發送成功",
+            text: "已成功發送",
+            icon: "success",
+          });
+        })
+        .catch((err) => {
+          this.$swal.fire({
+            title: "發送失敗",
+            text: "發送失敗",
+            icon: "error",
+          });
+          console.log(err);
+        });
+    },
   },
   mounted() {
-    this.$refs.htmlEditorContainer.MonacoEnvironment = {
-      getWorkerUrl: (moduleId, label) => {
-        return new htmlWorker();
-      },
-    };
-    this.$refs.cssEditorContainer.MonacoEnvironment = {
-      getWorkerUrl: (moduleId, label) => {
-        return new cssWorker();
-      },
-    };
-    this.$refs.jsEditorContainer.MonacoEnvironment = {
-      getWorkerUrl: (moduleId, label) => {
-        return new tsWorker();
-      },
-    };
     // 初始化 HTML 编辑器
     this.htmlEditor = monaco.editor.create(this.$refs.htmlEditorContainer, {
       value: `<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8">\n\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\t<title>Document</title>\n</head>\n<body>\n\t\n</body>\n</html>\n`,
@@ -492,11 +504,30 @@ export default {
       this.task.jsCode = this.jsEditor.getValue();
       this.updateOutput();
     });
-
-    // this.task.slides.forEach((slide, index) => {
-    //     slide.title = localStorage.getItem(`slide-${index}-title`) || slide.title;
-    //     slide.content = localStorage.getItem(`slide-${index}-content`) || slide.content;
-    // });
+    var storedToken = localStorage.getItem("token");
+    this.$axios
+      .get("/task/allTask")
+      .then((res) => {
+        res.data.task.forEach((task) => {
+          this.allTask.push(task);
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    this.$axios
+      .get("/auth/students", {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        this.AllStudent = res.data.data.students;
+      })
+      .catch((err) => {
+        console.error("Error fetching students:", err);
+      });
   },
   beforeDestroy() {
     if (this.htmlEditor) {
