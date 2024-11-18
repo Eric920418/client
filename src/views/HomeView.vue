@@ -307,6 +307,7 @@
             學習目標
           </div>
           <div
+            v-if="studentClassNum == 'C'"
             class="w-100 text-center sidebar"
             ref="three"
             @click="changeFocus(3)"
@@ -315,6 +316,7 @@
             制定計劃
           </div>
           <div
+            v-if="studentClassNum == 'B' || studentClassNum == 'C'"
             class="w-100 text-center sidebar"
             ref="four"
             @click="changeFocus(4)"
@@ -398,7 +400,10 @@
                       {{ task.title }}
                     </h5>
                   </div>
-                  <div style="font-size: 10px">
+                  <div v-if="task.state + 1 == 6" style="font-size: 10px">
+                    等待老師批改
+                  </div>
+                  <div v-else style="font-size: 10px">
                     目前第：{{ task.state + 1 }}步驟
                   </div>
                   <div
@@ -1008,7 +1013,7 @@
           <button
             class="btn btn-danger bottom-0 start-0 m-1"
             style="position: absolute"
-            @click="closeExample"
+            @click="backTask"
           >
             返回
           </button>
@@ -2176,11 +2181,23 @@ export default {
       }
     },
     accept() {
-      this.$refs.one.classList.remove("indexFocus");
-      this.$refs.two.classList.remove("indexFocus");
-      this.$refs.three.classList.remove("indexFocus");
-      this.$refs.four.classList.remove("indexFocus");
-      this.$refs.five.classList.remove("indexFocus");
+      if (this.studentClassNum == "A") {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+      } else if (this.studentClassNum == "B") {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.four.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+      } else {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.three.classList.remove("indexFocus");
+        this.$refs.four.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+      }
+
       this.stopTimer();
       this.startTimer();
       this.NowState = 2;
@@ -2274,103 +2291,293 @@ export default {
       }
     },
     formulate() {
-      this.$refs.one.classList.remove("indexFocus");
-      this.$refs.two.classList.remove("indexFocus");
-      this.$refs.three.classList.remove("indexFocus");
-      this.$refs.four.classList.remove("indexFocus");
-      this.$refs.five.classList.remove("indexFocus");
       this.stopTimer();
       setTimeout(() => {
         this.startTimer();
-        this.NowState = 3;
+        this.NowState = 5;
       }, 0);
-      if (this.tasks[this.focusTaskIndex].state == 1) {
-        let task = {
-          state: 2,
-          taskId: this.tasks[this.focusTaskIndex].taskId,
-        };
-        var storedToken = localStorage.getItem("token");
-        const { id } = jwtDecode(storedToken);
-        this.$axios
-          .patch(`/task/state/${id}`, task, {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-              "Content-Type": "application/json",
-            },
-          })
-          .then((response) => {
-            this.$swal
-              .fire({
-                title: "完成第二步",
-                text: "進入第三步,接下來會出現幾個小任務,請制定完成順序並寫下如何完成的策略",
-                icon: "success",
-              })
-              .then(() => {
-                this.action.push({
-                  action: "完成第二步",
-                  timestamp: new Date()
-                    .toLocaleString("zh-TW", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })
-                    .replace(/\//g, "-")
-                    .replace(",", ""),
-                });
-                this.tasks[this.focusTaskIndex].state = 2;
-                this.$refs.practice.style.cssText =
-                  "left: -50%; top: 50%; opacity: 0;";
-                setTimeout(() => {
-                  this.$refs.practice.style.cssText =
-                    "left: 150%; top: 50%; opacity: 0; ";
-                  this.$refs.taskInformation.classList.add("d-none");
-                  this.$refs.formulate.classList.remove("d-none");
-                }, 400);
-                setTimeout(() => {
-                  this.$refs.practice.style.cssText =
-                    "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-                }, 800);
-                this.$refs.two.style.cssText =
-                  "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
-                this.$refs.three.style.cssText =
-                  "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-                setTimeout(() => {
-                  document.querySelectorAll(".ts").forEach((tr, index) => {
-                    setTimeout(() => {
-                      tr.style.cssText =
-                        "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-                    }, 500 * index);
+      if (this.studentClassNum == "A") {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+        if (this.tasks[this.focusTaskIndex].state == 1) {
+          let task = {
+            state: 5,
+            taskId: this.tasks[this.focusTaskIndex].taskId,
+          };
+          var storedToken = localStorage.getItem("token");
+          const { id } = jwtDecode(storedToken);
+          this.$axios
+            .patch(`/task/state/${id}`, task, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+            })
+            .then((response) => {
+              this.$swal
+                .fire({
+                  title: "完成第二步",
+                  text: "進入第三步,",
+                  icon: "success",
+                })
+                .then(() => {
+                  this.action.push({
+                    action: "完成第二步",
+                    timestamp: new Date()
+                      .toLocaleString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })
+                      .replace(/\//g, "-")
+                      .replace(",", ""),
                   });
-                }, 1500);
-              });
-          });
+                  this.tasks[this.focusTaskIndex].state = 5;
+                  this.$refs.practice.style.cssText =
+                    "left: -50%; top: 50%; opacity: 0;";
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: 150%; top: 50%; opacity: 0; ";
+                    this.$refs.taskInformation.classList.add("d-none");
+                    this.$refs.finish.classList.remove("d-none");
+                  }, 400);
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                  }, 800);
+                  this.$refs.two.style.cssText =
+                    "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
+                  this.$refs.five.style.cssText =
+                    "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
+                  setTimeout(() => {
+                    document.querySelectorAll(".ts").forEach((tr, index) => {
+                      setTimeout(() => {
+                        tr.style.cssText =
+                          "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
+                      }, 500 * index);
+                    });
+                  }, 1500);
+                });
+            });
+        } else {
+          this.$refs.practice.style.cssText =
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.taskInformation.classList.add("d-none");
+            this.$refs.finish.classList.remove("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+          this.$refs.two.style.cssText =
+            "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
+          this.$refs.five.style.cssText =
+            "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
+          setTimeout(() => {
+            document.querySelectorAll(".ts").forEach((tr, index) => {
+              setTimeout(() => {
+                tr.style.cssText =
+                  "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
+              }, 500 * index);
+            });
+          }, 1500);
+        }
+      } else if (this.studentClassNum == "B") {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.four.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+        if (this.tasks[this.focusTaskIndex].state == 1) {
+          let task = {
+            state: 4,
+            taskId: this.tasks[this.focusTaskIndex].taskId,
+          };
+          var storedToken = localStorage.getItem("token");
+          const { id } = jwtDecode(storedToken);
+          this.$axios
+            .patch(`/task/state/${id}`, task, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+            })
+            .then((response) => {
+              this.$swal
+                .fire({
+                  title: "完成第二步",
+                  text: "進入第三步,",
+                  icon: "success",
+                })
+                .then(() => {
+                  this.action.push({
+                    action: "完成第二步",
+                    timestamp: new Date()
+                      .toLocaleString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })
+                      .replace(/\//g, "-")
+                      .replace(",", ""),
+                  });
+                  this.tasks[this.focusTaskIndex].state = 5;
+                  this.$refs.practice.style.cssText =
+                    "left: -50%; top: 50%; opacity: 0;";
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: 150%; top: 50%; opacity: 0; ";
+                    this.$refs.taskInformation.classList.add("d-none");
+                    this.$refs.todo.classList.remove("d-none");
+                  }, 400);
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                  }, 800);
+                  this.$refs.two.style.cssText =
+                    "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
+                  this.$refs.four.style.cssText =
+                    "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
+                  setTimeout(() => {
+                    document.querySelectorAll(".ts").forEach((tr, index) => {
+                      setTimeout(() => {
+                        tr.style.cssText =
+                          "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
+                      }, 500 * index);
+                    });
+                  }, 1500);
+                });
+            });
+        } else {
+          this.$refs.practice.style.cssText =
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.taskInformation.classList.add("d-none");
+            this.$refs.todo.classList.remove("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+          this.$refs.two.style.cssText =
+            "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
+          this.$refs.four.style.cssText =
+            "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
+          setTimeout(() => {
+            document.querySelectorAll(".ts").forEach((tr, index) => {
+              setTimeout(() => {
+                tr.style.cssText =
+                  "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
+              }, 500 * index);
+            });
+          }, 1500);
+        }
       } else {
-        this.$refs.practice.style.cssText = "left: -50%; top: 50%; opacity: 0;";
-        setTimeout(() => {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.three.classList.remove("indexFocus");
+        this.$refs.four.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+        if (this.tasks[this.focusTaskIndex].state == 1) {
+          let task = {
+            state: 2,
+            taskId: this.tasks[this.focusTaskIndex].taskId,
+          };
+          var storedToken = localStorage.getItem("token");
+          const { id } = jwtDecode(storedToken);
+          this.$axios
+            .patch(`/task/state/${id}`, task, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+            })
+            .then((response) => {
+              this.$swal
+                .fire({
+                  title: "完成第二步",
+                  text: "進入第三步,接下來會出現幾個小任務,請制定完成順序並寫下如何完成的策略",
+                  icon: "success",
+                })
+                .then(() => {
+                  this.action.push({
+                    action: "完成第二步",
+                    timestamp: new Date()
+                      .toLocaleString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })
+                      .replace(/\//g, "-")
+                      .replace(",", ""),
+                  });
+                  this.tasks[this.focusTaskIndex].state = 2;
+                  this.$refs.practice.style.cssText =
+                    "left: -50%; top: 50%; opacity: 0;";
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: 150%; top: 50%; opacity: 0; ";
+                    this.$refs.taskInformation.classList.add("d-none");
+                    this.$refs.formulate.classList.remove("d-none");
+                  }, 400);
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                  }, 800);
+                  this.$refs.two.style.cssText =
+                    "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
+                  this.$refs.three.style.cssText =
+                    "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
+                  setTimeout(() => {
+                    document.querySelectorAll(".ts").forEach((tr, index) => {
+                      setTimeout(() => {
+                        tr.style.cssText =
+                          "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
+                      }, 500 * index);
+                    });
+                  }, 1500);
+                });
+            });
+        } else {
           this.$refs.practice.style.cssText =
-            "left: 150%; top: 50%; opacity: 0; ";
-          this.$refs.taskInformation.classList.add("d-none");
-          this.$refs.formulate.classList.remove("d-none");
-        }, 400);
-        setTimeout(() => {
-          this.$refs.practice.style.cssText =
-            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-        }, 800);
-        this.$refs.two.style.cssText =
-          "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
-        this.$refs.three.style.cssText =
-          "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-        setTimeout(() => {
-          document.querySelectorAll(".ts").forEach((tr, index) => {
-            setTimeout(() => {
-              tr.style.cssText =
-                "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-            }, 500 * index);
-          });
-        }, 1500);
+            "left: -50%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 150%; top: 50%; opacity: 0; ";
+            this.$refs.taskInformation.classList.add("d-none");
+            this.$refs.formulate.classList.remove("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          }, 800);
+          this.$refs.two.style.cssText =
+            "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
+          this.$refs.three.style.cssText =
+            "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
+          setTimeout(() => {
+            document.querySelectorAll(".ts").forEach((tr, index) => {
+              setTimeout(() => {
+                tr.style.cssText =
+                  "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
+              }, 500 * index);
+            });
+          }, 1500);
+        }
       }
     },
     beginTodo() {
@@ -2493,172 +2700,32 @@ export default {
       }
     },
     finishTask() {
-      this.$refs.one.classList.remove("indexFocus");
-      this.$refs.two.classList.remove("indexFocus");
-      this.$refs.three.classList.remove("indexFocus");
-      this.$refs.four.classList.remove("indexFocus");
-      this.$refs.five.classList.remove("indexFocus");
+      if (this.studentClassNum == "B") {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.four.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+      } else {
+        this.$refs.one.classList.remove("indexFocus");
+        this.$refs.two.classList.remove("indexFocus");
+        this.$refs.three.classList.remove("indexFocus");
+        this.$refs.four.classList.remove("indexFocus");
+        this.$refs.five.classList.remove("indexFocus");
+      }
+
       this.tasks[this.focusTaskIndex].order.forEach((item) => {
         item.state = 1;
       });
-      if (
-        this.tasks[this.focusTaskIndex].state == 3 &&
-        this.tasks[this.focusTaskIndex].target.length != 0
-      ) {
-        let task = {
-          html: this.htmlCode,
-          css: this.cssCode,
-          js: this.jsCode,
-          order: this.tasks[this.focusTaskIndex].order,
-          taskId: this.tasks[this.focusTaskIndex].taskId,
-        };
-        var storedToken = localStorage.getItem("token");
-        const { id } = jwtDecode(storedToken);
-        this.$axios
-          .patch(`/task/state/${id}`, task, {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-              "Content-Type": "application/json",
-            },
-          })
-          .then((response) => {
-            this.$swal
-              .fire({
-                title: "完成",
-                text: "繼續完成子任務",
-                icon: "success",
-              })
-              .then(() => {
-                this.stopTimer(); // 停止當前計時器
-                setTimeout(() => {
-                  this.startTimer(); // 啟動新的計時器
-                  this.NowState = 5;
-                }, 0);
-                this.action.push({
-                  action: "完成子任務",
-                  timestamp: new Date()
-                    .toLocaleString("zh-TW", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })
-                    .replace(/\//g, "-")
-                    .replace(",", ""),
-                });
-                this.$refs.practice.style.cssText =
-                  "left: 150%; top: 50%; opacity: 0;";
-                setTimeout(() => {
-                  this.$refs.practice.style.cssText =
-                    "left: -50%; top: 50%; opacity: 0; ";
-                  this.$refs.formulate.classList.remove("d-none");
-                  this.$refs.todo.classList.add("d-none");
-                }, 400);
-                this.$refs.four.style.cssText =
-                  "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
-                this.$refs.three.style.cssText =
-                  "font-size: 15px;  background-color:#6C6C6C; color: black;   transition: all 0.5s ease-in-out;";
-                setTimeout(() => {
-                  this.$refs.practice.style.cssText =
-                    "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-                }, 800);
-              });
-          });
-      } else {
-        if (this.tasks[this.focusTaskIndex].state == 4) {
-          this.stopTimer(); // 停止當前計時器
-          setTimeout(() => {
-            this.startTimer(); // 啟動新的計時器
-            this.NowState = 5;
-          }, 0);
-          this.$refs.practice.style.cssText =
-            "left: -50%; top: 50%; opacity: 0;";
-          setTimeout(() => {
-            this.$refs.practice.style.cssText =
-              "left: 150%; top: 50%; opacity: 0; ";
-            this.$refs.todo.classList.add("d-none");
-            this.$refs.finish.classList.remove("d-none");
-          }, 400);
-          this.$refs.four.style.cssText =
-            "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
-          this.$refs.five.style.cssText =
-            "font-size: 15px;  background-color: #6C6C6C; color: black; transition: all 0.5s ease-in-out;";
-          setTimeout(() => {
-            this.$refs.practice.style.cssText =
-              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-          }, 800);
-        } else {
-          if (
-            this.tasks[this.focusTaskIndex].answer.length ==
-            this.tasks[this.focusTaskIndex].question.length
-          ) {
-            let task = {
-              state: 4,
-              answer: this.tasks[this.focusTaskIndex].answer,
-              taskId: this.tasks[this.focusTaskIndex].taskId,
-            };
-            var storedToken = localStorage.getItem("token");
-            const { id } = jwtDecode(storedToken);
-            this.$axios
-              .patch(`/task/state/${id}`, task, {
-                headers: {
-                  Authorization: `Bearer ${storedToken}`,
-                  "Content-Type": "application/json",
-                },
-              })
-              .then((response) => {
-                this.$swal
-                  .fire({
-                    title: "完成第四步",
-                    text: "進入第五步,接下來寫下五個問題,不能空白",
-                    icon: "success",
-                  })
-                  .then(() => {
-                    this.stopTimer(); // 停止當前計時器
-                    setTimeout(() => {
-                      this.startTimer(); // 啟動新的計時器
-                      this.NowState = 5;
-                    }, 0);
-                    this.tasks[this.focusTaskIndex].state = 4;
-                    this.$refs.practice.style.cssText =
-                      "left: -50%; top: 50%; opacity: 0;";
-                    setTimeout(() => {
-                      this.$refs.practice.style.cssText =
-                        "left: 150%; top: 50%; opacity: 0; ";
-                      this.$refs.todo.classList.add("d-none");
-                      this.$refs.finish.classList.remove("d-none");
-                    }, 400);
-                    this.$refs.four.style.cssText =
-                      "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
-                    this.$refs.five.style.cssText =
-                      "font-size: 15px; border: 2px solid white; background-color: #6C6C6C; color: black; transition: all 0.5s ease-in-out;";
-                    setTimeout(() => {
-                      this.$refs.practice.style.cssText =
-                        "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-                    }, 800);
-                  });
-              });
-          } else {
-            this.$swal.fire({
-              title: "有東西未填寫",
-              text: "每個問題都要回答",
-              icon: "error",
-            });
-          }
-        }
-      }
-    },
-    sendFinish() {
-      if (this.tasks[this.focusTaskIndex].state == 4) {
+      if (this.studentClassNum == "B") {
         if (
-          this.tasks[this.focusTaskIndex].thought.every((item) => item !== "")
+          this.tasks[this.focusTaskIndex].state == 3 &&
+          this.tasks[this.focusTaskIndex].target.length != 0
         ) {
-          this.stopTimer();
           let task = {
-            state: 5,
-            thoughts: this.tasks[this.focusTaskIndex].thought,
+            html: this.htmlCode,
+            css: this.cssCode,
+            js: this.jsCode,
+            order: this.tasks[this.focusTaskIndex].order,
             taskId: this.tasks[this.focusTaskIndex].taskId,
           };
           var storedToken = localStorage.getItem("token");
@@ -2673,68 +2740,458 @@ export default {
             .then((response) => {
               this.$swal
                 .fire({
-                  title: "恭喜任務完成",
-                  text: "返回任務欄等待老師評分",
+                  title: "完成",
+                  text: "繼續完成子任務",
                   icon: "success",
                 })
                 .then(() => {
-                  this.tasks[this.focusTaskIndex].state = 5;
+                  this.stopTimer(); // 停止當前計時器
+                  setTimeout(() => {
+                    this.startTimer(); // 啟動新的計時器
+                    this.NowState = 5;
+                  }, 0);
+                  this.action.push({
+                    action: "完成子任務",
+                    timestamp: new Date()
+                      .toLocaleString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })
+                      .replace(/\//g, "-")
+                      .replace(",", ""),
+                  });
                   this.$refs.practice.style.cssText =
                     "left: 150%; top: 50%; opacity: 0;";
                   setTimeout(() => {
                     this.$refs.practice.style.cssText =
                       "left: -50%; top: 50%; opacity: 0; ";
-                    this.$refs.practiceCard.classList.remove("d-none");
-                    this.$refs.finish.classList.add("d-none");
-                    this.$refs.nav.classList.add("d-none");
+                    this.$refs.formulate.classList.remove("d-none");
+                    this.$refs.todo.classList.add("d-none");
                   }, 400);
+                  this.$refs.four.style.cssText =
+                    "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
+                  this.$refs.three.style.cssText =
+                    "font-size: 15px;  background-color:#6C6C6C; color: black;   transition: all 0.5s ease-in-out;";
                   setTimeout(() => {
                     this.$refs.practice.style.cssText =
                       "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-                    this.$refs.two.style.cssText =
-                      "font-size: 15px; z-index:30; transition: all 0.5s ease-in-out;";
-                    this.$refs.five.style.cssText =
-                      "font-size: 15px; z-index:30; transition: all 0.5s ease-in-out;";
-                    this.focusTaskIndex = null;
                   }, 800);
                 });
             });
         } else {
-          this.$swal.fire({
-            title: "有東西未填寫",
-            text: "每個問題都要回答",
-            icon: "error",
-          });
+          if (this.tasks[this.focusTaskIndex].state == 4) {
+            this.stopTimer(); // 停止當前計時器
+            setTimeout(() => {
+              this.startTimer(); // 啟動新的計時器
+              this.NowState = 5;
+            }, 0);
+            this.$refs.practice.style.cssText =
+              "left: -50%; top: 50%; opacity: 0;";
+            setTimeout(() => {
+              this.$refs.practice.style.cssText =
+                "left: 150%; top: 50%; opacity: 0; ";
+              this.$refs.todo.classList.add("d-none");
+              this.$refs.finish.classList.remove("d-none");
+            }, 400);
+            this.$refs.four.style.cssText =
+              "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
+            this.$refs.five.style.cssText =
+              "font-size: 15px;  background-color: #6C6C6C; color: black; transition: all 0.5s ease-in-out;";
+            setTimeout(() => {
+              this.$refs.practice.style.cssText =
+                "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+            }, 800);
+          } else {
+            if (
+              this.tasks[this.focusTaskIndex].answer.length ==
+              this.tasks[this.focusTaskIndex].question.length
+            ) {
+              let task = {
+                state: 4,
+                answer: this.tasks[this.focusTaskIndex].answer,
+                taskId: this.tasks[this.focusTaskIndex].taskId,
+              };
+              var storedToken = localStorage.getItem("token");
+              const { id } = jwtDecode(storedToken);
+              this.$axios
+                .patch(`/task/state/${id}`, task, {
+                  headers: {
+                    Authorization: `Bearer ${storedToken}`,
+                    "Content-Type": "application/json",
+                  },
+                })
+                .then((response) => {
+                  this.$swal
+                    .fire({
+                      title: "完成第三步",
+                      text: "進入第四步,接下來寫下五個問題,不能空白",
+                      icon: "success",
+                    })
+                    .then(() => {
+                      this.stopTimer(); // 停止當前計時器
+                      setTimeout(() => {
+                        this.startTimer(); // 啟動新的計時器
+                        this.NowState = 5;
+                      }, 0);
+                      this.tasks[this.focusTaskIndex].state = 4;
+                      this.$refs.practice.style.cssText =
+                        "left: -50%; top: 50%; opacity: 0;";
+                      setTimeout(() => {
+                        this.$refs.practice.style.cssText =
+                          "left: 150%; top: 50%; opacity: 0; ";
+                        this.$refs.todo.classList.add("d-none");
+                        this.$refs.finish.classList.remove("d-none");
+                      }, 400);
+                      this.$refs.four.style.cssText =
+                        "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
+                      this.$refs.five.style.cssText =
+                        "font-size: 15px; border: 2px solid white; background-color: #6C6C6C; color: black; transition: all 0.5s ease-in-out;";
+                      setTimeout(() => {
+                        this.$refs.practice.style.cssText =
+                          "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                      }, 800);
+                    });
+                });
+            } else {
+              this.$swal.fire({
+                title: "有東西未填寫",
+                text: "每個問題都要回答",
+                icon: "error",
+              });
+            }
+          }
         }
       } else {
-        this.$refs.practice.style.cssText = "left: 150%; top: 50%; opacity: 0;";
-        setTimeout(() => {
+        if (
+          this.tasks[this.focusTaskIndex].state == 3 &&
+          this.tasks[this.focusTaskIndex].target.length != 0
+        ) {
+          let task = {
+            html: this.htmlCode,
+            css: this.cssCode,
+            js: this.jsCode,
+            order: this.tasks[this.focusTaskIndex].order,
+            taskId: this.tasks[this.focusTaskIndex].taskId,
+          };
+          var storedToken = localStorage.getItem("token");
+          const { id } = jwtDecode(storedToken);
+          this.$axios
+            .patch(`/task/state/${id}`, task, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+            })
+            .then((response) => {
+              this.$swal
+                .fire({
+                  title: "完成",
+                  text: "繼續完成子任務",
+                  icon: "success",
+                })
+                .then(() => {
+                  this.stopTimer(); // 停止當前計時器
+                  setTimeout(() => {
+                    this.startTimer(); // 啟動新的計時器
+                    this.NowState = 5;
+                  }, 0);
+                  this.action.push({
+                    action: "完成子任務",
+                    timestamp: new Date()
+                      .toLocaleString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })
+                      .replace(/\//g, "-")
+                      .replace(",", ""),
+                  });
+                  this.$refs.practice.style.cssText =
+                    "left: 150%; top: 50%; opacity: 0;";
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: -50%; top: 50%; opacity: 0; ";
+                    this.$refs.formulate.classList.remove("d-none");
+                    this.$refs.todo.classList.add("d-none");
+                  }, 400);
+                  this.$refs.four.style.cssText =
+                    "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
+                  this.$refs.three.style.cssText =
+                    "font-size: 15px;  background-color:#6C6C6C; color: black;   transition: all 0.5s ease-in-out;";
+                  setTimeout(() => {
+                    this.$refs.practice.style.cssText =
+                      "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                  }, 800);
+                });
+            });
+        } else {
+          if (this.tasks[this.focusTaskIndex].state == 4) {
+            this.stopTimer(); // 停止當前計時器
+            setTimeout(() => {
+              this.startTimer(); // 啟動新的計時器
+              this.NowState = 5;
+            }, 0);
+            this.$refs.practice.style.cssText =
+              "left: -50%; top: 50%; opacity: 0;";
+            setTimeout(() => {
+              this.$refs.practice.style.cssText =
+                "left: 150%; top: 50%; opacity: 0; ";
+              this.$refs.todo.classList.add("d-none");
+              this.$refs.finish.classList.remove("d-none");
+            }, 400);
+            this.$refs.four.style.cssText =
+              "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
+            this.$refs.five.style.cssText =
+              "font-size: 15px;  background-color: #6C6C6C; color: black; transition: all 0.5s ease-in-out;";
+            setTimeout(() => {
+              this.$refs.practice.style.cssText =
+                "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+            }, 800);
+          } else {
+            if (
+              this.tasks[this.focusTaskIndex].answer.length ==
+              this.tasks[this.focusTaskIndex].question.length
+            ) {
+              let task = {
+                state: 4,
+                answer: this.tasks[this.focusTaskIndex].answer,
+                taskId: this.tasks[this.focusTaskIndex].taskId,
+              };
+              var storedToken = localStorage.getItem("token");
+              const { id } = jwtDecode(storedToken);
+              this.$axios
+                .patch(`/task/state/${id}`, task, {
+                  headers: {
+                    Authorization: `Bearer ${storedToken}`,
+                    "Content-Type": "application/json",
+                  },
+                })
+                .then((response) => {
+                  this.$swal
+                    .fire({
+                      title: "完成第四步",
+                      text: "進入第五步,接下來寫下五個問題,不能空白",
+                      icon: "success",
+                    })
+                    .then(() => {
+                      this.stopTimer(); // 停止當前計時器
+                      setTimeout(() => {
+                        this.startTimer(); // 啟動新的計時器
+                        this.NowState = 5;
+                      }, 0);
+                      this.tasks[this.focusTaskIndex].state = 4;
+                      this.$refs.practice.style.cssText =
+                        "left: -50%; top: 50%; opacity: 0;";
+                      setTimeout(() => {
+                        this.$refs.practice.style.cssText =
+                          "left: 150%; top: 50%; opacity: 0; ";
+                        this.$refs.todo.classList.add("d-none");
+                        this.$refs.finish.classList.remove("d-none");
+                      }, 400);
+                      this.$refs.four.style.cssText =
+                        "font-size: 15px; z-index:30;background-color: #9D9D9D; transition: all 0.5s ease-in-out;";
+                      this.$refs.five.style.cssText =
+                        "font-size: 15px; border: 2px solid white; background-color: #6C6C6C; color: black; transition: all 0.5s ease-in-out;";
+                      setTimeout(() => {
+                        this.$refs.practice.style.cssText =
+                          "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                      }, 800);
+                    });
+                });
+            } else {
+              this.$swal.fire({
+                title: "有東西未填寫",
+                text: "每個問題都要回答",
+                icon: "error",
+              });
+            }
+          }
+        }
+      }
+    },
+    sendFinish() {
+      if (this.studentClassNum == "A") {
+        if (this.tasks[this.focusTaskIndex].state == 2) {
+          if (
+            this.tasks[this.focusTaskIndex].thought.every((item) => item !== "")
+          ) {
+            this.stopTimer();
+            let task = {
+              state: 5,
+              thoughts: this.tasks[this.focusTaskIndex].thought,
+              taskId: this.tasks[this.focusTaskIndex].taskId,
+            };
+            var storedToken = localStorage.getItem("token");
+            const { id } = jwtDecode(storedToken);
+            this.$axios
+              .patch(`/task/state/${id}`, task, {
+                headers: {
+                  Authorization: `Bearer ${storedToken}`,
+                  "Content-Type": "application/json",
+                },
+              })
+              .then((response) => {
+                this.$swal
+                  .fire({
+                    title: "恭喜任務完成",
+                    text: "返回任務欄等待老師評分",
+                    icon: "success",
+                  })
+                  .then(() => {
+                    this.tasks[this.focusTaskIndex].state = 5;
+                    this.$refs.practice.style.cssText =
+                      "left: 150%; top: 50%; opacity: 0;";
+                    setTimeout(() => {
+                      this.$refs.practice.style.cssText =
+                        "left: -50%; top: 50%; opacity: 0; ";
+                      this.$refs.practiceCard.classList.remove("d-none");
+                      this.$refs.finish.classList.add("d-none");
+                      this.$refs.nav.classList.add("d-none");
+                    }, 400);
+                    setTimeout(() => {
+                      this.$refs.practice.style.cssText =
+                        "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                      this.$refs.two.style.cssText =
+                        "font-size: 15px; z-index:30; transition: all 0.5s ease-in-out;";
+                      this.$refs.five.style.cssText =
+                        "font-size: 15px; z-index:30; transition: all 0.5s ease-in-out;";
+                      this.focusTaskIndex = null;
+                    }, 800);
+                  });
+              });
+          } else {
+            this.$swal.fire({
+              title: "有東西未填寫",
+              text: "每個問題都要回答",
+              icon: "error",
+            });
+          }
+        } else {
           this.$refs.practice.style.cssText =
-            "left: -50%; top: 50%; opacity: 0; ";
-          this.$refs.practiceCard.classList.remove("d-none");
-          this.$refs.finish.classList.add("d-none");
-          this.$refs.nav.classList.add("d-none");
-        }, 400);
-        setTimeout(() => {
+            "left: 150%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: -50%; top: 50%; opacity: 0; ";
+            this.$refs.practiceCard.classList.remove("d-none");
+            this.$refs.finish.classList.add("d-none");
+            this.$refs.nav.classList.add("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+            this.$refs.two.style.cssText =
+              "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+            this.$refs.five.style.cssText =
+              "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+            this.focusTaskIndex = null;
+          }, 800);
+        }
+      } else {
+        if (this.tasks[this.focusTaskIndex].state == 4) {
+          if (
+            this.tasks[this.focusTaskIndex].thought.every((item) => item !== "")
+          ) {
+            this.stopTimer();
+            let task = {
+              state: 5,
+              thoughts: this.tasks[this.focusTaskIndex].thought,
+              taskId: this.tasks[this.focusTaskIndex].taskId,
+            };
+            var storedToken = localStorage.getItem("token");
+            const { id } = jwtDecode(storedToken);
+            this.$axios
+              .patch(`/task/state/${id}`, task, {
+                headers: {
+                  Authorization: `Bearer ${storedToken}`,
+                  "Content-Type": "application/json",
+                },
+              })
+              .then((response) => {
+                this.$swal
+                  .fire({
+                    title: "恭喜任務完成",
+                    text: "返回任務欄等待老師評分",
+                    icon: "success",
+                  })
+                  .then(() => {
+                    this.tasks[this.focusTaskIndex].state = 5;
+                    this.$refs.practice.style.cssText =
+                      "left: 150%; top: 50%; opacity: 0;";
+                    setTimeout(() => {
+                      this.$refs.practice.style.cssText =
+                        "left: -50%; top: 50%; opacity: 0; ";
+                      this.$refs.practiceCard.classList.remove("d-none");
+                      this.$refs.finish.classList.add("d-none");
+                      this.$refs.nav.classList.add("d-none");
+                    }, 400);
+                    setTimeout(() => {
+                      this.$refs.practice.style.cssText =
+                        "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+                      this.$refs.two.style.cssText =
+                        "font-size: 15px; z-index:30; transition: all 0.5s ease-in-out;";
+                      this.$refs.five.style.cssText =
+                        "font-size: 15px; z-index:30; transition: all 0.5s ease-in-out;";
+                      this.focusTaskIndex = null;
+                    }, 800);
+                  });
+              });
+          } else {
+            this.$swal.fire({
+              title: "有東西未填寫",
+              text: "每個問題都要回答",
+              icon: "error",
+            });
+          }
+        } else {
           this.$refs.practice.style.cssText =
-            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-          this.$refs.two.style.cssText =
-            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
-          this.$refs.five.style.cssText =
-            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
-          this.focusTaskIndex = null;
-        }, 800);
+            "left: 150%; top: 50%; opacity: 0;";
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: -50%; top: 50%; opacity: 0; ";
+            this.$refs.practiceCard.classList.remove("d-none");
+            this.$refs.finish.classList.add("d-none");
+            this.$refs.nav.classList.add("d-none");
+          }, 400);
+          setTimeout(() => {
+            this.$refs.practice.style.cssText =
+              "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+            this.$refs.two.style.cssText =
+              "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+            this.$refs.five.style.cssText =
+              "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+            this.focusTaskIndex = null;
+          }, 800);
+        }
       }
     },
     changeFocus(index) {
-      if (this.tasks[this.focusTaskIndex].state > index - 1) {
+      if (this.tasks[this.focusTaskIndex].state >= index - 1) {
         this.orderIndex = null;
         this.NowState = index;
-        this.$refs.one.classList.remove("indexFocus");
-        this.$refs.two.classList.remove("indexFocus");
-        this.$refs.three.classList.remove("indexFocus");
-        this.$refs.four.classList.remove("indexFocus");
-        this.$refs.five.classList.remove("indexFocus");
+        if (this.studentClassNum == "A") {
+          this.$refs.one.classList.remove("indexFocus");
+          this.$refs.two.classList.remove("indexFocus");
+          this.$refs.five.classList.remove("indexFocus");
+        } else if (this.studentClassNum == "B") {
+          this.$refs.one.classList.remove("indexFocus");
+          this.$refs.two.classList.remove("indexFocus");
+          this.$refs.four.classList.remove("indexFocus");
+          this.$refs.five.classList.remove("indexFocus");
+        } else {
+          this.$refs.one.classList.remove("indexFocus");
+          this.$refs.two.classList.remove("indexFocus");
+          this.$refs.three.classList.remove("indexFocus");
+          this.$refs.four.classList.remove("indexFocus");
+          this.$refs.five.classList.remove("indexFocus");
+        }
+
         if (index == 1) {
           this.$refs.practice.style.cssText =
             "left: -50%; top: 50%; opacity: 0;";
@@ -2836,22 +3293,64 @@ export default {
         this.$refs.taskInformation.classList.add("d-none");
         this.$refs.practiceIframeCard.classList.add("d-none");
         this.$refs.formulate.classList.add("d-none");
+        this.$refs.finish.classList.add("d-none");
+        this.$refs.teacherCard.classList.add("d-none");
         this.$refs.todo.classList.add("d-none");
         this.$refs.nav.classList.add("d-none");
       }, 400);
       setTimeout(() => {
-        this.$refs.practice.style.cssText =
-          "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
-        this.$refs.one.style.cssText =
-          "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
-        this.$refs.two.style.cssText =
-          "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
-        this.$refs.five.style.cssText =
-          "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
-        this.$refs.three.style.cssText =
-          "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
-        this.$refs.four.style.cssText =
-          "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+        if (this.studentClassNum == "A") {
+          this.$refs.practice.style.cssText =
+            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          this.$refs.one.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+          this.$refs.two.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+
+          this.$refs.five.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+
+          this.$refs.one.classList.remove("indexFocus");
+          this.$refs.two.classList.remove("indexFocus");
+          this.$refs.five.classList.remove("indexFocus");
+        } else if (this.studentClassNum == "B") {
+          this.$refs.practice.style.cssText =
+            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          this.$refs.one.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+          this.$refs.two.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+          this.$refs.four.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+
+          this.$refs.five.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+
+          this.$refs.one.classList.remove("indexFocus");
+          this.$refs.two.classList.remove("indexFocus");
+          this.$refs.four.classList.remove("indexFocus");
+          this.$refs.five.classList.remove("indexFocus");
+        } else {
+          this.$refs.practice.style.cssText =
+            "left: 50%; top: 50%; opacity: 1; transition: all 0.5s ease-in-out;";
+          this.$refs.one.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+          this.$refs.two.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+          this.$refs.three.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+          this.$refs.four.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+          this.$refs.five.style.cssText =
+            "font-size: 15px; z-index:30;  transition: all 0.5s ease-in-out;";
+
+          this.$refs.one.classList.remove("indexFocus");
+          this.$refs.two.classList.remove("indexFocus");
+          this.$refs.three.classList.remove("indexFocus");
+          this.$refs.four.classList.remove("indexFocus");
+          this.$refs.five.classList.remove("indexFocus");
+        }
+
         this.focusTaskIndex = null;
       }, 800);
     },
