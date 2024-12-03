@@ -71,12 +71,18 @@
               :value="target"
               class="d-flex justify-content-between my-2 w-100"
             >
-              <div class="w-100">
+              <div class="d-flex w-100">
                 <input
                   type="text"
-                  class="form-control fs-5"
-                  v-model="task.target[index]"
+                  class="form-control fs-5 mx-1"
+                  v-model="task.target[index].content"
                   :placeholder="`目標${index + 1}`"
+                />
+                <input
+                  type="text"
+                  class="form-control fs-5 mx-1"
+                  v-model="task.target[index].page"
+                  :placeholder="`頁數`"
                 />
               </div>
               <div class="d-flex align-items-end">
@@ -168,7 +174,7 @@
           data-bs-toggle="modal"
           data-bs-target="#exampleModal2"
         >
-          發送單一同學考卷
+          發送單一同學任務
         </button>
         <button type="button" class="btn btn-primary m-2" @click="sendPractice">
           <div v-if="loading" class="spinner-border" role="status">
@@ -201,17 +207,27 @@
                 <th scope="col">任務名稱</th>
                 <th scope="col">班級</th>
                 <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="(task, index) in allTask"
                 :key="index"
-                @click="checkTask(task)"
                 data-bs-dismiss="modal"
               >
                 <td>{{ task.title }}</td>
                 <td>{{ task.type }}</td>
+                <td>
+                  <button class="btn btn-primary" @click="checkTask(task)">
+                    載入
+                  </button>
+                </td>
+                <td>
+                  <button class="btn btn-danger" @click="deleteTask(task._id)">
+                    刪除
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -250,6 +266,7 @@
               <tr
                 v-for="(student, index) in AllStudent"
                 :key="index"
+                data-bs-dismiss="modal"
                 @click="pushOnlyOne(student._id)"
               >
                 <td>{{ student.name }}</td>
@@ -289,7 +306,7 @@ export default {
         taskName: "",
         class: "",
         guide: [""],
-        target: [""],
+        target: [{ content: "", page: "" }],
         question: [""],
         slides: [],
         htmlCode: "",
@@ -363,7 +380,11 @@ export default {
         });
     },
     add(i) {
-      this.task[i].push("");
+      if (i == "target") {
+        this.task[i].push({ content: "", page: "" });
+      } else {
+        this.task[i].push("");
+      }
     },
     remove(i, index) {
       this.task[i].splice(index, 1);
@@ -419,6 +440,7 @@ export default {
       this.updateOutput();
     },
     pushOnlyOne(student) {
+      this.loading = true;
       const practice = {
         title: this.task.taskName,
         type: this.task.class,
@@ -447,6 +469,25 @@ export default {
             icon: "error",
           });
           console.log(err);
+        });
+    },
+    deleteTask(index) {
+      this.$axios
+        .delete(`/task/${index}`)
+        .then((res) => {
+          this.$swal.fire({
+            title: "刪除成功",
+            text: "考卷已成功刪除",
+            icon: "success",
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          this.$swal.fire({
+            title: "刪除失敗",
+            text: "刪除考卷時發生錯誤",
+            icon: "error",
+          });
         });
     },
   },
