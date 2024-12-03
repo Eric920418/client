@@ -567,7 +567,15 @@
                         transition: all 0.5s ease-in-out;
                       "
                     >
-                      {{ option }}
+                      {{ option.content }}
+                    </td>
+                    <td>
+                      <button
+                        class="btn btn-primary mx-1"
+                        @click="goPDF(option.page)"
+                      >
+                        跳頁
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -576,8 +584,15 @@
           </div>
           <div class="d-flex bottom-0 end-0 m-1" style="position: absolute">
             <button class="btn btn-danger mx-1" @click="backTask">返回</button>
-            <button class="btn btn-primary mx-1" @click="formulate">
+            <button
+              v-if="studentClassNum == 'C'"
+              class="btn btn-primary mx-1"
+              @click="formulate"
+            >
               制定學習計畫
+            </button>
+            <button v-else class="btn btn-primary mx-1" @click="formulate">
+              下一步
             </button>
           </div>
         </div>
@@ -932,7 +947,7 @@
             </div>
             <div class="my-4">
               <div class="form-label" style="font-size: 25px">
-                從此次的學習任務中，我學習到了....
+                從此次的學習任務中，我使用了什麼策略完成呢？
               </div>
               <textarea
                 placeholder="盡可能詳細描述，可列點式說明"
@@ -958,7 +973,7 @@
             </div>
             <div class="my-4">
               <div class="form-label" style="font-size: 25px">
-                我覺得有那些方面可以做得更好，或是可以改善的地方...
+                我覺得有哪些方面可以做得更好，或是可以改善的地方...，為什麼呢？
               </div>
               <textarea
                 placeholder="盡可能詳細描述，可列點式說明"
@@ -2318,7 +2333,7 @@ export default {
               this.$swal
                 .fire({
                   title: "完成第二步",
-                  text: "進入第三步,",
+                  text: "進入第三步",
                   icon: "success",
                 })
                 .then(() => {
@@ -3728,6 +3743,9 @@ export default {
       if (this.currentSlide < this.tasks[this.focusTaskIndex].ppt.length - 1) {
         this.currentSlide += 1;
       }
+    },
+    goPDF(page) {
+      this.currentSlide = page - 1;
     },
     selectOrder(index) {
       this.orderIndex = index;
