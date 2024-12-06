@@ -559,14 +559,7 @@
                       .guide"
                     :key="option.id"
                   >
-                    <td
-                      class="tr"
-                      style="
-                        transform: translateX(-100%);
-                        opacity: 0;
-                        transition: all 0.5s ease-in-out;
-                      "
-                    >
+                    <td class="tr" style="font-size: 20px; opacity: 1">
                       {{ option.content }}
                     </td>
                     <td>
@@ -633,14 +626,7 @@
                       v-for="(option, index) in filterTaskTarget"
                       :key="option.id"
                     >
-                      <td
-                        class="ts"
-                        style="
-                          transform: translateX(-100%);
-                          opacity: 0;
-                          transition: all 0.5s ease-in-out;
-                        "
-                      >
+                      <td class="ts" style="font-size: 20px; opacity: 1">
                         <div
                           class="d-flex justify-content-between align-items-center"
                         >
@@ -2269,14 +2255,6 @@ export default {
                   "font-size: 15px; z-index: 30;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
                 this.$refs.two.style.cssText =
                   "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-                setTimeout(() => {
-                  document.querySelectorAll(".tr").forEach((tr, index) => {
-                    setTimeout(() => {
-                      tr.style.cssText =
-                        "font-size: 20px;transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-                    }, 500 * index);
-                  });
-                }, 1500);
               });
           });
       } else {
@@ -2295,14 +2273,6 @@ export default {
           "font-size: 15px; z-index: 30;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
         this.$refs.two.style.cssText =
           "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-        setTimeout(() => {
-          document.querySelectorAll(".tr").forEach((tr, index) => {
-            setTimeout(() => {
-              tr.style.cssText =
-                "font-size: 20px;transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-            }, 500 * index);
-          });
-        }, 1500);
       }
     },
     formulate() {
@@ -2368,14 +2338,6 @@ export default {
                     "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
                   this.$refs.five.style.cssText =
                     "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-                  setTimeout(() => {
-                    document.querySelectorAll(".ts").forEach((tr, index) => {
-                      setTimeout(() => {
-                        tr.style.cssText =
-                          "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-                      }, 500 * index);
-                    });
-                  }, 1500);
                 });
             });
         } else {
@@ -2395,14 +2357,6 @@ export default {
             "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
           this.$refs.five.style.cssText =
             "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-          setTimeout(() => {
-            document.querySelectorAll(".ts").forEach((tr, index) => {
-              setTimeout(() => {
-                tr.style.cssText =
-                  "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-              }, 500 * index);
-            });
-          }, 1500);
         }
       } else if (this.studentClassNum == "B") {
         this.$refs.one.classList.remove("indexFocus");
@@ -2462,14 +2416,6 @@ export default {
                     "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
                   this.$refs.four.style.cssText =
                     "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-                  setTimeout(() => {
-                    document.querySelectorAll(".ts").forEach((tr, index) => {
-                      setTimeout(() => {
-                        tr.style.cssText =
-                          "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-                      }, 500 * index);
-                    });
-                  }, 1500);
                 });
             });
         } else {
@@ -2489,14 +2435,6 @@ export default {
             "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
           this.$refs.four.style.cssText =
             "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-          setTimeout(() => {
-            document.querySelectorAll(".ts").forEach((tr, index) => {
-              setTimeout(() => {
-                tr.style.cssText =
-                  "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-              }, 500 * index);
-            });
-          }, 1500);
         }
       } else {
         this.$refs.one.classList.remove("indexFocus");
@@ -2557,14 +2495,6 @@ export default {
                     "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
                   this.$refs.three.style.cssText =
                     "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-                  setTimeout(() => {
-                    document.querySelectorAll(".ts").forEach((tr, index) => {
-                      setTimeout(() => {
-                        tr.style.cssText =
-                          "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-                      }, 500 * index);
-                    });
-                  }, 1500);
                 });
             });
         } else {
@@ -2584,14 +2514,6 @@ export default {
             "font-size: 15px; z-index: 30 ;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
           this.$refs.three.style.cssText =
             "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
-          setTimeout(() => {
-            document.querySelectorAll(".ts").forEach((tr, index) => {
-              setTimeout(() => {
-                tr.style.cssText =
-                  "transform: translateX(0);opacity: 1;transition: all 0.5s ease-in-out;";
-              }, 500 * index);
-            });
-          }, 1500);
         }
       }
     },
@@ -3769,12 +3691,6 @@ export default {
       this.tasks[this.focusTaskIndex].target.push(option.taskName);
       this.tasks[this.focusTaskIndex].order.splice(index, 1);
       this.$forceUpdate();
-      this.$nextTick(() => {
-        document.querySelectorAll(".ts").forEach((tr) => {
-          tr.style.cssText =
-            "font-size: 20px; transform: translateX(0); opacity: 1; transition: all 0.5s ease-in-out;";
-        });
-      });
     },
     updateThought(index, value) {
       this.tasks[this.focusTaskIndex].thought[0].push(value);
