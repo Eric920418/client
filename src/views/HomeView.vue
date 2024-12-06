@@ -2827,6 +2827,9 @@ export default {
             ) {
               let task = {
                 state: 4,
+                html: this.htmlCode,
+                css: this.cssCode,
+                js: this.jsCode,
                 answer: this.tasks[this.focusTaskIndex].answer,
                 taskId: this.tasks[this.focusTaskIndex].taskId,
               };
@@ -2976,6 +2979,9 @@ export default {
             ) {
               let task = {
                 state: 4,
+                html: this.htmlCode,
+                css: this.cssCode,
+                js: this.jsCode,
                 answer: this.tasks[this.focusTaskIndex].answer,
                 taskId: this.tasks[this.focusTaskIndex].taskId,
               };
