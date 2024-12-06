@@ -2961,7 +2961,8 @@ export default {
     },
     sendFinish() {
       if (this.studentClassNum == "A") {
-        if (this.tasks[this.focusTaskIndex].state == 2) {
+        console.log(this.tasks[this.focusTaskIndex].state);
+        if (this.tasks[this.focusTaskIndex].state == 5) {
           if (
             this.tasks[this.focusTaskIndex].thought.every((item) => item !== "")
           ) {
