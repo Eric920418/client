@@ -39,25 +39,13 @@
               </div>
             </th>
             <td class="sm" ref="html">
-              <pre
-                @mouseover="showCode('html')"
-                @mouseleave="DontShowCode()"
-                v-html="code.html"
-              ></pre>
+              <pre v-html="code.html"></pre>
             </td>
             <td class="sm" ref="css">
-              <pre
-                @mouseover="showCode('css')"
-                @mouseleave="DontShowCode()"
-                v-html="code.css"
-              ></pre>
+              <pre v-html="code.css"></pre>
             </td>
             <td class="sm" ref="js">
-              <pre
-                @mouseover="showCode('js')"
-                @mouseleave="DontShowCode()"
-                v-html="code.js"
-              ></pre>
+              <pre v-html="code.js"></pre>
             </td>
           </tr>
         </tbody>

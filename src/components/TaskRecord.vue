@@ -637,7 +637,6 @@ export default {
         taskId: this.student.task[0].taskId._id,
         teacherTalk: this.student.task[0].teacherTalk,
       };
-      console.log(task);
       var storedToken = localStorage.getItem("token");
       this.$axios
         .patch(`/task/state/${this.student.id}`, task, {
@@ -741,7 +740,6 @@ export default {
         });
       });
 
-      console.log(newData);
       this.series2[0].data = newData;
 
       // 更新 chartOptions 的 tooltip 和 dataLabels
@@ -786,34 +784,46 @@ export default {
           });
         });
 
-        mergedFinishTimes.set(task.state, {
+        const existing = mergedFinishTimes.get(task.state) || [];
+        existing.push({
           actions: NewActions,
           state: task.state,
           time: task.time,
           name: this.student.name,
           studentID: this.student.studentID,
         });
+
+        mergedFinishTimes.set(task.state, existing);
       });
 
-      mergedFinishTimes.forEach((task) => {
-        if (task && task.actions) {
-          const stepData = task.actions.map((action) => [
-            task.name,
-            task.studentID,
-            task.state,
-            action.action,
-            action.talkContent,
-            action.timestamp,
-          ]);
-          FilterData.push(...stepData);
-        }
+      // 確保處理 Map 的陣列值
+      mergedFinishTimes.forEach((tasks) => {
+        tasks.forEach((task) => {
+          if (task && task.actions) {
+            const stepData = task.actions.map((action) => [
+              task.name,
+              task.studentID,
+              task.state,
+              action.action,
+              action.talkContent,
+              action.timestamp,
+            ]);
+            FilterData.push(...stepData);
+          }
+        });
       });
+
+      // 確保資料正確反轉
       FilterData = FilterData.reverse();
+
+      // 準備匯出資料
       const ws_data = [header, ...FilterData];
+      console.log("Excel Data:", ws_data); // 確認匯出資料
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Sheet JS");
 
+      // 寫入檔案
       XLSX.writeFile(wb, "學生動作紀錄.xlsx");
     },
   },
