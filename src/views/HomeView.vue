@@ -834,6 +834,7 @@
                 </div>
                 <textarea
                   class="form-control"
+                  @change="answerQuestions"
                   v-model="tasks[this.focusTaskIndex].answer[index]"
                   :placeholder="`回答${index + 1}`"
                 ></textarea>
@@ -941,6 +942,7 @@
                 id=""
                 class="form-control"
                 @keydown="preventSpace"
+                @change="answerThought()"
                 v-model="tasks[this.focusTaskIndex].thought[1]"
               ></textarea>
             </div>
@@ -954,6 +956,7 @@
                 id=""
                 class="form-control"
                 @keydown="preventSpace"
+                @change="answerThought()"
                 v-model="tasks[this.focusTaskIndex].thought[2]"
               ></textarea>
             </div>
@@ -967,6 +970,7 @@
                 id=""
                 class="form-control"
                 @keydown="preventSpace"
+                @change="answerThought()"
                 v-model="tasks[this.focusTaskIndex].thought[3]"
               ></textarea>
             </div>
@@ -2064,12 +2068,44 @@ export default {
         this.openTest();
       }
       if (!this.isStarted) {
+        if (this.time > 0) {
+          this.action.push({
+            action: "開始任務列表",
+            timestamp: new Date()
+              .toLocaleString("zh-TW", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })
+              .replace(/\//g, "-")
+              .replace(",", ""),
+          });
+        }
         this.$refs.practice.style.top = "50%";
         if (this.focusTaskIndex != null) {
           this.$refs.nav.classList.remove("d-none");
         }
         this.isStarted = true;
       } else {
+        if (this.time > 0) {
+          this.action.push({
+            action: "關閉任務列表",
+            timestamp: new Date()
+              .toLocaleString("zh-TW", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })
+              .replace(/\//g, "-")
+              .replace(",", ""),
+          });
+        }
         this.$refs.practice.style.top = "-50%";
         if (this.focusTaskIndex != null) {
           this.$refs.nav.classList.add("d-none");
@@ -2093,6 +2129,13 @@ export default {
       }, 800);
     },
     watchExm(index) {
+      this.$swal.fire({
+        title: "注意！！！",
+        text: "多多善用右邊『儲存按鈕』！！！只要開始任務沒有點擊『返回』任務列表的情況下，就算關閉任務面板依然會對程式碼、回答問題、評估反思進行覆蓋保存",
+        icon: "info",
+      });
+      // this.stopTimer();
+      this.startTimer();
       this.focusTaskIndex = index;
       if (this.tasks[this.focusTaskIndex].state == 0) {
         this.$swal
@@ -2180,6 +2223,20 @@ export default {
           }
         }, 800);
       }
+      this.action.push({
+        action: " 查看最終成果",
+        timestamp: new Date()
+          .toLocaleString("zh-TW", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })
+          .replace(/\//g, "-")
+          .replace(",", ""),
+      });
     },
     accept() {
       if (this.studentClassNum == "A") {
@@ -2276,12 +2333,12 @@ export default {
       }
     },
     formulate() {
-      this.stopTimer();
-      setTimeout(() => {
-        this.startTimer();
-        this.NowState = 5;
-      }, 0);
       if (this.studentClassNum == "A") {
+        this.stopTimer();
+        setTimeout(() => {
+          this.startTimer();
+          this.NowState = 5;
+        }, 0);
         this.$refs.one.classList.remove("indexFocus");
         this.$refs.two.classList.remove("indexFocus");
         this.$refs.five.classList.remove("indexFocus");
@@ -2359,6 +2416,11 @@ export default {
             "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
         }
       } else if (this.studentClassNum == "B") {
+        this.stopTimer();
+        setTimeout(() => {
+          this.startTimer();
+          this.NowState = 4;
+        }, 0);
         this.$refs.one.classList.remove("indexFocus");
         this.$refs.two.classList.remove("indexFocus");
         this.$refs.four.classList.remove("indexFocus");
@@ -2437,6 +2499,11 @@ export default {
             "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
         }
       } else {
+        this.stopTimer();
+        setTimeout(() => {
+          this.startTimer();
+          this.NowState = 3;
+        }, 0);
         this.$refs.one.classList.remove("indexFocus");
         this.$refs.two.classList.remove("indexFocus");
         this.$refs.three.classList.remove("indexFocus");
@@ -2961,7 +3028,6 @@ export default {
     },
     sendFinish() {
       if (this.studentClassNum == "A") {
-        console.log(this.tasks[this.focusTaskIndex].state);
         if (this.tasks[this.focusTaskIndex].state == 5) {
           if (
             this.tasks[this.focusTaskIndex].thought.every((item) => item !== "")
@@ -3226,6 +3292,22 @@ export default {
     },
 
     backTask() {
+      if (this.time > 0) {
+        this.action.push({
+          action: "返回任務列表",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.stopTimer();
       this.orderIndex = null;
       this.NowState = 0;
@@ -3329,6 +3411,22 @@ export default {
         });
       }
       this.isActionPushed = false;
+      if (this.NowState != 0) {
+        let task = {
+          html: this.htmlCode,
+          css: this.cssCode,
+          js: this.jsCode,
+          thoughts: this.tasks[this.focusTaskIndex].thought,
+          answer: this.tasks[this.focusTaskIndex].answer,
+          taskId: this.tasks[this.focusTaskIndex].taskId,
+        };
+        this.$axios.patch(`/task/state/${id}`, task, {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
       this.$axios
         .post("/code", code, {
           headers: {
@@ -3451,6 +3549,22 @@ export default {
       }
     },
     handleGoToDemo(code) {
+      if (this.time > 0) {
+        this.action.push({
+          action: "使用儲存的程式碼進入Demo",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.htmlEditor.setValue(code.html);
       this.cssEditor.setValue(code.css);
       this.jsEditor.setValue(code.js);
@@ -3460,6 +3574,7 @@ export default {
       this.isOpenLog = true;
       this.updateOutput();
     },
+
     checkExam(exam) {
       this.exam = exam;
     },
@@ -3528,8 +3643,6 @@ export default {
             });
         })
         .catch((error) => {
-          console.error(error);
-          console.log(exam);
           this.$swal.fire({
             title: "交卷失敗",
             text: error,
@@ -3547,61 +3660,27 @@ export default {
       this.cssCode = ``;
       this.jsCode = ``;
       this.updateOutput();
+      if (this.time > 0) {
+        this.action.push({
+          action: "刷新程式碼",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.$swal.fire({
         title: "重置成功",
         text: "已成功重置",
         icon: "success",
       });
-    },
-    firstLogin() {
-      if (localStorage.getItem("loginNumber") == 0) {
-        function changeText(content, delay) {
-          setTimeout(() => {
-            const text = output.contentWindow.document.getElementById("text");
-            text.style.cssText = "transition: all 0.3s ease; opacity: 0;";
-            setTimeout(() => {
-              text.style.opacity = "1";
-              text.innerHTML = content;
-            }, 300);
-          }, delay);
-        }
-
-        document.getElementById("output").onload = function () {
-          this.contentWindow.document.getElementById(
-            "demo-canvas"
-          ).style.cssText =
-            "backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);background:rgba(255, 255, 255, 0.37);";
-
-          const messages = [
-            "歡迎 來到編譯網站",
-            "左下角這裡有一個按鈕當你點擊按住不放<br>會顯示說明欄",
-            "準備好開始學習",
-          ];
-
-          messages.forEach((message, index) => {
-            changeText(message, index * 5000);
-
-            if (
-              message === "左下角這裡有一個按鈕當你點擊按住不放<br>會顯示說明欄"
-            ) {
-              setTimeout(() => {
-                const button = document.getElementById("documentBtn");
-                button.classList.add("active"); // 添加 active 效果
-                setTimeout(() => {
-                  button.classList.remove("active"); // 4秒後移除 active 效果
-                }, 5000);
-              }, index * 5000);
-            }
-          });
-        };
-
-        setTimeout(() => {
-          localStorage.setItem("loginNumber", 1);
-          window.location.reload();
-        }, 17000);
-      } else {
-        return;
-      }
     },
     closeSocket() {
       var storedToken = localStorage.getItem("token");
@@ -3654,10 +3733,23 @@ export default {
           this.tasks = tasks;
         });
     },
-    add() {
-      this.tasks[this.focusTaskIndex].order[this.orderIndex].strategy.push("");
-    },
     remove(index) {
+      if (this.time > 0) {
+        this.action.push({
+          action: "刪除策略",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.tasks[this.focusTaskIndex].order[this.orderIndex].strategy.splice(
         index,
         1
@@ -3666,20 +3758,100 @@ export default {
     prevSlide() {
       if (this.currentSlide > 0) {
         this.currentSlide -= 1;
+        if (this.time > 0) {
+          this.action.push({
+            action: "上一頁PPT",
+            timestamp: new Date()
+              .toLocaleString("zh-TW", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })
+              .replace(/\//g, "-")
+              .replace(",", ""),
+          });
+        }
       }
     },
     nextSlide() {
       if (this.currentSlide < this.tasks[this.focusTaskIndex].ppt.length - 1) {
         this.currentSlide += 1;
+        if (this.time > 0) {
+          this.action.push({
+            action: "下一頁PPT",
+            timestamp: new Date()
+              .toLocaleString("zh-TW", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })
+              .replace(/\//g, "-")
+              .replace(",", ""),
+          });
+        }
       }
     },
     goPDF(page) {
+      if (this.time > 0) {
+        this.action.push({
+          action: "跳頁PDF",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.currentSlide = page - 1;
     },
     selectOrder(index) {
+      if (this.time > 0) {
+        this.action.push({
+          action: "選擇策略",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.orderIndex = index;
     },
     addOrder(option, index) {
+      if (this.time > 0) {
+        this.action.push({
+          action: "新增子任務",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.tasks[this.focusTaskIndex].order.push({
         taskName: option,
         state: 0,
@@ -3688,12 +3860,44 @@ export default {
       this.tasks[this.focusTaskIndex].target.splice(index, 1);
     },
     removeOrder(option, index) {
+      if (this.time > 0) {
+        this.action.push({
+          action: "刪除子任務",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.orderIndex = null;
       this.tasks[this.focusTaskIndex].target.push(option.taskName);
       this.tasks[this.focusTaskIndex].order.splice(index, 1);
       this.$forceUpdate();
     },
     updateThought(index, value) {
+      if (this.time > 0) {
+        this.action.push({
+          action: "確認子任務是否完成",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
       this.tasks[this.focusTaskIndex].thought[0].push(value);
     },
     startTimer() {
@@ -3741,14 +3945,48 @@ export default {
         });
       }
     },
-
     copyToClipboard(text) {
       navigator.clipboard.writeText(text);
     },
-
     preventSpace(event) {
       if (event.key === " ") {
         event.preventDefault(); // 阻止輸入空白鍵
+      }
+    },
+    answerQuestions() {
+      if (this.time > 0) {
+        this.action.push({
+          action: "輸入計畫問題",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
+      }
+    },
+    answerThought() {
+      if (this.time > 0) {
+        this.action.push({
+          action: "輸入評估與反思問題",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
       }
     },
   },
@@ -3756,7 +3994,6 @@ export default {
   mounted() {
     this.startPractice();
     this.studentClassNum = localStorage.getItem("classNum");
-    this.firstLogin();
     this.toggleIframe();
     var storedToken = localStorage.getItem("token");
     if (storedToken == null) {
@@ -4404,14 +4641,12 @@ label i {
 }
 
 .taskCard:hover {
-  animation: rotate2 1.5s forwards 1;
-  animation-fill-mode: forwards;
+  transform: rotateY(360deg);
   cursor: pointer;
 }
 
 .taskCard:not(:hover) {
-  animation: rotateBack 1.5s forwards 1;
-  animation-fill-mode: forwards;
+  transform: rotateY(0deg);
 }
 
 .front {
