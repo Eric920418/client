@@ -818,7 +818,6 @@ export default {
 
       // 準備匯出資料
       const ws_data = [header, ...FilterData];
-      console.log("Excel Data:", ws_data); // 確認匯出資料
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Sheet JS");
