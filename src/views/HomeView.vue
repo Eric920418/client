@@ -145,7 +145,6 @@
       </div>
       <div>
         <button
-          v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn3 btn"
           id="save"
           style="
