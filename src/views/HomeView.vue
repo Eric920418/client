@@ -1729,6 +1729,9 @@ export default {
       isJsFocused: false,
 
       activeButton: "null",
+
+      timeout: null,
+      inactivityTime: 300000,
     };
   },
   computed: {
@@ -3988,9 +3991,26 @@ export default {
         });
       }
     },
+
+    resetTimer() {
+      if (this.timeout) clearTimeout(this.timeout); // 清除之前的計時器
+      this.timeout = setTimeout(async () => {
+        await this.saveButton();
+        if (this.NowState != 0) {
+          this.stopTimer();
+        }
+        this.SignOut();
+      }, this.inactivityTime);
+    },
+    handleActivity() {
+      this.resetTimer();
+    },
   },
 
   mounted() {
+    window.addEventListener("mousemove", this.handleActivity);
+    window.addEventListener("keydown", this.handleActivity);
+    this.resetTimer();
     this.startPractice();
     this.studentClassNum = localStorage.getItem("classNum");
     this.toggleIframe();
@@ -4091,26 +4111,23 @@ export default {
     });
     // 监听 HTML 编辑器内容变化
     this.htmlEditor.onDidChangeModelContent(() => {
-      if (!this.isActionPushed) {
-        this.htmlCode = this.htmlEditor.getValue();
-        if (this.time > 0) {
-          this.action.push({
-            action: "編寫html",
-            timestamp: new Date()
-              .toLocaleString("zh-TW", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })
-              .replace(/\//g, "-")
-              .replace(",", ""),
-          });
-        }
-
-        this.isActionPushed = true;
+      this.htmlCode = this.htmlEditor.getValue();
+      console.log(this.htmlCode);
+      if (this.time > 0) {
+        this.action.push({
+          action: "編寫html",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
       }
     });
     // 初始化 CSS 编辑器
@@ -4129,25 +4146,22 @@ export default {
     });
     // 监听 CSS 编辑器内容变化
     this.cssEditor.onDidChangeModelContent(() => {
-      if (!this.isActionPushed) {
-        this.cssCode = this.cssEditor.getValue();
-        if (this.time > 0) {
-          this.action.push({
-            action: "編寫css",
-            timestamp: new Date()
-              .toLocaleString("zh-TW", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })
-              .replace(/\//g, "-")
-              .replace(",", ""),
-          });
-        }
-        this.isActionPushed = true;
+      this.cssCode = this.cssEditor.getValue();
+      if (this.time > 0) {
+        this.action.push({
+          action: "編寫css",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
       }
     });
     // 初始化 JavaScript 编辑器
@@ -4166,24 +4180,21 @@ export default {
     this.jsEditor.onDidChangeModelContent(() => {
       this.jsCode = this.jsEditor.getValue();
 
-      if (!this.isActionPushed) {
-        if (this.time > 0) {
-          this.action.push({
-            action: "編寫JavaScript",
-            timestamp: new Date()
-              .toLocaleString("zh-TW", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })
-              .replace(/\//g, "-")
-              .replace(",", ""),
-          });
-        }
-        this.isActionPushed = true;
+      if (this.time > 0) {
+        this.action.push({
+          action: "編寫JavaScript",
+          timestamp: new Date()
+            .toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+            .replace(/\//g, "-")
+            .replace(",", ""),
+        });
       }
     });
     ///////////////////////////////////////////////////////////
@@ -4377,6 +4388,9 @@ export default {
     }
   },
   beforeDestroy() {
+    window.removeEventListener("mousemove", this.handleActivity);
+    window.removeEventListener("keydown", this.handleActivity);
+    if (this.timeout) clearTimeout(this.timeout);
     this.SignOut();
   },
 };
