@@ -179,7 +179,7 @@
           </transition>
         </button>
       </div>
-      <div>
+      <!-- <div>
         <button
           v-if="studentClassNum == 'B' || studentClassNum == 'C'"
           class="toggle-btn btn btn-light"
@@ -208,7 +208,7 @@
             </div>
           </transition>
         </button>
-      </div>
+      </div> -->
       <div>
         <button
           class="toggle-btn btn practiceBtn"
@@ -371,6 +371,7 @@
               overflow-y: scroll;
               margin-top: 50px;
             "
+            v-if="loading == true"
           >
             <div class="row">
               <div
@@ -458,6 +459,24 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div
+            class="card-body d-flex justify-content-center"
+            style="
+              overflow-y: scroll;
+              margin-top: 50px;
+              height: 90%;
+              align-items: center;
+            "
+            v-else
+          >
+            <div
+              class="spinner-border text-secondary"
+              style="width: 4rem; height: 4rem"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
             </div>
           </div>
         </div>
@@ -886,11 +905,14 @@
           </div>
           <div
             class="d-flex justify-content-between bottom-0 end-0 m-1"
-            style="position: absolute; width: 38%"
+            style="position: absolute; width: 50%"
           >
             <p class="text-danger p-0 m-0 mt-1" style="font-size: 20px">
               (當按下『繳交任務』會自動交出程式碼)
             </p>
+            <button class="btn btn-warning mx-3" @click="saveButtonAnswer">
+              存檔
+            </button>
             <button class="btn btn-danger mx-1" @click="backTask">返回</button>
             <button class="btn btn-primary" @click="finishTask">
               繳交任務
@@ -987,6 +1009,9 @@
             </div>
           </div>
           <div class="d-flex bottom-0 end-0 m-2" style="position: fixed">
+            <button class="btn btn-warning mx-3" @click="saveButtonThoughts">
+              存檔
+            </button>
             <button class="btn btn-danger mx-1" @click="backTask">返回</button>
             <button class="btn btn-primary mx-1" @click="sendFinish">
               送出
@@ -1697,7 +1722,6 @@ export default {
       jsCode: "",
       isCollapsed: true,
       actions: [],
-      isActionPushed: false,
       isOpenLog: true,
       isTest: true,
       isStarted: false,
@@ -1732,6 +1756,8 @@ export default {
 
       timeout: null,
       inactivityTime: 300000,
+
+      loading: false,
     };
   },
   computed: {
@@ -1788,7 +1814,6 @@ export default {
             .replace(",", ""),
         });
       }
-      this.isActionPushed = false;
       let storedToken = localStorage.getItem("token");
       this.$axios
         .post(
@@ -1887,7 +1912,6 @@ export default {
               .replace(/\//g, "-")
               .replace(",", ""),
           });
-          this.isActionPushed = false;
         } else {
           this.action.push({
             action: "開啟聊天室",
@@ -1903,7 +1927,6 @@ export default {
               .replace(/\//g, "-")
               .replace(",", ""),
           });
-          this.isActionPushed = false;
         }
       } else {
         if (this.isCollapsed) {
@@ -1951,7 +1974,6 @@ export default {
             .replace(",", ""),
         });
       }
-      this.isActionPushed = false;
     },
     toggleCss() {
       this.isOpenLog = true;
@@ -1990,7 +2012,6 @@ export default {
             .replace(",", ""),
         });
       }
-      this.isActionPushed = false;
     },
     toggleJs() {
       this.isOpenLog = true;
@@ -2030,7 +2051,6 @@ export default {
             .replace(",", ""),
         });
       }
-      this.isActionPushed = false;
     },
     toggleIframe() {
       this.$refs.iframe.classList.add("text");
@@ -2057,7 +2077,6 @@ export default {
             .replace(",", ""),
         });
       }
-      this.isActionPushed = false;
     },
     startPractice() {
       if (this.isCollapsed == false) {
@@ -2332,6 +2351,15 @@ export default {
           "font-size: 15px; z-index: 30;background-color: #9D9D9D;transition: all 0.5s ease-in-out;";
         this.$refs.two.style.cssText =
           "font-size: 15px; width:30px; background-color: #6C6C6C; color: black;  transition: all 0.5s ease-in-out;";
+
+        this.htmlEditor.setValue(this.tasks[this.focusTaskIndex].userHtml);
+        this.cssEditor.setValue(this.tasks[this.focusTaskIndex].userCss);
+        this.jsEditor.setValue(this.tasks[this.focusTaskIndex].userJs);
+        this.htmlCode = this.tasks[this.focusTaskIndex].userHtml;
+        this.cssCode = this.tasks[this.focusTaskIndex].userCss;
+        this.jsCode = this.tasks[this.focusTaskIndex].userJs;
+        this.isOpenLog = true;
+        this.updateOutput();
       }
     },
     formulate() {
@@ -2795,6 +2823,21 @@ export default {
               this.startTimer(); // 啟動新的計時器
               this.NowState = 5;
             }, 0);
+            let task = {
+              html: this.htmlCode,
+              css: this.cssCode,
+              js: this.jsCode,
+              answer: this.tasks[this.focusTaskIndex].answer,
+              taskId: this.tasks[this.focusTaskIndex].taskId,
+            };
+            var storedToken = localStorage.getItem("token");
+            const { id } = jwtDecode(storedToken);
+            this.$axios.patch(`/task/state/${id}`, task, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+            });
             this.$refs.practice.style.cssText =
               "left: -50%; top: 50%; opacity: 0;";
             setTimeout(() => {
@@ -2824,6 +2867,7 @@ export default {
                 answer: this.tasks[this.focusTaskIndex].answer,
                 taskId: this.tasks[this.focusTaskIndex].taskId,
               };
+              console.log(task);
               var storedToken = localStorage.getItem("token");
               const { id } = jwtDecode(storedToken);
               this.$axios
@@ -2947,6 +2991,21 @@ export default {
               this.startTimer(); // 啟動新的計時器
               this.NowState = 5;
             }, 0);
+            let task = {
+              html: this.htmlCode,
+              css: this.cssCode,
+              js: this.jsCode,
+              answer: this.tasks[this.focusTaskIndex].answer,
+              taskId: this.tasks[this.focusTaskIndex].taskId,
+            };
+            var storedToken = localStorage.getItem("token");
+            const { id } = jwtDecode(storedToken);
+            this.$axios.patch(`/task/state/${id}`, task, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+            });
             this.$refs.practice.style.cssText =
               "left: -50%; top: 50%; opacity: 0;";
             setTimeout(() => {
@@ -3412,14 +3471,11 @@ export default {
             .replace(",", ""),
         });
       }
-      this.isActionPushed = false;
       if (this.NowState != 0) {
         let task = {
           html: this.htmlCode,
           css: this.cssCode,
           js: this.jsCode,
-          thoughts: this.tasks[this.focusTaskIndex].thought,
-          answer: this.tasks[this.focusTaskIndex].answer,
           taskId: this.tasks[this.focusTaskIndex].taskId,
         };
         this.$axios.patch(`/task/state/${id}`, task, {
@@ -3452,6 +3508,34 @@ export default {
           });
         });
     },
+    saveButtonThoughts() {
+      if (this.NowState != 0) {
+        let task = {
+          thoughts: this.tasks[this.focusTaskIndex].thought,
+          taskId: this.tasks[this.focusTaskIndex].taskId,
+        };
+        this.$axios.patch(`/task/state/${id}`, task, {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+    },
+    saveButtonAnswer() {
+      if (this.NowState != 0) {
+        let task = {
+          answer: this.tasks[this.focusTaskIndex].answer,
+          taskId: this.tasks[this.focusTaskIndex].taskId,
+        };
+        this.$axios.patch(`/task/state/${id}`, task, {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+    },
     openLog() {
       this.isOpenLog = !this.isOpenLog;
       if (this.time > 0) {
@@ -3470,7 +3554,6 @@ export default {
               .replace(/\//g, "-")
               .replace(",", ""),
           });
-          this.isActionPushed = false;
         } else {
           this.action.push({
             action: "打開程式碼紀錄",
@@ -3486,7 +3569,6 @@ export default {
               .replace(/\//g, "-")
               .replace(",", ""),
           });
-          this.isActionPushed = false;
         }
       } else {
         if (this.isOpenLog) {
@@ -3540,7 +3622,6 @@ export default {
               .replace(/\//g, "-")
               .replace(",", ""),
           });
-          this.isActionPushed = false;
         }
       } else {
         if (this.isTest) {
@@ -3722,17 +3803,22 @@ export default {
               css: element.taskId.css,
               js: element.taskId.js,
               taskId: element.taskId._id,
-
+              userHtml: element.html,
+              userCss: element.css,
+              userJs: element.js,
               state: element.state,
               answer: element.answer,
               order: element.order ? element.order : [],
               teacherTalk: element.teacherTalk,
-              thought: element.thought ? element.thought : [[], "", "", "", ""],
+              thought: element.thoughts
+                ? element.thoughts
+                : [[], "", "", "", ""],
               finishTime: element.finishTime,
             };
             tasks.push(task);
           });
           this.tasks = tasks;
+          this.loading = true;
         });
     },
     remove(index) {
@@ -4112,7 +4198,6 @@ export default {
     // 监听 HTML 编辑器内容变化
     this.htmlEditor.onDidChangeModelContent(() => {
       this.htmlCode = this.htmlEditor.getValue();
-      console.log(this.htmlCode);
       if (this.time > 0) {
         this.action.push({
           action: "編寫html",

@@ -37,6 +37,9 @@
       >
         任務紀錄
       </button>
+      <button class="btn btn-outline-secondary border-0" @click="goHome()">
+        去首頁
+      </button>
       <button
         v-if="state === 1"
         class="btn btn-outline-warning border-0 ms-auto"
@@ -200,6 +203,9 @@ export default {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       }
+    },
+    goHome() {
+      window.location.href = "/client/";
     },
   },
   mounted() {

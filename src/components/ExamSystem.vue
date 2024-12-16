@@ -145,6 +145,19 @@
           <option value="25">25</option>
           <option value="30">30</option>
         </select>
+        <label for="inputState" class="mx-3 mt-2 w-50 form-label fs-5"
+          >班級</label
+        >
+        <select
+          id="inputState"
+          class="form-select mx-3 w-50"
+          aria-label="Default select example"
+          v-model="ExamTicket.classType"
+        >
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </select>
         <div class="d-flex flex-wrap justify-content-center mt-4">
           <div
             class="card m-2 border-3"
@@ -343,6 +356,19 @@
           <option value="20">20</option>
           <option value="25">25</option>
           <option value="30">30</option>
+        </select>
+        <label for="inputState" class="mx-3 mt-2 w-50 form-label fs-5"
+          >班級</label
+        >
+        <select
+          id="inputState"
+          class="form-select mx-3 w-50"
+          aria-label="Default select example"
+          v-model="oldExamTicket.classType"
+        >
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
         </select>
         <div class="d-flex flex-wrap justify-content-center mt-4">
           <div
@@ -1138,6 +1164,7 @@ export default {
       this.oldExamTicket.HowMany = event.HowMany;
       this.oldExamTicket.date = event.date;
       this.oldExamTicket.time = event.time;
+      this.oldExamTicket.classType = event.classType;
       this.oldExamTicket.question = JSON.parse(JSON.stringify(event.question));
       this.oldExamTicket._id = event._id;
     },
