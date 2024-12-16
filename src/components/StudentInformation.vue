@@ -61,13 +61,13 @@
           <th scope="col">狀態</th>
           <th scope="col"></th>
           <th scope="col"></th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
         <tr
           v-for="(student, index) in filteredStudents"
           :key="student.studentID"
-          @click="goToStudentDetail(student)"
         >
           <th scope="row">{{ index + 1 }}</th>
           <td>{{ student.name }}</td>
@@ -82,17 +82,26 @@
             ></div>
             <div v-else class="light"></div>
           </td>
+
           <td class="d-flex justify-content-center">
             <button class="btn btn-danger" @click.stop="deleteStudent(student)">
               刪除
             </button>
           </td>
-          <td>
+          <td style="width: 9rem">
             <button
               class="btn btn-secondary"
               @click.stop="forceLogout(student)"
             >
               強制登出
+            </button>
+          </td>
+          <td>
+            <button
+              class="btn btn-primary"
+              @click.stop="goToStudentDetail(student)"
+            >
+              資料
             </button>
           </td>
         </tr>

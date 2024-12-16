@@ -1,96 +1,153 @@
 <template>
-  <div class="bar">
-    <button class="btn btn-danger m-3" @click="$router.push('/admin')">
-      返回
-    </button>
-    <button class="btn btn-secondary m-3" @click="gotoInfo">學生資料</button>
-    <button class="btn btn-primary m-3" @click="gotoScore">成績</button>
-    <button class="btn btn-info m-3" @click="gotoChat">聊天記錄</button>
-    <button class="btn btn-success m-3" @click="gotoCode">Code</button>
-  </div>
+  <div v-if="loading == true">
+    <div class="bar">
+      <button class="btn btn-danger m-3" @click="$router.push('/admin')">
+        返回
+      </button>
+      <button class="btn btn-secondary m-3" @click="gotoInfo">學生資料</button>
+      <button class="btn btn-primary m-3" @click="gotoScore">成績</button>
+      <button class="btn btn-info m-3" @click="gotoChat">聊天記錄</button>
+      <button class="btn btn-success m-3" @click="gotoCode">Code</button>
+    </div>
 
-  <div class="px-5" style="margin-top: 100px">
-    <div class="card shadow-lg mb-5" ref="info">
-      <div class="card-body">
-        <h5 class="card-title text-primary">學生詳細信息</h5>
-        <div v-if="data">
-          <div class="form-group my-3">
-            <label for="name" class="form-label">姓名:</label>
-            <input
-              type="text"
-              id="name"
-              v-model="data.name"
-              class="form-control"
-            />
+    <div class="px-5" style="margin-top: 100px">
+      <div class="card shadow-lg mb-5" ref="info">
+        <div class="card-body">
+          <h5 class="card-title text-primary">學生詳細信息</h5>
+          <div v-if="data">
+            <div class="form-group my-3">
+              <label for="name" class="form-label">姓名:</label>
+              <input
+                type="text"
+                id="name"
+                v-model="data.name"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group my-3">
+              <label for="studentID" class="form-label">學號:</label>
+              <input
+                type="text"
+                id="studentID"
+                v-model="data.studentID"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group my-3">
+              <label for="classNum" class="form-label">班級:</label>
+              <input
+                type="text"
+                id="classNum"
+                v-model="data.classNum"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group my-3">
+              <label for="session" class="form-label">學期:</label>
+              <input
+                type="text"
+                id="session"
+                v-model="data.session"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group my-3">
+              <label for="password" class="form-label"
+                >密碼 (有需要更改在輸入):</label
+              >
+              <input
+                type="password"
+                id="password"
+                v-model="data.password"
+                class="form-control"
+              />
+            </div>
           </div>
-          <div class="form-group my-3">
-            <label for="studentID" class="form-label">學號:</label>
-            <input
-              type="text"
-              id="studentID"
-              v-model="data.studentID"
-              class="form-control"
-            />
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-success" @click="saveData">儲存</button>
           </div>
-          <div class="form-group my-3">
-            <label for="classNum" class="form-label">班級:</label>
-            <input
-              type="text"
-              id="classNum"
-              v-model="data.classNum"
-              class="form-control"
-            />
-          </div>
-          <div class="form-group my-3">
-            <label for="session" class="form-label">學期:</label>
-            <input
-              type="text"
-              id="session"
-              v-model="data.session"
-              class="form-control"
-            />
-          </div>
-          <div class="form-group my-3">
-            <label for="password" class="form-label"
-              >密碼 (有需要更改在輸入):</label
-            >
-            <input
-              type="password"
-              id="password"
-              v-model="data.password"
-              class="form-control"
-            />
-          </div>
-        </div>
-        <div class="d-flex justify-content-end">
-          <button class="btn btn-success" @click="saveData">儲存</button>
         </div>
       </div>
-    </div>
-    <div class="card shadow-lg mb-5" ref="score">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h5 class="card-title">成績</h5>
-          <!-- <button class="btn btn-success p-0 px-2" style="height: 25px; font-size: 11px;" @click="exportToExcel">匯出Excel</button> -->
+      <div class="card shadow-lg mb-5" ref="score">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <h5 class="card-title">成績</h5>
+            <!-- <button class="btn btn-success p-0 px-2" style="height: 25px; font-size: 11px;" @click="exportToExcel">匯出Excel</button> -->
+          </div>
+          <div
+            class="messages p-3 border rounded"
+            style="height: 500px; overflow-y: scroll"
+          >
+            <div class="message mb-2">
+              <table class="table mt-3 table-sm table-hover align-middle">
+                <thead>
+                  <th class="fs-4 bold" scope="col">考券名稱</th>
+                  <th class="fs-4 bold" scope="col">分數</th>
+                  <th class="fs-4 bold" scope="col">狀態</th>
+                  <th class="fs-4 bold" scope="col">完成時間</th>
+                </thead>
+                <tbody>
+                  <tr v-for="exam in data.examTicket" :key="exam">
+                    <td>{{ exam.name }}</td>
+                    <td>{{ exam.score }}</td>
+                    <td>{{ exam.state }}</td>
+                    <td>{{ exam.finishTime }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div
-          class="messages p-3 border rounded"
-          style="height: 500px; overflow-y: scroll"
-        >
-          <div class="message mb-2">
-            <table class="table mt-3 table-sm table-hover align-middle">
+      </div>
+      <div class="card shadow-lg mb-5" ref="chat">
+        <div class="card-body">
+          <h5 class="card-title">聊天記錄</h5>
+          <div
+            class="messages p-3 border rounded"
+            style="height: 500px; overflow-y: scroll"
+          >
+            <div
+              v-for="(message, index) in data.chat"
+              :key="index"
+              class="message mb-2"
+            >
+              <p>
+                <strong>{{ message.sender }}:</strong> {{ message.text }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="data.code" class="card shadow-lg mb-5" ref="code">
+        <div class="card-body code">
+          <h5 class="card-title">Code</h5>
+          <div style="overflow-x: auto; transform: rotateX(180deg)">
+            <table
+              class="table mt-3 table-sm table-hover table-borderless"
+              style="width: 100%; transform: rotateX(180deg)"
+            >
               <thead>
-                <th class="fs-4 bold" scope="col">考券名稱</th>
-                <th class="fs-4 bold" scope="col">分數</th>
-                <th class="fs-4 bold" scope="col">狀態</th>
-                <th class="fs-4 bold" scope="col">完成時間</th>
+                <tr>
+                  <th style="width: 10%" scope="">時間</th>
+                  <th scope="">html</th>
+                  <th scope="">css</th>
+                  <th scope="">js</th>
+                </tr>
               </thead>
               <tbody>
-                <tr v-for="exam in data.examTicket" :key="exam">
-                  <td>{{ exam.name }}</td>
-                  <td>{{ exam.score }}</td>
-                  <td>{{ exam.state }}</td>
-                  <td>{{ exam.finishTime }}</td>
+                <tr
+                  class="border-3"
+                  v-for="(code, index) in data.code"
+                  :key="code._id"
+                >
+                  <td>{{ code.createdAt }}</td>
+                  <td
+                    class="sm"
+                    v-html="code.html"
+                    style="font-size: 12px"
+                  ></td>
+                  <td class="sm" v-html="code.css" style="font-size: 12px"></td>
+                  <td class="sm" v-html="code.js" style="font-size: 12px"></td>
                 </tr>
               </tbody>
             </table>
@@ -98,56 +155,18 @@
         </div>
       </div>
     </div>
-    <div class="card shadow-lg mb-5" ref="chat">
-      <div class="card-body">
-        <h5 class="card-title">聊天記錄</h5>
-        <div
-          class="messages p-3 border rounded"
-          style="height: 500px; overflow-y: scroll"
-        >
-          <div
-            v-for="(message, index) in data.chat"
-            :key="index"
-            class="message mb-2"
-          >
-            <p>
-              <strong>{{ message.sender }}:</strong> {{ message.text }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div v-if="data.code" class="card shadow-lg mb-5" ref="code">
-      <div class="card-body code">
-        <h5 class="card-title">Code</h5>
-        <div style="overflow-x: auto; transform: rotateX(180deg)">
-          <table
-            class="table mt-3 table-sm table-hover table-borderless"
-            style="width: 100%; transform: rotateX(180deg)"
-          >
-            <thead>
-              <tr>
-                <th style="width: 10%" scope="">時間</th>
-                <th scope="">html</th>
-                <th scope="">css</th>
-                <th scope="">js</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                class="border-3"
-                v-for="(code, index) in data.code"
-                :key="code._id"
-              >
-                <td>{{ code.createdAt }}</td>
-                <td class="sm" v-html="code.html" style="font-size: 12px"></td>
-                <td class="sm" v-html="code.css" style="font-size: 12px"></td>
-                <td class="sm" v-html="code.js" style="font-size: 12px"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  </div>
+  <div
+    class="d-flex justify-content-center align-items-center"
+    style="height: 100vh"
+    v-else
+  >
+    <div
+      class="spinner-border text-light"
+      style="width: 4rem; height: 4rem"
+      role="status"
+    >
+      <span class="visually-hidden">Loading...</span>
     </div>
   </div>
 </template>
@@ -171,6 +190,7 @@ export default {
         classNum: "",
         examTicket: [],
       },
+      loading: false,
     };
   },
   methods: {
@@ -291,6 +311,7 @@ export default {
           };
           this.data.examTicket.push(exam);
         });
+        this.loading = true;
       })
       .catch((error) => {
         console.error(error);
