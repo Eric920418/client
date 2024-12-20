@@ -7,20 +7,21 @@
       <div class="m-1">
         <i class="fa-solid fa-comment-dots"></i> {{ this.nowModel }} Chat
       </div>
-      <div class="m-1">
+      <div v-if="!isSubmitting" class="m-1">
         <button class="btn btn-sm btn-outline-secondary mx-3" @click="back">
           返回
         </button>
-        <button
+        <!-- <button
           class="btn btn-sm btn-outline-secondary d-none"
           @click="changeModel"
         >
           切換模型
-        </button>
+        </button> -->
       </div>
     </div>
     <div v-if="!thisLog" class="log w-100" ref="log">
       <div
+        v-if="!donMove"
         class="thisLog"
         v-for="(log, index) in log"
         :key="index"
@@ -33,6 +34,7 @@
           <div>{{ log.time }}</div>
         </div>
       </div>
+      <div v-else style="background-color: yellow">等等</div>
     </div>
     <div v-else class="ch w-100" ref="chat">
       <div v-for="(message, index) in chat" :key="index">
@@ -112,6 +114,7 @@ export default {
       isSubmitting: false,
       action: [],
       nowModel: "ChatGPT",
+      donMove: false,
     };
   },
   methods: {
@@ -238,6 +241,7 @@ export default {
       });
     },
     loadingChat() {
+      this.donMove = true;
       let storedToken = localStorage.getItem("token");
       const { id } = jwtDecode(storedToken);
       this.$axios
@@ -265,6 +269,7 @@ export default {
             log._id = data._id;
             this.log.push(log);
           });
+          this.donMove = false;
         });
     },
     back() {
