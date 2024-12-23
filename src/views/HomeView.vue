@@ -2152,7 +2152,7 @@ export default {
     watchExm(index) {
       this.$swal.fire({
         title: "注意！！！",
-        text: "多多善用右邊『儲存按鈕』！！！只要開始任務沒有點擊『返回』任務列表的情況下，就算關閉任務面板依然會對程式碼、回答問題、評估反思進行覆蓋保存",
+        text: "各位同學實在非常抱歉，一直讓你們重新填寫，學長經驗不足能力不夠，導致平凡出現Bug，目前存檔問題右下角那顆按鈕已經修復，如果擔心再次發生填完拍照起來，只要資料不見，照片給我我會負責幫你們填完，真的非常抱歉！",
         icon: "info",
       });
       // this.stopTimer();
@@ -3510,6 +3510,8 @@ export default {
     },
     saveButtonThoughts() {
       if (this.NowState != 0) {
+        let storedToken = localStorage.getItem("token");
+        const { id } = jwtDecode(storedToken);
         let task = {
           thoughts: this.tasks[this.focusTaskIndex].thought,
           taskId: this.tasks[this.focusTaskIndex].taskId,
@@ -3524,6 +3526,8 @@ export default {
     },
     saveButtonAnswer() {
       if (this.NowState != 0) {
+        let storedToken = localStorage.getItem("token");
+        const { id } = jwtDecode(storedToken);
         let task = {
           answer: this.tasks[this.focusTaskIndex].answer,
           taskId: this.tasks[this.focusTaskIndex].taskId,
