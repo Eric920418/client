@@ -596,9 +596,11 @@ export default {
               studentID: student.studentID,
               task: student.Task,
               id: student._id,
+              task: student.Task,
             });
           });
           this.students = students;
+          // this.exportToExcelForClass();
         });
     },
     checkTask(task) {
@@ -824,6 +826,80 @@ export default {
 
       // 寫入檔案
       XLSX.writeFile(wb, "學生動作紀錄.xlsx");
+    },
+    exportToExcelForClass() {
+      const header = ["姓名", "學號", "步驟", "動作", "對話內容", "時間"];
+      let FilterData = [];
+
+      this.students.forEach((student) => {
+        // 每位學生的資料處理
+        const data = student.task[0].finishTime.filter(
+          (item) => item && item.actions.length > 0
+        );
+
+        const mergedFinishTimes = new Map();
+
+        data.forEach((task) => {
+          let NewActions = [];
+          task.actions.forEach((action) => {
+            let talkContent = "";
+
+            if (action.action && action.action.includes("發送問題")) {
+              const contentMatch =
+                action.action.match(/發送問題 問題內容：(.*)/);
+              if (contentMatch && contentMatch[1]) {
+                talkContent = contentMatch[1];
+                action.action = "發送問題";
+              }
+            }
+
+            NewActions.push({
+              action: action.action,
+              timestamp: action.timestamp,
+              talkContent: talkContent,
+            });
+          });
+
+          const existing = mergedFinishTimes.get(task.state) || [];
+          existing.push({
+            actions: NewActions,
+            state: task.state,
+            time: task.time,
+            name: student.name,
+            studentID: student.studentID,
+          });
+
+          mergedFinishTimes.set(task.state, existing);
+        });
+
+        // 處理 Map 的資料
+        mergedFinishTimes.forEach((tasks) => {
+          tasks.forEach((task) => {
+            if (task && task.actions) {
+              const stepData = task.actions.map((action) => [
+                task.name,
+                task.studentID,
+                task.state,
+                action.action,
+                action.talkContent,
+                action.timestamp,
+              ]);
+              FilterData.push(...stepData);
+            }
+          });
+        });
+      });
+
+      // 確保資料正確反轉
+      FilterData = FilterData.reverse();
+      // 準備匯出資料
+      const ws_data = [header, ...FilterData];
+      const ws = XLSX.utils.aoa_to_sheet(ws_data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "全班動作紀錄");
+
+      // 寫入檔案
+      XLSX.writeFile(wb, "全班動作紀錄.xlsx");
     },
   },
 
