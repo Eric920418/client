@@ -19,84 +19,73 @@ export default {
       const isStudentIDInUse = this.userLogin.some(
         (user) => user.studentID === this.studentID
       );
-      if (this.userLogin.some((user) => user === this.studentID)) {
-        this.$swal
-          .fire({
-            title: "登入失敗",
-            text: "帳號正在被使用",
-            icon: "error",
-          })
-          .then((result) => {
-            window.location.reload();
-          });
-      } else {
-        this.$axios
-          .post("/auth/login", {
-            studentID: this.studentID,
-            password: this.password,
-          })
-          .then((res) => {
-            this.token = res.data.user.token;
-            const { studentID } = jwtDecode(res.data.user.token);
-            const userLogin = JSON.stringify({
-              type: "open",
-              userId: studentID,
-            });
-            this.socket.send(userLogin);
 
-            localStorage.setItem("token", this.token);
-            localStorage.setItem("identity", res.data.user.identity);
-            localStorage.setItem("loginNumber", res.data.user.loginNumber);
-            localStorage.setItem("classNum", res.data.user.classNum);
-            this.studentID = "";
-            this.password = "";
-            var storedToken = localStorage.getItem("token");
-            var storedIdentity = localStorage.getItem("identity");
-            if (storedToken) {
-              if (storedIdentity == "admin") {
-                const jwtParts = storedToken.split(".");
-                const payload = JSON.parse(atob(jwtParts[1]));
-                this.$swal
-                  .fire({
-                    title: "登入成功",
-                    text: "老師您好",
-                    icon: "success",
-                    showCancelButton: false,
-                    confirmButtonText: "進入頁面",
-                  })
-                  .then((result) => {
-                    if (result.isConfirmed) {
-                      this.$router.push("/admin");
-                    }
-                  });
-              } else {
-                const jwtParts = storedToken.split(".");
-                const payload = JSON.parse(atob(jwtParts[1]));
-                this.$cookies.set("state", 1);
-                this.$swal
-                  .fire({
-                    title: "登入成功",
-                    text: "",
-                    icon: "success",
-                    showCancelButton: false,
-                    confirmButtonText: "進入頁面",
-                  })
-                  .then((result) => {
-                    if (result.isConfirmed) {
-                      this.$router.push("/");
-                    }
-                  });
-              }
-            }
-          })
-          .catch((err) => {
-            this.$swal.fire({
-              title: "登入失敗",
-              text: `登入失敗，請重試  ${err}`,
-              icon: "error",
-            });
+      this.$axios
+        .post("/auth/login", {
+          studentID: this.studentID,
+          password: this.password,
+        })
+        .then((res) => {
+          this.token = res.data.user.token;
+          const { studentID } = jwtDecode(res.data.user.token);
+          const userLogin = JSON.stringify({
+            type: "open",
+            userId: studentID,
           });
-      }
+          this.socket.send(userLogin);
+
+          localStorage.setItem("token", this.token);
+          localStorage.setItem("identity", res.data.user.identity);
+          localStorage.setItem("loginNumber", res.data.user.loginNumber);
+          localStorage.setItem("classNum", res.data.user.classNum);
+          this.studentID = "";
+          this.password = "";
+          var storedToken = localStorage.getItem("token");
+          var storedIdentity = localStorage.getItem("identity");
+          if (storedToken) {
+            if (storedIdentity == "admin") {
+              const jwtParts = storedToken.split(".");
+              const payload = JSON.parse(atob(jwtParts[1]));
+              this.$swal
+                .fire({
+                  title: "登入成功",
+                  text: "老師您好",
+                  icon: "success",
+                  showCancelButton: false,
+                  confirmButtonText: "進入頁面",
+                })
+                .then((result) => {
+                  if (result.isConfirmed) {
+                    this.$router.push("/admin");
+                  }
+                });
+            } else {
+              const jwtParts = storedToken.split(".");
+              const payload = JSON.parse(atob(jwtParts[1]));
+              this.$cookies.set("state", 1);
+              this.$swal
+                .fire({
+                  title: "登入成功",
+                  text: "",
+                  icon: "success",
+                  showCancelButton: false,
+                  confirmButtonText: "進入頁面",
+                })
+                .then((result) => {
+                  if (result.isConfirmed) {
+                    this.$router.push("/");
+                  }
+                });
+            }
+          }
+        })
+        .catch((err) => {
+          this.$swal.fire({
+            title: "登入失敗",
+            text: `登入失敗，請重試  ${err}`,
+            icon: "error",
+          });
+        });
     },
     signup() {
       this.$axios
