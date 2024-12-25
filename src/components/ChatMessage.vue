@@ -147,32 +147,36 @@ export default {
         try {
           let storedToken = localStorage.getItem("token");
           const { id } = jwtDecode(storedToken);
-          let chatId = this.thisLog._id;
-          const response = await this.$axios.post(
-            `/chat/${this.nowModel}`,
-            { messages: this.chat },
-            {
-              headers: {
-                Authorization: `Bearer ${storedToken}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          this.chat.push({ role: "assistant", content: response.data.ai });
-          this.$nextTick(() => {
-            this.scrollToBottom();
-          });
-          this.$refs.textarea.disabled = false;
-          this.$axios.put(
-            `/chat/dialogue/${chatId}`,
-            { dialogues: this.chat, user: id },
-            {
-              headers: {
-                Authorization: `Bearer ${storedToken}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+
+          await this.$axios
+            .post(
+              `/chat/${this.nowModel}`,
+              { messages: this.chat },
+              {
+                headers: {
+                  Authorization: `Bearer ${storedToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+            .then((response) => {
+              let chatId = this.thisLog._id;
+              this.chat.push({ role: "assistant", content: response.data.ai });
+              this.$nextTick(() => {
+                this.scrollToBottom();
+              });
+              this.$refs.textarea.disabled = false;
+              this.$axios.put(
+                `/chat/dialogue/${chatId}`,
+                { dialogues: this.chat, user: id },
+                {
+                  headers: {
+                    Authorization: `Bearer ${storedToken}`,
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+            });
         } catch (err) {
           console.error("Failed to send/receive chat:", err);
           this.chat.push({ ai: "發生錯誤" });
