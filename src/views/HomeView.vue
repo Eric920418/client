@@ -962,7 +962,6 @@
                 name=""
                 id=""
                 class="form-control"
-                @keydown="preventSpace"
                 @change="answerThought()"
                 v-model="tasks[this.focusTaskIndex].thought[1]"
               ></textarea>
@@ -976,7 +975,6 @@
                 name=""
                 id=""
                 class="form-control"
-                @keydown="preventSpace"
                 @change="answerThought()"
                 v-model="tasks[this.focusTaskIndex].thought[2]"
               ></textarea>
@@ -990,7 +988,6 @@
                 name=""
                 id=""
                 class="form-control"
-                @keydown="preventSpace"
                 @change="answerThought()"
                 v-model="tasks[this.focusTaskIndex].thought[3]"
               ></textarea>
@@ -1755,7 +1752,7 @@ export default {
       activeButton: "null",
 
       timeout: null,
-      inactivityTime: 300000,
+      inactivityTime: 600000,
 
       loading: false,
     };
@@ -4040,11 +4037,7 @@ export default {
     copyToClipboard(text) {
       navigator.clipboard.writeText(text);
     },
-    preventSpace(event) {
-      if (event.key === " ") {
-        event.preventDefault(); // 阻止輸入空白鍵
-      }
-    },
+
     answerQuestions() {
       if (this.time > 0) {
         this.action.push({

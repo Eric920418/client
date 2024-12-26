@@ -42,7 +42,7 @@
           class="m-1 d-flex justify-content-end"
           v-if="message.role === 'user'"
         >
-          <div class="user-message">{{ message.content }}</div>
+          <pre class="user-message">{{ message.content }}</pre>
         </div>
         <div
           class="m-1 d-flex justify-content-start"
@@ -118,75 +118,89 @@ export default {
     };
   },
   methods: {
-    async handleEnter() {
-      if (!this.chatOpen || this.isSubmitting) return;
-      this.isSubmitting = true;
-      if (this.que.trim() !== "") {
-        this.chat.push({ role: "user", content: this.que });
-        this.$nextTick(() => {
-          this.scrollToBottom();
-        });
-        this.$refs.textarea.disabled = true;
-        this.$refs.textarea.style.height = "30px";
-        const newAction = {
-          action: `發送問題 問題內容：${this.que}`,
-          timestamp: new Date()
-            .toLocaleString("zh-TW", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })
-            .replace(/\//g, "-")
-            .replace(",", ""),
-        };
-        this.action.push(newAction);
-        this.que = "";
-        try {
-          let storedToken = localStorage.getItem("token");
-          const { id } = jwtDecode(storedToken);
+    async handleEnter(event) {
+      // Shift + Enter：允許換行
+      if (event.key === "Enter" && event.shiftKey) {
+        return;
+      }
 
-          await this.$axios
-            .post(
-              `/chat/${this.nowModel}`,
-              { messages: this.chat },
-              {
-                headers: {
-                  Authorization: `Bearer ${storedToken}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            )
-            .then((response) => {
-              let chatId = this.thisLog._id;
-              this.chat.push({ role: "assistant", content: response.data.ai });
-              this.$nextTick(() => {
-                this.scrollToBottom();
-              });
-              this.$refs.textarea.disabled = false;
-              this.$axios.put(
-                `/chat/dialogue/${chatId}`,
-                { dialogues: this.chat, user: id },
+      // 單獨按下 Enter：執行自定義邏輯
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        if (!this.chatOpen || this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        if (this.que.trim() !== "") {
+          this.chat.push({ role: "user", content: this.que });
+          this.$nextTick(() => {
+            this.scrollToBottom();
+          });
+          this.$refs.textarea.disabled = true;
+          this.$refs.textarea.style.height = "30px";
+          const newAction = {
+            action: `發送問題 問題內容：${this.que}`,
+            timestamp: new Date()
+              .toLocaleString("zh-TW", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })
+              .replace(/\//g, "-")
+              .replace(",", ""),
+          };
+          this.action.push(newAction);
+          this.que = "";
+          try {
+            let storedToken = localStorage.getItem("token");
+            const { id } = jwtDecode(storedToken);
+
+            await this.$axios
+              .post(
+                `/chat/${this.nowModel}`,
+                { messages: this.chat },
                 {
                   headers: {
                     Authorization: `Bearer ${storedToken}`,
                     "Content-Type": "application/json",
                   },
                 }
-              );
-            });
-        } catch (err) {
-          console.error("Failed to send/receive chat:", err);
-          this.chat.push({ ai: "發生錯誤" });
-        }
+              )
+              .then((response) => {
+                let chatId = this.thisLog._id;
+                this.chat.push({
+                  role: "assistant",
+                  content: response.data.ai,
+                });
+                this.$nextTick(() => {
+                  this.scrollToBottom();
+                });
+                this.$refs.textarea.disabled = false;
+                this.$axios.put(
+                  `/chat/dialogue/${chatId}`,
+                  { dialogues: this.chat, user: id },
+                  {
+                    headers: {
+                      Authorization: `Bearer ${storedToken}`,
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+              });
+          } catch (err) {
+            console.error("Failed to send/receive chat:", err);
+            this.chat.push({ ai: "發生錯誤" });
+          }
 
-        this.$emit("update-action", this.action);
+          this.$emit("update-action", this.action);
+        }
+        this.isSubmitting = false;
+        this.chatOpen = true;
       }
-      this.isSubmitting = false;
-      this.chatOpen = true;
     },
+
     renderMessage(message) {
       const renderer = new marked.Renderer();
       renderer.code = (code, infostring, escaped) => {
